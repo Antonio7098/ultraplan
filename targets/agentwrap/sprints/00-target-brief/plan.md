@@ -1,11 +1,11 @@
 # Sprint Tracker: Target Brief and Decision Scaffold
 
-> Target: opencode-wrap
+> Target: agentwrap
 > Sprint ID: 00-target-brief
 > Created: 2026-05-18
-> Reasoning: `targets/runwrap/sprints/00-target-brief/reasoning.md`
-> Roadmap Section: `targets/runwrap/roadmap.md` - `## Sprint 0: Target Brief and Decision Scaffold`
-> Evidence Bundle: `targets/runwrap/reports/sprint-evidence/00-target-brief.txt`
+> Reasoning: `targets/agentwrap/sprints/00-target-brief/reasoning.md`
+> Roadmap Section: `targets/agentwrap/roadmap.md` - `## Sprint 0: Target Brief and Decision Scaffold`
+> Evidence Bundle: `targets/agentwrap/reports/sprint-evidence/00-target-brief.txt`
 
 ## Sprint Overview
 
@@ -16,18 +16,18 @@
 
 ## Requirement Links
 
-- `targets/runwrap/sources/PRD.md` - product summary, goals, MVP scope, non-goals, success metrics, and open product questions summarized in the target brief.
-- `targets/runwrap/sources/TRD.md` - system boundary, core technical requirements, acceptance criteria, and open technical questions summarized and carried forward.
-- `targets/runwrap/sources/feature-architecture.md` - state-first planning protocol used as a guardrail for later design decisions.
-- `targets/runwrap/roadmap.md` - Sprint 0 scope, outputs, and quality gate.
-- `targets/runwrap/sprints/00-target-brief/reasoning.md` - decision basis this tracker executes.
+- `targets/agentwrap/sources/PRD.md` - product summary, goals, MVP scope, non-goals, success metrics, and open product questions summarized in the target brief.
+- `targets/agentwrap/sources/TRD.md` - system boundary, core technical requirements, acceptance criteria, and open technical questions summarized and carried forward.
+- `targets/agentwrap/sources/feature-architecture.md` - state-first planning protocol used as a guardrail for later design decisions.
+- `targets/agentwrap/roadmap.md` - Sprint 0 scope, outputs, and quality gate.
+- `targets/agentwrap/sprints/00-target-brief/reasoning.md` - decision basis this tracker executes.
 
 ## Evidence Links
 
-- `targets/runwrap/reports/sprint-evidence/00-target-brief.txt` - generated `study evolve --top-sources 1` bundle used for planning.
-- `targets/runwrap/reports/evidence/runtime-contract.md` - supports deferring runtime/session/turn/event contract decisions while capturing them as future decision areas.
-- `targets/runwrap/reports/evidence/cli-design.md` - supports keeping CLI implementation out of Sprint 0 while retaining later thin-CLI guardrails.
-- `targets/runwrap/reports/evidence/testing-strategy.md` - supports explicit quality gates, fake-runtime/fixture expectations for later sprints, and documentation checks for this sprint.
+- `targets/agentwrap/reports/sprint-evidence/00-target-brief.txt` - generated `study evolve --top-sources 1` bundle used for planning.
+- `targets/agentwrap/reports/evidence/runtime-contract.md` - supports deferring runtime/session/turn/event contract decisions while capturing them as future decision areas.
+- `targets/agentwrap/reports/evidence/cli-design.md` - supports keeping CLI implementation out of Sprint 0 while retaining later thin-CLI guardrails.
+- `targets/agentwrap/reports/evidence/testing-strategy.md` - supports explicit quality gates, fake-runtime/fixture expectations for later sprints, and documentation checks for this sprint.
 - `studies/opencode-wrap-study/reports/final/01-runtime-contract-and-api-shape.md` - supports avoiding premature API decisions and preserving unresolved runtime-contract questions.
 - `studies/go-cli-study/reports/final/01-project-structure.md` and `studies/go-cli-study/reports/final/02-command-architecture.md` - support later CLI/package boundary concerns without deciding Sprint 0 implementation structure.
 - `studies/go-cli-study/reports/final/11-testing-strategy.md` - supports behavior-focused future testing expectations and the Sprint 0 documentation review checks.
@@ -35,7 +35,7 @@
 
 ## Sprint Goals
 
-- **Primary Goal:** Create `targets/runwrap/brief.md` and `targets/runwrap/DECISIONS.md` so future sprints have a concise target entry point and a disciplined decision record.
+- **Primary Goal:** Create `targets/agentwrap/brief.md` and `targets/agentwrap/DECISIONS.md` so future sprints have a concise target entry point and a disciplined decision record.
 - **Secondary Goals:**
   - Verify that `templates/sprint-reasoning.md` and `templates/sprint-plan.md` force requirement mapping, evidence mapping, decisions, tradeoffs, risks, quality gates, and evaluation.
   - Carry PRD/TRD open questions into the brief and decision backlog without resolving them prematurely.
@@ -43,8 +43,8 @@
 
 ## Scope
 
-- Create `targets/runwrap/brief.md` as a concise synthesis of target intent, users, goals, non-goals, MVP requirement areas, system boundary, feature-architecture guardrails, open questions, and later-sprint reminders.
-- Create `targets/runwrap/DECISIONS.md` with a lightweight decision policy, decision entry template, accepted-decision section, and open-decision backlog seeded from PRD/TRD/evidence questions.
+- Create `targets/agentwrap/brief.md` as a concise synthesis of target intent, users, goals, non-goals, MVP requirement areas, system boundary, feature-architecture guardrails, open questions, and later-sprint reminders.
+- Create `targets/agentwrap/DECISIONS.md` with a lightweight decision policy, decision entry template, accepted-decision section, and open-decision backlog seeded from PRD/TRD/evidence questions.
 - Verify the shared sprint templates are usable for later evidence-grounded sprint plans; update only if a concrete template gap is found.
 - Ensure the sprint outputs cite the PRD, TRD, feature architecture protocol, roadmap, reasoning document, and generated evidence bundle.
 
@@ -70,28 +70,28 @@
 
 - [x] **Decision 1: Keep Sprint 0 Documentation-Only**
   > **Requirement:** Roadmap Sprint 0 scope and PRD/TRD non-goals.
-  > **Evidence:** `targets/runwrap/sprints/00-target-brief/reasoning.md` Decision Area 1; runtime-contract evidence warns against premature abstraction.
+  > **Evidence:** `targets/agentwrap/sprints/00-target-brief/reasoning.md` Decision Area 1; runtime-contract evidence warns against premature abstraction.
   > **Tradeoff:** No executable progress in Sprint 0.
   > **Rejected Alternative:** Add SDK contract, module layout, or CLI skeleton now; rejected because those are later sprint scopes.
   > **Risk / Follow-up:** Future agents may see Sprint 0 as too light; mitigate by making `brief.md` and `DECISIONS.md` directly useful for Sprint 1 and Sprint 2.
 
 - [x] **Decision 2: Make The Brief A Requirement And Guardrail Synthesis**
   > **Requirement:** Later sprints must start from PRD/TRD requirements and avoid product-specific SDK scope creep.
-  > **Evidence:** `targets/runwrap/sprints/00-target-brief/reasoning.md` Decision Area 2; PRD/TRD requirement maps.
+  > **Evidence:** `targets/agentwrap/sprints/00-target-brief/reasoning.md` Decision Area 2; PRD/TRD requirement maps.
   > **Tradeoff:** Some PRD/TRD content is intentionally repeated in concise form.
   > **Rejected Alternative:** Write an architecture brief; rejected because Sprint 0 must not choose the public contract or implementation structure.
   > **Risk / Follow-up:** Brief may become stale; later sprints should update it only when target requirements or accepted decisions change.
 
 - [x] **Decision 3: Start DECISIONS.md Empty But Structured**
   > **Requirement:** Every major future decision must record requirement, evidence, tradeoff, rejected alternative, and risk/follow-up.
-  > **Evidence:** `targets/runwrap/sprints/00-target-brief/reasoning.md` Decision Area 3; planning prompt decision discipline.
+  > **Evidence:** `targets/agentwrap/sprints/00-target-brief/reasoning.md` Decision Area 3; planning prompt decision discipline.
   > **Tradeoff:** Study recommendations remain open questions until their sprint makes a decision.
   > **Rejected Alternative:** Pre-fill architecture decisions from study reports; rejected as premature.
   > **Risk / Follow-up:** Decision backlog can grow; later sprints should close or update entries when evidence is sufficient.
 
 - [x] **Decision 4: Verify Shared Templates Instead Of Forking Them**
   > **Requirement:** Roadmap says to use shared sprint-reasoning and sprint-plan templates that force requirement/evidence mapping and evaluation.
-  > **Evidence:** `targets/runwrap/sprints/00-target-brief/reasoning.md` Decision Area 4; testing-strategy evidence emphasizes quality gates and behavior-focused evidence.
+  > **Evidence:** `targets/agentwrap/sprints/00-target-brief/reasoning.md` Decision Area 4; testing-strategy evidence emphasizes quality gates and behavior-focused evidence.
   > **Tradeoff:** Shared templates may be verbose for small sprints.
   > **Rejected Alternative:** Create target-specific templates; rejected because no concrete gap requires process divergence.
   > **Risk / Follow-up:** If implementation agents find a real template gap, record it and update shared templates with evidence.
@@ -99,14 +99,14 @@
 ## Execution Checklist
 
 - [x] **Task 1: Create Target Brief**
-  > *Description: Write `targets/runwrap/brief.md` as a concise, source-grounded planning entry point.*
+  > *Description: Write `targets/agentwrap/brief.md` as a concise, source-grounded planning entry point.*
   - [x] **Sub-task 1.1:** Summarize target intent, users, product goals, MVP surface, non-goals, and success metrics from the PRD.
   - [x] **Sub-task 1.2:** Summarize technical boundary, requirement areas, acceptance criteria, and open technical questions from the TRD.
   - [x] **Sub-task 1.3:** Add feature-architecture guardrails: behavior first, state boundaries, linear flow, runtime versus logic versus infra, and earned abstractions.
   - [x] **Sub-task 1.4:** Add Sprint 0 and later-sprint guardrails: no workflow complexity before runtime primitives are testable, no product-specific UltraPlan logic in the SDK, and no architecture decisions without evidence.
 
 - [x] **Task 2: Create Decision Log Scaffold**
-  > *Description: Write `targets/runwrap/DECISIONS.md` so future decisions are auditable and open questions remain visible.*
+  > *Description: Write `targets/agentwrap/DECISIONS.md` so future decisions are auditable and open questions remain visible.*
   - [x] **Sub-task 2.1:** Add a decision policy requiring requirement source, evidence source, tradeoff, rejected alternative, risk/follow-up, status, and date.
   - [x] **Sub-task 2.2:** Add an accepted-decisions section with no speculative accepted architecture decisions.
   - [x] **Sub-task 2.3:** Add an open-decision backlog seeded from PRD/TRD/evidence questions: primitive boundary, workflow composition, event compatibility, schema/validation strategy, metadata requirements, session retention, output expectations, and repair behavior.
@@ -154,9 +154,9 @@
 
 ## Success Criteria
 
-- [x] **Success Criteria 1:** `targets/runwrap/brief.md` exists and concisely summarizes PRD/TRD intent, scope, non-goals, technical requirement areas, acceptance criteria, guardrails, and open questions.
-- [x] **Success Criteria 2:** `targets/runwrap/DECISIONS.md` exists with a reusable decision template, accepted-decision area, and open-decision backlog, without speculative accepted implementation decisions.
-- [x] **Success Criteria 3:** Sprint 0 documents cite `targets/runwrap/reports/sprint-evidence/00-target-brief.txt` and the relevant PRD/TRD/roadmap/template sources.
+- [x] **Success Criteria 1:** `targets/agentwrap/brief.md` exists and concisely summarizes PRD/TRD intent, scope, non-goals, technical requirement areas, acceptance criteria, guardrails, and open questions.
+- [x] **Success Criteria 2:** `targets/agentwrap/DECISIONS.md` exists with a reusable decision template, accepted-decision area, and open-decision backlog, without speculative accepted implementation decisions.
+- [x] **Success Criteria 3:** Sprint 0 documents cite `targets/agentwrap/reports/sprint-evidence/00-target-brief.txt` and the relevant PRD/TRD/roadmap/template sources.
 - [x] **Success Criteria 4:** No implementation code, module skeleton, CLI command, runtime adapter, fake runtime, fixture, or runtime test is added in Sprint 0.
 - [x] **Success Criteria 5:** A future Sprint 1 planner can use the brief, decision log, roadmap, and evidence bundle without rereading every study report.
 
@@ -174,13 +174,13 @@
 
 ## Execution Evidence
 
-- Generated evidence bundle already exists: `targets/runwrap/reports/sprint-evidence/00-target-brief.txt`.
-- Sprint reasoning completed before tracker: `targets/runwrap/sprints/00-target-brief/reasoning.md`.
-- Created `targets/runwrap/brief.md` as the concise target planning entry point, citing PRD, TRD, feature architecture protocol, roadmap, Sprint 0 reasoning, and Sprint 0 evidence bundle.
-- Created `targets/runwrap/DECISIONS.md` with a decision policy, reusable entry template, empty accepted-decision section, and open-decision backlog.
+- Generated evidence bundle already exists: `targets/agentwrap/reports/sprint-evidence/00-target-brief.txt`.
+- Sprint reasoning completed before tracker: `targets/agentwrap/sprints/00-target-brief/reasoning.md`.
+- Created `targets/agentwrap/brief.md` as the concise target planning entry point, citing PRD, TRD, feature architecture protocol, roadmap, Sprint 0 reasoning, and Sprint 0 evidence bundle.
+- Created `targets/agentwrap/DECISIONS.md` with a decision policy, reusable entry template, empty accepted-decision section, and open-decision backlog.
 - Verified `templates/sprint-reasoning.md` includes target sources, evidence basis, requirement map, decision analysis, tradeoffs, assumptions, risks, evidence review checklist, and phase exit criteria. No template edit needed.
 - Verified `templates/sprint-plan.md` includes reasoning citation, evidence links, decisions, execution checklist, testing/documentation checklist, risks, open questions, success criteria, study evaluation, review sign-off, and execution evidence. No template edit needed.
-- Documentation review command: `rg -n "\[[^]]+\]|TODO|TBD|Insert|placeholder|\[target|\[Sprint|\[Name|Not completed|Not Started" targets/runwrap/brief.md targets/runwrap/DECISIONS.md targets/runwrap/sprints/00-target-brief/plan.md`. Initial hit found only planned tracker checkboxes/status and the decision-log template placeholders; template placeholders were replaced with descriptive fields before final review.
-- Scope review command: `find targets/runwrap -maxdepth 2 -type f | sort`. Sprint 0 added only target-level markdown docs; no SDK code, module skeleton, CLI code, tests, harness, or fixtures were added by this sprint.
-- Git review command: `git status --short`. Existing unrelated modified files and untracked sprint/evidence files were present before final review; Sprint 0 implementation touched only `targets/runwrap/brief.md`, `targets/runwrap/DECISIONS.md`, and this tracker.
+- Documentation review command: `rg -n "\[[^]]+\]|TODO|TBD|Insert|placeholder|\[target|\[Sprint|\[Name|Not completed|Not Started" targets/agentwrap/brief.md targets/agentwrap/DECISIONS.md targets/agentwrap/sprints/00-target-brief/plan.md`. Initial hit found only planned tracker checkboxes/status and the decision-log template placeholders; template placeholders were replaced with descriptive fields before final review.
+- Scope review command: `find targets/agentwrap -maxdepth 2 -type f | sort`. Sprint 0 added only target-level markdown docs; no SDK code, module skeleton, CLI code, tests, harness, or fixtures were added by this sprint.
+- Git review command: `git status --short`. Existing unrelated modified files and untracked sprint/evidence files were present before final review; Sprint 0 implementation touched only `targets/agentwrap/brief.md`, `targets/agentwrap/DECISIONS.md`, and this tracker.
 - Explicit test deferrals: unit, fixture, integration, and real runtime smoke tests are not applicable because Sprint 0 is documentation-only and does not launch or wrap OpenCode.

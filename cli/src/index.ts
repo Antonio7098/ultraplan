@@ -35,13 +35,15 @@ interface Config {
   defaultTimeoutMs: number
   sprintPlanningModel: string
   sprintPlanningContextWindow: number
+  sprintExecutionModel: string
+  sprintExecutionVariant: string
 }
 
 function loadConfig(): Config {
   try {
     return JSON.parse(readFileSync(join(ULTRAPLAN_ROOT, "config.json"), "utf-8"))
   } catch {
-    return { defaultModel: "minimax-coding-plan/MiniMax-M2.7", primaryModel: "minimax-coding-plan/MiniMax-M2.7", backupModel: "opencode/deepseek-v4-flash-free", defaultVariant: "high", defaultParallel: 3, defaultTimeoutMs: 1800000, sprintPlanningModel: "openai/gpt-5.5", sprintPlanningContextWindow: 1000000 }
+    return { defaultModel: "minimax-coding-plan/MiniMax-M2.7", primaryModel: "minimax-coding-plan/MiniMax-M2.7", backupModel: "opencode/deepseek-v4-flash-free", defaultVariant: "high", defaultParallel: 3, defaultTimeoutMs: 1800000, sprintPlanningModel: "openai/gpt-5.5", sprintPlanningContextWindow: 1000000, sprintExecutionModel: "openai/gpt-5.5", sprintExecutionVariant: "low" }
   }
 }
 
@@ -562,7 +564,8 @@ function cmdList(ROOT: string): void {
   console.log("  study <study-name> status")
   console.log("  study <study-name> list")
   console.log("  study code [--output <file>] <@report-file>...")
-  console.log("  study sprint-plan <target> <sprint-slug> [options]\n")
+  console.log("  study sprint-plan <target> <sprint-slug> [options]")
+  console.log("  study execute-sprint <target> <sprint-slug> [options]\n")
 }
 
 async function cmdRun(ROOT: string, dimensionRef: string, sourceRef: string, opts: { model?: string; variant?: string; dryRun?: boolean; timeoutMs?: number; primaryModel: string; backupModel: string }) {
@@ -1175,6 +1178,80 @@ async function cmdPlanSprint(
   }
 }
 
+async function cmdExecuteSprint(
+  target: string,
+  sprintSlug: string,
+  opts: {
+    model?: string
+    variant?: string
+    dryRun?: boolean
+    timeoutMs?: number
+  }
+) {
+  const targetDir = join(ULTRAPLAN_ROOT, "targets", target)
+  if (!existsSync(targetDir)) {
+    console.error(`\nError: Target "${target}" not found at targets/${target}`)
+    process.exit(1)
+  }
+
+  const sprintDir = join(targetDir, "sprints", sprintSlug)
+  const planPath = join(sprintDir, "plan.md")
+  const reasoningPath = join(sprintDir, "reasoning.md")
+  const bundlePath = join(targetDir, "reports", "sprint-evidence", `${sprintSlug}.txt`)
+
+  const missing: string[] = []
+  if (!existsSync(planPath)) missing.push(planPath)
+  if (!existsSync(reasoningPath)) missing.push(reasoningPath)
+  if (!existsSync(bundlePath)) missing.push(bundlePath)
+
+  if (missing.length > 0) {
+    console.error(`\nError: Cannot execute sprint "${sprintSlug}" for target "${target}". Missing required planning artefacts:\n`)
+    for (const p of missing) {
+      console.error(`  ✗ ${p}`)
+    }
+    console.error(`\n  Run 'study sprint-plan ${target} ${sprintSlug}' to generate the missing artefacts.\n`)
+    process.exit(1)
+  }
+
+  const promptPath = join(ULTRAPLAN_ROOT, "prompts", "execute-sprint.md")
+  if (!existsSync(promptPath)) {
+    console.error(`\nError: Sprint execution prompt not found at prompts/execute-sprint.md`)
+    process.exit(1)
+  }
+
+  let prompt = readFileSync(promptPath, "utf-8")
+  prompt = prompt.replace(/\{target\}/g, target).replace(/\{sprint-slug\}/g, sprintSlug)
+
+  const outputFile = planPath
+
+  if (opts.dryRun) {
+    console.log(`\n=== DRY RUN: execute-sprint ${target} ${sprintSlug} ===\n`)
+    console.log(`Prompt file: ${promptPath}`)
+    console.log(`Output file: ${outputFile}`)
+    console.log(`Model: ${opts.model || "sprintExecutionModel"}`)
+    console.log(`Evidence bundle: ${bundlePath}`)
+    console.log("")
+    return
+  }
+
+  console.log(`\n▶ Executing sprint ${sprintSlug} for target ${target}...\n`)
+
+  const { code } = await runOpenCode(prompt, ULTRAPLAN_ROOT, {
+    model: opts.model,
+    variant: opts.variant,
+    timeoutMs: opts.timeoutMs,
+    primaryModel: opts.model || "",
+    backupModel: "",
+  })
+
+  if (code === 0) {
+    console.log(`\n✓ Sprint execution complete: ${outputFile}`)
+  } else {
+    console.error(`\n✗ Sprint execution failed (exit code ${code})`)
+    process.exit(code)
+  }
+}
+
 function generateSummary(ROOT: string): void {
   const summaryFile = join(ROOT, "summary.csv")
   const sources = discoverSources(ROOT)
@@ -1232,7 +1309,8 @@ function cmdListStudies(): void {
   console.log("       study code [--output <file>] <@report-file>...")
   console.log("       study evolve [--top-sources <N>] [--output <file>] [--no-code] <@evidence-report>...")
   console.log("       study sprint-plan <target> <sprint-slug> [options]")
-  console.log("       study sprint-plan --help\n")
+  console.log("       study execute-sprint <target> <sprint-slug> [options]")
+  console.log("       study execute-sprint --help\n")
 }
 
 function cmdCode(args: string[], ultraplanRoot: string): void {
@@ -1327,6 +1405,26 @@ async function main() {
     const timeoutIdx = sprArgs.indexOf("--timeout")
     const timeout = timeoutIdx >= 0 ? parseInt(sprArgs[timeoutIdx + 1], 10) : CONFIG.defaultTimeoutMs
     await cmdPlanSprint(target, sprintSlug, { model, variant, dryRun, timeoutMs: timeout, contextWindow: CONFIG.sprintPlanningContextWindow })
+    process.exit(0)
+  }
+
+  if (args[0] === "execute-sprint") {
+    const execArgs = args.slice(1)
+    if (execArgs.length < 2) {
+      console.error("Usage: study execute-sprint <target> <sprint-slug> [--model <model>] [--variant <variant>] [--dry-run] [--timeout <ms>]")
+      process.exit(1)
+    }
+    const CONFIG = loadConfig()
+    const target = execArgs[0]
+    const sprintSlug = execArgs[1]
+    const modelIdx = execArgs.indexOf("--model")
+    const model = modelIdx >= 0 ? execArgs[modelIdx + 1] : CONFIG.sprintExecutionModel
+    const variantIdx = execArgs.indexOf("--variant")
+    const variant = variantIdx >= 0 ? execArgs[variantIdx + 1] : CONFIG.sprintExecutionVariant
+    const dryRun = execArgs.includes("--dry-run")
+    const timeoutIdx = execArgs.indexOf("--timeout")
+    const timeout = timeoutIdx >= 0 ? parseInt(execArgs[timeoutIdx + 1], 10) : CONFIG.defaultTimeoutMs
+    await cmdExecuteSprint(target, sprintSlug, { model, variant, dryRun, timeoutMs: timeout })
     process.exit(0)
   }
 

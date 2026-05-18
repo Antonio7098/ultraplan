@@ -1,37 +1,37 @@
 # Sprint Reasoning: Target Brief and Decision Scaffold
 
-> Target: opencode-wrap
+> Target: agentwrap
 > Sprint ID: 00-target-brief
-> Output: `targets/opencode-wrap/sprints/00-target-brief/reasoning.md`
-> Sprint Tracker: `targets/opencode-wrap/sprints/00-target-brief/plan.md`
-> Evidence Bundle: `targets/opencode-wrap/reports/sprint-evidence/00-target-brief.txt`
+> Output: `targets/agentwrap/sprints/00-target-brief/reasoning.md`
+> Sprint Tracker: `targets/agentwrap/sprints/00-target-brief/plan.md`
+> Evidence Bundle: `targets/agentwrap/reports/sprint-evidence/00-target-brief.txt`
 
 ## Overview
 
 **Sprint:** Target Brief and Decision Scaffold
 **Purpose:** Create the planning surface needed for later implementation sprints without selecting runtime architecture prematurely.
-**Roadmap Section:** `targets/opencode-wrap/roadmap.md` - `## Sprint 0: Target Brief and Decision Scaffold`
+**Roadmap Section:** `targets/agentwrap/roadmap.md` - `## Sprint 0: Target Brief and Decision Scaffold`
 **Depends On:** None
 **Reasoning Status:** Ready For Tracker
 
 ## Target Sources
 
-- `targets/opencode-wrap/sources/PRD.md` - product goals, non-goals, MVP boundaries, output safety, observability, and open product questions used to constrain the brief and decision log.
-- `targets/opencode-wrap/sources/TRD.md` - technical requirements, system boundary, acceptance criteria, and open technical questions used to define what must be captured but not yet designed.
-- `targets/opencode-wrap/sources/feature-architecture.md` - state-first design protocol used to keep Sprint 0 focused on behavior, state, flow, ownership, and earned abstractions rather than premature architecture.
-- `targets/opencode-wrap/roadmap.md` - Sprint 0 scope, output paths, quality gate, and non-negotiable development rules.
+- `targets/agentwrap/sources/PRD.md` - product goals, non-goals, MVP boundaries, output safety, observability, and open product questions used to constrain the brief and decision log.
+- `targets/agentwrap/sources/TRD.md` - technical requirements, system boundary, acceptance criteria, and open technical questions used to define what must be captured but not yet designed.
+- `targets/agentwrap/sources/feature-architecture.md` - state-first design protocol used to keep Sprint 0 focused on behavior, state, flow, ownership, and earned abstractions rather than premature architecture.
+- `targets/agentwrap/roadmap.md` - Sprint 0 scope, output paths, quality gate, and non-negotiable development rules.
 
 ## Evidence Basis
 
-**Evidence Bundle:** `targets/opencode-wrap/reports/sprint-evidence/00-target-brief.txt`
+**Evidence Bundle:** `targets/agentwrap/reports/sprint-evidence/00-target-brief.txt`
 **Evidence Status:** Complete and used
 **Context Strategy:** Staged loading used. The bundle is 40,888 lines and about 430,979 estimated tokens, so the planning pass loaded the required PRD, TRD, feature architecture protocol, roadmap Sprint 0 section, evidence pack sections, relevant final report sections, the highest-value runtime-contract per-source report section, and selected resolved code references where they clarified why decisions must remain deferred.
 
 ### Evidence Packs Used
 
-- `targets/opencode-wrap/reports/evidence/runtime-contract.md` - informs which runtime primitives must be documented as requirements or open questions, not implemented or finalized in Sprint 0.
-- `targets/opencode-wrap/reports/evidence/cli-design.md` - informs the later CLI direction and supports keeping command/runtime behavior outside Sprint 0.
-- `targets/opencode-wrap/reports/evidence/testing-strategy.md` - informs quality gates for later sprints and the need for explicit test evidence expectations in templates and plans.
+- `targets/agentwrap/reports/evidence/runtime-contract.md` - informs which runtime primitives must be documented as requirements or open questions, not implemented or finalized in Sprint 0.
+- `targets/agentwrap/reports/evidence/cli-design.md` - informs the later CLI direction and supports keeping command/runtime behavior outside Sprint 0.
+- `targets/agentwrap/reports/evidence/testing-strategy.md` - informs quality gates for later sprints and the need for explicit test evidence expectations in templates and plans.
 
 ### Final Reports Used
 
@@ -248,7 +248,7 @@
 
 **Options Considered**
 - **Option A:** Verify and use the existing sprint reasoning and sprint plan templates, updating them only if they fail Sprint 0 quality needs.
-- **Option B:** Rewrite templates specifically for `opencode-wrap`.
+- **Option B:** Rewrite templates specifically for `agentwrap`.
 - **Option C:** Let each later sprint invent its own plan format.
 
 **Chosen Approach**
@@ -300,7 +300,7 @@
 
 ### Dependencies
 
-- `targets/opencode-wrap/reports/sprint-evidence/00-target-brief.txt`: Must remain available as the evidence source of truth for Sprint 0.
+- `targets/agentwrap/reports/sprint-evidence/00-target-brief.txt`: Must remain available as the evidence source of truth for Sprint 0.
 - `templates/sprint-reasoning.md` and `templates/sprint-plan.md`: Must remain available as the shared planning formats.
 - Later Sprint 1 and Sprint 2 plans: Depend on Sprint 0 brief and decision scaffold being accurate and non-speculative.
 
@@ -313,7 +313,7 @@
 
 ## Tracker Guidance
 
-Use this reasoning to write `targets/opencode-wrap/sprints/00-target-brief/plan.md`.
+Use this reasoning to write `targets/agentwrap/sprints/00-target-brief/plan.md`.
 
 The tracker must include:
 
@@ -348,7 +348,7 @@ The tracker must include:
 
 ## Documentation Updates
 
-- `targets/opencode-wrap/brief.md`: Must be created in Sprint 0 so later implementation agents have a concise target entry point.
-- `targets/opencode-wrap/DECISIONS.md`: Must be created in Sprint 0 so later implementation decisions are recorded with requirement and evidence traceability.
+- `targets/agentwrap/brief.md`: Must be created in Sprint 0 so later implementation agents have a concise target entry point.
+- `targets/agentwrap/DECISIONS.md`: Must be created in Sprint 0 so later implementation decisions are recorded with requirement and evidence traceability.
 - `templates/sprint-reasoning.md`: Must be verified for continued suitability; update only if Sprint 0 execution finds a concrete gap.
 - `templates/sprint-plan.md`: Must be verified for continued suitability; update only if Sprint 0 execution finds a concrete gap.

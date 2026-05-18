@@ -1,6 +1,6 @@
 ════════════════════════════════════════════════════════
 Evidence Pack: cli-design
-File: /home/antonioborgerees/coding/ultraplan/targets/opencode-wrap/reports/evidence/cli-design.md
+File: /home/antonioborgerees/coding/ultraplan/targets/agentwrap/reports/evidence/cli-design.md
 ════════════════════════════════════════════════════════
 
 # Evidence Pack: CLI Design
@@ -50,7 +50,7 @@ Supporting:
 
 ════════════════════════════════════════════════════════
 Evidence Pack: testing-strategy
-File: /home/antonioborgerees/coding/ultraplan/targets/opencode-wrap/reports/evidence/testing-strategy.md
+File: /home/antonioborgerees/coding/ultraplan/targets/agentwrap/reports/evidence/testing-strategy.md
 ════════════════════════════════════════════════════════
 
 # Evidence Pack: Testing Strategy

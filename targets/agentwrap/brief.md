@@ -1,10 +1,13 @@
-# Target Brief: opencode-wrap
+# Target Brief: agentwrap
 
-> Sources: `targets/runwrap/sources/PRD.md`, `targets/runwrap/sources/TRD.md`, `targets/runwrap/sources/feature-architecture.md`, `targets/runwrap/roadmap.md`, `targets/runwrap/sprints/00-target-brief/reasoning.md`, `targets/runwrap/reports/sprint-evidence/00-target-brief.txt`
+> Sources: `targets/agentwrap/sources/PRD.md`, `targets/agentwrap/sources/TRD.md`, `targets/agentwrap/sources/feature-architecture.md`, `targets/agentwrap/roadmap.md`, `targets/agentwrap/sprints/00-target-brief/reasoning.md`, `targets/agentwrap/reports/sprint-evidence/00-target-brief.txt`
+> Implementation: `/home/antonioborgerees/coding/agentwrap`
 
 ## Purpose
 
 Build a reusable runtime wrapper SDK for starting, supervising, observing, cancelling, validating, and recovering agentic coding runtime work from product workflows. OpenCode is the first supported runtime, but the SDK must stay product-agnostic and runtime-neutral enough to support later runtimes such as Codex, Claude Code, Pi, ACP-compatible agents, and direct provider workers.
+
+The reused Go CLI study material is internal evidence about boundaries, dependency injection, IO handling, and testing discipline. It does not mean this target is becoming a CLI product.
 
 The SDK is a foundational primitive for UltraPlan, 24-hour-testers, and future tools. Product callers should not need to understand each runtime's native process model, event format, provider setup, permission behavior, output truncation behavior, or failure modes.
 
@@ -88,10 +91,10 @@ Sprint 0 does not implement these capabilities. It records them as requirements 
 - Sprint 2 must earn the public runtime contract from runtime/session/event requirements and evidence; Sprint 0 does not choose the smallest primitive.
 - Sprint 3 and later adapter work must use structured OpenCode output and preserve native payloads where safe.
 - Runtime primitives must stay separate from UltraPlan workflow/DAG composition.
-- CLI code should remain thin; runtime behavior belongs behind SDK primitives.
+- CLI-oriented study material is evidence about internals only, not a commitment to ship a CLI surface here.
 - Use fake runtimes and fixtures before trusting real OpenCode runs.
 - Treat runtime exit success as insufficient; product success requires validation.
-- Record major decisions in `targets/runwrap/DECISIONS.md` with requirement, evidence, tradeoff, rejected alternative, risk/follow-up, status, and date.
+- Record major decisions in `targets/agentwrap/DECISIONS.md` with requirement, evidence, tradeoff, rejected alternative, risk/follow-up, status, and date.
 
 ## Open Questions To Carry Forward
 

@@ -6,5 +6,7 @@
   "defaultParallel": 3,
   "defaultTimeoutMs": 1800000,
   "sprintPlanningModel": "openai/gpt-5.5",
-  "sprintPlanningContextWindow": 1000000
+  "sprintPlanningContextWindow": 1000000,
+  "sprintExecutionModel": "openai/gpt-5.5",
+  "sprintExecutionVariant": "low"
 }

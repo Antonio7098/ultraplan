@@ -1,6 +1,6 @@
-# Decision Log: opencode-wrap
+# Decision Log: agentwrap
 
-> Sources: `targets/runwrap/sources/PRD.md`, `targets/runwrap/sources/TRD.md`, `targets/runwrap/sources/feature-architecture.md`, `targets/runwrap/roadmap.md`, `targets/runwrap/sprints/00-target-brief/reasoning.md`, `targets/runwrap/reports/sprint-evidence/00-target-brief.txt`
+> Sources: `targets/agentwrap/sources/PRD.md`, `targets/agentwrap/sources/TRD.md`, `targets/agentwrap/sources/feature-architecture.md`, `targets/agentwrap/roadmap.md`, `targets/agentwrap/sprints/00-target-brief/reasoning.md`, `targets/agentwrap/reports/sprint-evidence/00-target-brief.txt`
 
 ## Policy
 
@@ -38,9 +38,41 @@ Do not convert study recommendations into accepted architecture decisions until 
 
 ## Accepted Decisions
 
-No accepted implementation or architecture decisions yet.
+### DEC-001: Root SDK Package With Thin CLI Entrypoint
 
-Sprint 0 creates the target brief and this decision scaffold only. Runtime primitives, package layout, event schema, persistence, CLI shape, validation technology, and OpenCode adapter behavior remain undecided until later evidence-backed sprints.
+- **Status:** Accepted
+- **Date:** 2026-05-18
+- **Sprint:** `targets/agentwrap/sprints/01-project-skeleton/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` product goals and non-goals; `targets/agentwrap/sources/TRD.md` system boundary; `targets/agentwrap/roadmap.md` Sprint 1 scope.
+- **Evidence Source:** `targets/agentwrap/reports/sprint-evidence/01-project-skeleton.txt`; `studies/go-cli-study/reports/final/01-project-structure.md`; implementation in `/home/antonioborgerees/coding/agentwrap`.
+- **Decision:** Use one Go module with the root package reserved for public SDK documentation and future public contracts, `cmd/agentwrap` as the executable composition root, and `internal/` for private CLI and test harness code.
+- **Tradeoff:** The root package exists before public runtime/session/event contracts are implemented.
+- **Rejected Alternatives:** `pkg/agentwrap` was rejected because it adds path stutter before multiple public packages exist. Keeping all code under `internal/` was rejected because the product is an SDK, not only a CLI.
+- **Risk / Follow-up:** Keep the root package minimal until Sprint 2 defines the public contract.
+
+### DEC-002: Framework-Neutral CLI Skeleton With Injected IO
+
+- **Status:** Accepted
+- **Date:** 2026-05-18
+- **Sprint:** `targets/agentwrap/sprints/01-project-skeleton/plan.md`
+- **Requirement Source:** `targets/agentwrap/roadmap.md` Sprint 1 quality gate and CLI thinness rule.
+- **Evidence Source:** `targets/agentwrap/reports/sprint-evidence/01-project-skeleton.txt`; `studies/go-cli-study/reports/final/02-command-architecture.md`; `studies/go-cli-study/reports/final/03-dependency-injection.md`; `studies/go-cli-study/reports/final/06-io-abstraction.md`; implementation in `internal/cli`.
+- **Decision:** Keep the Sprint 1 CLI framework-neutral. `cmd/agentwrap/main.go` wires process args and IO, while `internal/cli.Run` accepts explicit dependencies and returns an exit code.
+- **Tradeoff:** Sprint 9 may later refactor to Cobra or another framework if the real command surface earns it.
+- **Rejected Alternatives:** Cobra was rejected as premature for a skeleton with no product command tree. Argument handling directly in `main.go` was rejected because it weakens in-process tests.
+- **Risk / Follow-up:** Reopen the CLI framework choice in Sprint 9.
+
+### DEC-003: Private Structured Fixture And Fake Lifecycle Harness
+
+- **Status:** Accepted
+- **Date:** 2026-05-18
+- **Sprint:** `targets/agentwrap/sprints/01-project-skeleton/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` structured event requirement; `targets/agentwrap/sources/TRD.md` structured runtime events; `targets/agentwrap/roadmap.md` Sprint 1 fake runtime fixtures.
+- **Evidence Source:** `targets/agentwrap/reports/sprint-evidence/01-project-skeleton.txt`; `targets/agentwrap/reports/evidence/testing-strategy.md`; implementation in `internal/testkit`.
+- **Decision:** Use private JSONL structured fixtures and a private harness-local lifecycle runner under `internal/testkit`; preserve raw records and decode errors.
+- **Tradeoff:** Sprint 2 may replace or adapt test helper concepts when it defines public lifecycle and event contracts.
+- **Rejected Alternatives:** Terminal transcript fixtures were rejected because structured runtime output is required. A public fake runtime contract was rejected as Sprint 2 scope.
+- **Risk / Follow-up:** Sprint 3 should add representative OpenCode structured fixtures and revisit fixture shape.
 
 ## Superseded Decisions
 
@@ -61,7 +93,7 @@ None.
 | Repair behavior | How should repair attempts balance automated recovery, retained context, bounded attempts, and explicit user visibility? | PRD graceful degradation and repair questions; TRD repair and reprompt | `validation-repair.md`, `session-lifecycle.md`, policy tests | Sprint 7 |
 | Decode failures | What is the default policy when structured event decoding fails mid-run? | TRD structured runtime events and error model | OpenCode event fixtures, malformed-event tests | Sprint 3 |
 | Persistence backend boundary | What persistence model should the SDK expose without prescribing a product storage engine? | TRD persistence requirements | `observability-metadata.md`, fake persistence hooks, integration findings | Sprint 8 |
-| CLI shape | What command hierarchy and command framework, if any, should expose runtime SDK behavior? | Roadmap Sprint 9; PRD product goals | `cli-design.md`, project skeleton and command architecture evidence | Sprint 1, Sprint 9 |
+| CLI shape | Should this target expose any CLI surface at all, or keep CLI material as internal study evidence only? | User clarification; PRD product goals; TRD system boundary | `go-cli-study` final reports, internal-engineering target docs, future scope decisions | Deferred / likely never |
 | Configuration precedence | How should runtime defaults, caller-provided values, environment, and optional config files combine? | TRD configuration requirements | configuration management evidence and project skeleton findings | Sprint 5 |
 | Concurrency limits | How should caller-defined concurrency limits and shared runtime/provider limits be represented? | TRD concurrency and rate-limit requirements | resilience and observability evidence, fake runtime stress tests | Sprint 6 |
 | Security and permissions | How should permissions, sandbox constraints, secret masking, and non-interactive operation be modeled? | TRD permissions, sandboxing, and security requirements | security evidence, OpenCode adapter permission behavior | Sprint 3, Sprint 5 |

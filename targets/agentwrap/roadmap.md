@@ -1,8 +1,10 @@
-# Roadmap: opencode-wrap
+# Roadmap: agentwrap
 
 ## Roadmap Intent
 
-Build the runtime wrapper SDK and CLI incrementally from the foundations upward. Each sprint should produce a small, reviewable layer that can be evaluated against the relevant study reports before the next layer starts.
+Build the runtime wrapper SDK incrementally from the foundations upward. Each sprint should produce a small, reviewable layer that can be evaluated against the relevant study reports before the next layer starts.
+
+The reused Go CLI study material in this target is internal evidence about internals, boundaries, dependency injection, IO handling, and testing discipline. It is not a directive to ship a CLI product.
 
 The guiding rule is: do not add workflow complexity until the lower-level runtime primitive is demonstrably correct, testable, observable, and hard to misuse.
 
@@ -10,20 +12,19 @@ The guiding rule is: do not add workflow complexity until the lower-level runtim
 
 Target requirements:
 
-- `targets/runwrap/sources/PRD.md`
-- `targets/runwrap/sources/TRD.md`
-- `targets/runwrap/sources/feature-architecture.md`
+- `targets/agentwrap/sources/PRD.md`
+- `targets/agentwrap/sources/TRD.md`
+- `targets/agentwrap/sources/feature-architecture.md`
 
 Compression layer:
 
-- `targets/runwrap/reports/study-index.md`
-- `targets/runwrap/reports/evidence/runtime-contract.md`
-- `targets/runwrap/reports/evidence/session-lifecycle.md`
-- `targets/runwrap/reports/evidence/resilience-policies.md`
-- `targets/runwrap/reports/evidence/validation-repair.md`
-- `targets/runwrap/reports/evidence/observability-metadata.md`
-- `targets/runwrap/reports/evidence/cli-design.md`
-- `targets/runwrap/reports/evidence/testing-strategy.md`
+- `targets/agentwrap/reports/study-index.md`
+- `targets/agentwrap/reports/evidence/runtime-contract.md`
+- `targets/agentwrap/reports/evidence/session-lifecycle.md`
+- `targets/agentwrap/reports/evidence/resilience-policies.md`
+- `targets/agentwrap/reports/evidence/validation-repair.md`
+- `targets/agentwrap/reports/evidence/observability-metadata.md`
+- `targets/agentwrap/reports/evidence/testing-strategy.md`
 
 Primary study dimensions:
 
@@ -32,7 +33,7 @@ Primary study dimensions:
 - Resilience, fallback, and validation
 - Workflow composition and observability
 
-Supporting Go CLI dimensions:
+Supporting Go internals/principles dimensions:
 
 - Project structure and boundaries
 - Command architecture
@@ -54,7 +55,7 @@ Supporting Go CLI dimensions:
 
 The evidence packs are selectors, not the full planning context.
 
-For sprint planning, run `study evolve` on the sprint's evidence packs and write the result to `targets/runwrap/reports/sprint-evidence/`. The command expands each pack into a large planning bundle:
+For sprint planning, run `study evolve` on the sprint's evidence packs and write the result to `targets/agentwrap/reports/sprint-evidence/`. The command expands each pack into a large planning bundle:
 
 - the evidence pack content
 - every linked final report from `## Source Reports`
@@ -68,18 +69,18 @@ Sprint evidence bundle commands:
 
 | Sprint | Command |
 | --- | --- |
-| 0 Target Brief and Decision Scaffold | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/00-target-brief.txt @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 1 Project Skeleton and Test Harness | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/01-project-skeleton.txt @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 2 Core Runtime Contract | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/02-core-runtime-contract.txt @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 3 OpenCode Structured Event Adapter | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/03-opencode-adapter.txt @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 4 Lifecycle, Cancellation, Cleanup, and Retained Sessions | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/04-lifecycle-sessions.txt @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/observability-metadata.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 5 Health Checks and Configuration Validation | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/05-health-config.txt @targets/runwrap/reports/evidence/resilience-policies.md @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 6 Retry, Backoff, Fallback, and Rate Limits | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/06-resilience-policies.txt @targets/runwrap/reports/evidence/resilience-policies.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/observability-metadata.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 7 Output Validation and Repair | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/07-validation-repair.txt @targets/runwrap/reports/evidence/validation-repair.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 8 Observability, Metadata, and Persistence Hooks | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/08-observability-metadata.txt @targets/runwrap/reports/evidence/observability-metadata.md @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 9 CLI Product Surface | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/09-cli-product-surface.txt @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/resilience-policies.md @targets/runwrap/reports/evidence/testing-strategy.md` |
-| 10 Second Runtime Spike | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/10-second-runtime-spike.txt @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/resilience-policies.md @targets/runwrap/reports/evidence/observability-metadata.md` |
-| 11 UltraPlan Integration Spike | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/11-ultraplan-integration.txt @targets/runwrap/reports/evidence/observability-metadata.md @targets/runwrap/reports/evidence/validation-repair.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/cli-design.md` |
+| 0 Target Brief and Decision Scaffold | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/00-target-brief.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 1 Project Skeleton and Test Harness | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/01-project-skeleton.txt @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 2 Core Runtime Contract | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/02-core-runtime-contract.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 3 OpenCode Structured Event Adapter | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/03-opencode-adapter.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 4 Lifecycle, Cancellation, Cleanup, and Retained Sessions | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/04-lifecycle-sessions.txt @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 5 Health Checks and Configuration Validation | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/05-health-config.txt @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 6 Retry, Backoff, Fallback, and Rate Limits | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/06-resilience-policies.txt @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 7 Output Validation and Repair | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/07-validation-repair.txt @targets/agentwrap/reports/evidence/validation-repair.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 8 Observability, Metadata, and Persistence Hooks | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/08-observability-metadata.txt @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 9 CLI Product Surface | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/09-cli-product-surface.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 10 Second Runtime Spike | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/10-second-runtime-spike.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/observability-metadata.md` |
+| 11 UltraPlan Integration Spike | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/11-ultraplan-integration.txt @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/validation-repair.md @targets/agentwrap/reports/evidence/session-lifecycle.md` |
 
 The sprint planner should load the PRD, TRD, feature architecture protocol, roadmap sprint section, and that generated bundle.
 
@@ -101,7 +102,7 @@ The sprint planner may explore more source reports or repository code directly w
 - Every sprint plan cites the generated bundle path and the evidence packs used to produce it.
 - Every sprint ends with an evaluation against the same study dimensions that informed it.
 - Do not proceed to the next sprint while known foundational defects remain.
-- Keep CLI code thin; runtime behavior belongs behind SDK primitives.
+- Keep CLI-oriented study material internal to engineering principles; do not infer a product CLI from it.
 - Keep product-specific UltraPlan workflow logic out of the SDK.
 - Prefer explicit state, explicit errors, explicit lifecycle, and earned abstractions.
 - Use fake runtimes and fixtures before trusting real OpenCode runs.
@@ -128,8 +129,8 @@ Create the working planning surface for implementation without making architectu
 
 ### Output
 
-- `targets/runwrap/brief.md`
-- `targets/runwrap/DECISIONS.md`
+- `targets/agentwrap/brief.md`
+- `targets/agentwrap/DECISIONS.md`
 - `templates/sprint-reasoning.md`
 - `templates/sprint-plan.md`
 
@@ -450,23 +451,21 @@ Expose enough structured state for dashboards, historical inspection, synthesis,
 - Estimates are clearly marked as estimates.
 - Persistence is optional and not entangled with runtime adapters.
 
-## Sprint 9: CLI Product Surface
+## Sprint 9: Future Interface Review
 
 ### Goal
 
-Provide a thin but useful Go CLI around the SDK for local development, debugging, and future UltraPlan integration.
+Reassess whether any user-facing convenience surface is warranted after the SDK is mature. This is a placeholder for future scope review, not a commitment to ship a CLI.
 
 ### Scope
 
-- Refine CLI command set around SDK primitives.
-- Include commands for health, run, status, cancel, inspect, and validate.
-- Make configuration behavior visible.
-- Keep command handlers thin and testable.
-- Separate stdout user output from diagnostics.
+- Reassess whether a command surface, API surface, or no additional surface is warranted.
+- If a surface is justified, keep it thin and testable.
+- Make configuration behavior visible only if a surface exists.
+- Separate stdout user output from diagnostics only if a surface exists.
 
 ### Evidence Inputs
 
-- `evidence/cli-design.md`
 - `evidence/testing-strategy.md`
 - `studies/go-cli-study/reports/final/01-project-structure.md`
 - `studies/go-cli-study/reports/final/02-command-architecture.md`
@@ -477,16 +476,16 @@ Provide a thin but useful Go CLI around the SDK for local development, debugging
 
 ### Output
 
-- Usable CLI surface.
-- Command tests with fake runtime.
-- Golden output fixtures for help/status/error output where useful.
+- Determination on whether any additional surface is needed.
+- If a surface exists, tests with fake runtime.
+- If a surface exists, golden output fixtures for help/status/error output where useful.
 
 ### Quality Gate
 
-- CLI commands do not contain runtime business logic.
-- CLI output is scriptable and diagnostics are separable.
-- Effective configuration and error states are explainable to users.
-- CLI can exercise SDK behavior without requiring OpenCode in unit tests.
+- Any additional surface does not contain runtime business logic.
+- If a surface exists, output is scriptable and diagnostics are separable.
+- Effective configuration and error states are explainable if a surface exists.
+- The SDK can be exercised without requiring OpenCode in unit tests.
 
 ## Sprint 10: Second Runtime Spike
 
@@ -588,7 +587,7 @@ The roadmap intentionally moves from stable primitives to product integration:
 7. Resilience policies.
 8. Validation and repair.
 9. Observability and metadata.
-10. CLI surface.
+10. Future interface review.
 11. Second runtime pressure test.
 12. UltraPlan integration pressure test.
 
