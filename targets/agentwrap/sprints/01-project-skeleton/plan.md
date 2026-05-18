@@ -10,7 +10,7 @@
 ## Sprint Overview
 
 - **Sprint Name:** Project Skeleton and Test Harness
-- **Sprint Focus:** Create a buildable Go module with a visible SDK boundary, injectable private helpers, private fake structured-event fixtures, and first tests that run without OpenCode. The reused Go CLI study material is evidence about internals and principles only, not a commitment to ship a CLI surface.
+- **Sprint Focus:** Create a buildable Go module with a visible SDK boundary, injectable private helpers, private fake structured-event fixtures, and first tests that run without OpenCode. The reused Go study material is evidence about internals and principles only, not a commitment to ship a user-facing executable surface.
 - **Depends On:** Sprint 0 target brief and decision scaffold.
 - **Status:** Complete
 
@@ -25,10 +25,10 @@
 ## Evidence Links
 
 - `targets/agentwrap/reports/sprint-evidence/01-project-skeleton.txt` - generated `study evolve --top-sources 1` bundle used for planning.
-- `targets/agentwrap/reports/evidence/cli-design.md` - reused from a different project as internal evidence about boundaries, IO, and testability; not a directive to ship a CLI surface here.
+- `targets/agentwrap/reports/evidence/executable-design.md` - reused from a different project as internal evidence about boundaries, IO, and testability; not a directive to ship a user-facing executable surface here.
 - `targets/agentwrap/reports/evidence/testing-strategy.md` - supports fake-runtime-first verification, structured fixtures, table-driven tests, and real-runtime deferral.
-- `studies/go-cli-study/reports/final/01-project-structure.md` - supports `cmd/` entrypoint, public SDK/library boundary, private `internal/` code, and unidirectional imports.
-- `studies/go-cli-study/reports/final/02-command-architecture.md` - supports side-effect-free command construction, thin wrappers, and deferring complex command hierarchy.
+- `studies/go-cli-study/reports/final/01-project-structure.md` - supports a thin entrypoint, public SDK/library boundary, private `internal/` code, and unidirectional imports.
+- `studies/go-cli-study/reports/final/02-command-architecture.md` - supports side-effect-free construction, thin wrappers, and deferring complex command hierarchy.
 - `studies/go-cli-study/reports/final/03-dependency-injection.md` - supports visible composition root, manual DI, factory functions, and minimal globals.
 - `studies/go-cli-study/reports/final/06-io-abstraction.md` - direct roadmap-listed evidence for injected stdin/stdout/stderr and buffer-based tests.
 - `studies/go-cli-study/reports/final/11-testing-strategy.md` - supports table-driven tests, fixture/golden data where useful, fake implementations, and behavior-focused assertions.
@@ -39,20 +39,20 @@
 
 - **Primary Goal:** Establish the smallest buildable and testable Go project skeleton that later SDK contract and OpenCode adapter sprints can build on without reworking package ownership.
 - **Secondary Goals:**
-  - Create a thin CLI entrypoint that delegates to testable code and does not perform runtime work during command construction.
+  - Create a thin executable entrypoint that delegates to testable code and does not perform runtime work during construction.
   - Create a visible public SDK package boundary without defining the Sprint 2 runtime contract early.
-  - Add private structured event fixture loading and fake lifecycle tests that do not depend on OpenCode or terminal output.
+  - Add private structured event fixture loading and fake lifecycle tests that do not depend on OpenCode or process output.
   - Establish `go test ./...` or the repository's equivalent as the first implementation quality command.
 
 ## Scope
 
 - Initialize or verify a single Go module in the implementation repository recorded by the target brief.
 - Add a root public SDK package reserved for future public SDK contract code, with only minimal package documentation or compile-safe placeholder content in this sprint.
-- Add `cmd/agentwrap/main.go` as a thin executable entrypoint that wires process args, stdin/stdout/stderr, build metadata if needed, and delegates to internal CLI code.
-- Add an internal CLI runner or command constructor that accepts explicit args and IO streams and returns an exit code or error without calling `os.Exit`.
+- Add a thin executable entrypoint that wires process args, stdin/stdout/stderr, build metadata if needed, and delegates to internal private code.
+- Add an internal runner or constructor that accepts explicit args and IO streams and returns an exit code or error without calling `os.Exit`.
 - Add private/test-only fake structured-event fixtures and fixture loader support, preferably JSONL records that preserve raw lines and structured decode results.
-- Add first tests for CLI construction, injected IO behavior, fixture loading, malformed/unknown/partial structured event handling, and fake lifecycle transitions.
-- Confirm package imports are acyclic and dependency flow remains `cmd/agentwrap -> internal/cli -> SDK/private helpers`, never the reverse.
+- Add first tests for entrypoint construction, injected IO behavior, fixture loading, malformed/unknown/partial structured event handling, and fake lifecycle transitions.
+- Confirm package imports are acyclic and dependency flow remains `entrypoint -> private runner -> SDK/private helpers`, never the reverse.
 
 ## Non-Scope
 
@@ -64,32 +64,32 @@
 - Do not implement retry, fallback, backoff, rate-limit hooks, validation, repair, persistence, dashboards, cost estimation, or active-run inspection.
 - Do not add UltraPlan-specific study, synthesis, sprint planning, scoring, report validation, or workflow/DAG concepts to the SDK.
 - Do not add a dynamic plugin loader, runtime registry, or third-party extension system.
-- Do not commit to Cobra or another command framework unless implementation documents a concrete blocker for the lightweight skeleton.
+- Do not commit to Cobra or another framework unless implementation documents a concrete blocker for the lightweight skeleton.
 
 ## Proposed Implementation Shape
 
-- **Package / Module Boundaries:** Use one Go module. Reserve the module root package for the public SDK surface. Use `cmd/agentwrap` for the binary entrypoint. Use `internal/cli` for private command construction/running. Use a private test harness location such as `internal/testkit` or package-local `testdata` for fake fixtures.
+- **Package / Module Boundaries:** Use one Go module. Reserve the module root package for the public SDK surface. Use a thin executable entrypoint. Use private implementation code for runner behavior if needed. Use a private test harness location such as `internal/testkit` or package-local `testdata` for fake fixtures.
 - **Public Surface:** Package existence and documentation only, unless a tiny compile placeholder is necessary. No runtime contract, event schema, error model, configuration model, or OpenCode-specific public type should be added in Sprint 1.
 - **State And Lifecycle:** Keep state harness-local. Fake lifecycle states may exist only inside private tests/testkit to prove fixture-driven behavior; Sprint 2 defines public lifecycle vocabulary.
-- **Error And Failure Behavior:** CLI runner can return ordinary errors or exit codes for skeleton/help/version cases. Fixture loader should expose decode errors in tests, but public SDK classified errors are Sprint 2 scope.
+- **Error And Failure Behavior:** Runner code can return ordinary errors or exit codes for skeleton/help/version cases. Fixture loader should expose decode errors in tests, but public SDK classified errors are Sprint 2 scope.
 - **Observability:** No production observability yet. Preserve structured fixture raw records and decoded fields so later canonical event tests can audit source records.
-- **Testing Surface:** `go test ./...`, CLI construction tests with buffers, fixture loader tests for normal/unknown/malformed/partial records, and fake lifecycle tests. No network, provider credentials, terminal interaction, or OpenCode binary required.
+- **Testing Surface:** `go test ./...`, entrypoint construction tests with buffers, fixture loader tests for normal/unknown/malformed/partial records, and fake lifecycle tests. No network, provider credentials, terminal interaction, or OpenCode binary required.
 
 ## Decisions
 
-- [x] **Decision 1: Use Root SDK Package Plus `cmd/agentwrap` And `internal/` Boundaries**
-  > **Requirement:** PRD reusable SDK boundary; TRD system boundary; roadmap Sprint 1 SDK/library and CLI separation.
+- [x] **Decision 1: Use Root SDK Package Plus Thin Entry Point And `internal/` Boundaries**
+  > **Requirement:** PRD reusable SDK boundary; TRD system boundary; roadmap Sprint 1 SDK/library and entrypoint separation.
   > **Evidence:** `reasoning.md` Decision Area 1; project-structure final report supports thin `cmd/` entrypoints, public library packages for SDK use, and `internal/` for private implementation.
   > **Tradeoff:** The root public package exists before the public runtime contract is implemented.
-  > **Rejected Alternative:** `pkg/agentwrap` public package; rejected for Sprint 1 because it adds namespace stutter before multiple public packages exist. All code under `internal/`; rejected because the product is an SDK, not just a CLI.
+  > **Rejected Alternative:** `pkg/agentwrap` public package; rejected for Sprint 1 because it adds namespace stutter before multiple public packages exist. All code under `internal/`; rejected because the product is an SDK, not just implementation support code.
   > **Risk / Follow-up:** Keep root package minimal and record an accepted layout decision in `DECISIONS.md` only after implementation and tests validate the boundary.
 
-- [x] **Decision 2: Keep CLI Skeleton Framework-Neutral And Side-Effect-Free**
-  > **Requirement:** Roadmap Sprint 1 quality gate that CLI commands can be constructed without side effects; roadmap rule that CLI code stays thin.
+- [x] **Decision 2: Keep the Skeleton Framework-Neutral And Side-Effect-Free**
+  > **Requirement:** Roadmap Sprint 1 quality gate that entrypoint behavior can be constructed without side effects; roadmap rule that entrypoint code stays thin.
   > **Evidence:** `reasoning.md` Decision Area 2; command-architecture final report supports thin factories and says command frameworks are justified by real command breadth.
   > **Tradeoff:** Sprint 9 may later refactor to Cobra or another command framework.
   > **Rejected Alternative:** Adopt Cobra now; rejected as premature because Sprint 1 has no real product command tree.
-  > **Risk / Follow-up:** Reopen CLI framework choice in Sprint 9 when health/run/status/cancel/inspect/validate commands are in scope.
+  > **Risk / Follow-up:** Reopen framework choice in Sprint 9 when health/run/status/cancel/inspect/validate commands are in scope.
 
 - [x] **Decision 3: Use Explicit IO And Dependency Injection Through The Composition Root**
   > **Requirement:** TRD future configuration/security/concurrency constraints and roadmap testability gate.
@@ -124,12 +124,12 @@
   > *Description: Create the smallest package layout that separates public SDK surface, executable entrypoint, and private implementation/test support.*
   - [x] **Sub-task 2.1:** Create or verify `go.mod` and a root public SDK package that compiles without exposing runtime contract types.
   - [x] **Sub-task 2.2:** Create `cmd/agentwrap/main.go` as the only package that directly wires process-global args, streams, and exit behavior.
-  - [x] **Sub-task 2.3:** Create private internal package(s) only where they carry real skeleton behavior, such as CLI construction or test fixture loading.
+  - [x] **Sub-task 2.3:** Create private internal package(s) only where they carry real skeleton behavior, such as entrypoint construction or test fixture loading.
   - [x] **Sub-task 2.4:** Confirm no package cycle and no import from SDK/internal code back into `cmd/agentwrap`.
 
-- [x] **Task 3: Add Thin CLI Runner With Injected IO**
-  > *Description: Make the CLI constructible and testable without runtime side effects.*
-  - [x] **Sub-task 3.1:** Implement an internal CLI runner or command constructor that accepts args plus stdin/stdout/stderr and returns an exit code or error.
+- [x] **Task 3: Add Thin Executable Runner With Injected IO**
+  > *Description: Make the entrypoint constructible and testable without runtime side effects.*
+  - [x] **Sub-task 3.1:** Implement an internal runner or constructor that accepts args plus stdin/stdout/stderr and returns an exit code or error.
   - [x] **Sub-task 3.2:** Support only skeleton-safe behavior such as help/version/no-op root output; do not add runtime commands.
   - [x] **Sub-task 3.3:** Keep `os.Exit`, `os.Args`, `os.Stdout`, and `os.Stderr` access in `cmd/agentwrap/main.go` only.
   - [x] **Sub-task 3.4:** Add tests proving command construction and repeated invocations work with buffers and no side effects.
@@ -151,24 +151,24 @@
 - [x] **Task 6: Run Quality Gates And Review Scope**
   > *Description: Close the sprint with executable evidence and explicit deferrals.*
   - [x] **Sub-task 6.1:** Run `go test ./...` or the repository's equivalent and record the result.
-  - [x] **Sub-task 6.2:** Review imports and package layout for CLI/library cycles or unclear ownership.
+  - [x] **Sub-task 6.2:** Review imports and package layout for entrypoint/library cycles or unclear ownership.
   - [x] **Sub-task 6.3:** Review code for accidental OpenCode invocation, public runtime contract types, product workflow concepts, global mutable config, and direct IO outside the entrypoint.
   - [x] **Sub-task 6.4:** Update `targets/agentwrap/DECISIONS.md` only for implementation-confirmed accepted decisions, if any, with requirement, evidence, tradeoff, rejected alternative, and risk/follow-up.
 
 ## Testing And Documentation Checklist
 
-- [x] **Unit Tests:** CLI runner construction, injected IO behavior, repeated in-process invocations, fixture loader decode paths, and fake lifecycle transitions.
+- [x] **Unit Tests:** runner construction, injected IO behavior, repeated in-process invocations, fixture loader decode paths, and fake lifecycle transitions.
 - [x] **Fixture Tests:** normal structured event stream, unknown event type, malformed record, partial stream, lifecycle failure, and raw-record preservation.
-- [x] **Integration Tests:** limited to in-process CLI/testkit behavior only; no external runtime, provider, network, or terminal dependency.
+- [x] **Integration Tests:** limited to in-process runner/testkit behavior only; no external runtime, provider, network, or terminal dependency.
 - [x] **Real Runtime Smoke:** explicitly deferred to Sprint 3 because Sprint 1 has no real OpenCode integration.
-- [x] **Documentation Updates:** code comments or package docs should identify public SDK boundary, private CLI/testkit boundaries, real-runtime deferral, and fake harness non-public status. Update `DECISIONS.md` only after implementation evidence exists.
+- [x] **Documentation Updates:** code comments or package docs should identify public SDK boundary, private entrypoint/testkit boundaries, real-runtime deferral, and fake harness non-public status. Update `DECISIONS.md` only after implementation evidence exists.
 
 ## Risks And Blockers
 
 | Risk | Impact | Mitigation | Status |
 | --- | --- | --- | --- |
 | Implementation repository path is missing or differs from the target brief | High | Verified `/home/antonioborgerees/coding/agentwrap` from `brief.md`; created implementation there | Closed |
-| CLI framework is chosen before product command scope exists | Medium | Kept skeleton framework-neutral and recorded Sprint 9 follow-up in `DECISIONS.md` | Closed |
+| Framework is chosen before product command scope exists | Medium | Kept skeleton framework-neutral and recorded Sprint 9 follow-up in `DECISIONS.md` | Closed |
 | Root package accumulates speculative public API | High | Root package contains package documentation only; Sprint 2 owns public contract | Closed |
 | Fake harness types become accidental public API | High | Kept under `internal/testkit` and documented non-public status | Closed |
 | Fixture format fails to represent real OpenCode output | Medium | Preserve raw records and let Sprint 3 add representative OpenCode fixtures | Carried Forward |
@@ -182,22 +182,22 @@
 - Should Sprint 9 adopt Cobra, another command framework, or keep the lightweight runner? - Needs real command surface pressure.
 - Should structured fixtures remain JSONL after Sprint 3 captures real OpenCode output? - Needs adapter evidence.
 - Which fake harness components should become public contract tests in Sprint 2? - Sprint 2 owns the public contract decision.
-- Should package layout and CLI framework deferral become accepted `DECISIONS.md` entries? - Only after implementation and tests validate the choices.
+- Should package layout and framework deferral become accepted `DECISIONS.md` entries? - Only after implementation and tests validate the choices.
 
 ## Success Criteria
 
 - [x] **Success Criteria 1:** A buildable Go module exists in the implementation repository and `go test ./...` or equivalent passes without OpenCode.
-- [x] **Success Criteria 2:** The project has a clear root SDK package, `cmd/agentwrap` entrypoint, and private internal CLI/test harness packages with no package cycles.
-- [x] **Success Criteria 3:** CLI construction is side-effect-free in tests, uses injected IO, and keeps `os.Exit`/process-global IO in the executable entrypoint only.
+- [x] **Success Criteria 2:** The project has a clear root SDK package, thin entrypoint, and private internal test harness packages with no package cycles.
+- [x] **Success Criteria 3:** Construction is side-effect-free in tests, uses injected IO, and keeps `os.Exit`/process-global IO in the executable entrypoint only.
 - [x] **Success Criteria 4:** Structured event fixture loader tests cover normal, unknown, malformed, partial, and failure-oriented fixture cases while preserving raw records.
 - [x] **Success Criteria 5:** Fake lifecycle tests prove deterministic fake behavior without launching OpenCode or defining the public runtime contract.
-- [x] **Success Criteria 6:** Review can explain the skeleton as: CLI boundary -> SDK boundary -> private fake harness, with real runtime behavior deferred.
-- [x] **Success Criteria 7:** No UltraPlan workflow logic, real OpenCode adapter, health/config, retry/fallback, validation/repair, persistence, dashboard, or product CLI commands are added.
+- [x] **Success Criteria 6:** Review can explain the skeleton as: entrypoint boundary -> SDK boundary -> private fake harness, with real runtime behavior deferred.
+- [x] **Success Criteria 7:** No UltraPlan workflow logic, real OpenCode adapter, health/config, retry/fallback, validation/repair, persistence, dashboard, or product executable commands are added.
 
 ## Study Evaluation
 
-- [x] **Patterns Followed:** thin CLI entrypoint, unidirectional imports by source inspection, root composition, injected IO, manual DI, private fakes, structured fixtures, table-driven behavior tests, no real-runtime dependency.
-- [x] **Anti-Patterns Avoided:** monolithic `main.go`, command handlers with business/runtime logic, package-level mutable config, direct stdout/stderr/exit in testable packages, terminal transcript parsing, premature command framework, public runtime API before Sprint 2.
+- [x] **Patterns Followed:** thin entrypoint, unidirectional imports by source inspection, root composition, injected IO, manual DI, private fakes, structured fixtures, table-driven behavior tests, no real-runtime dependency.
+- [x] **Anti-Patterns Avoided:** monolithic `main.go`, handlers with business/runtime logic, package-level mutable config, direct stdout/stderr/exit in testable packages, transcript parsing, premature framework choice, public runtime API before Sprint 2.
 - [x] **Comparison Needed:** Compared completed skeleton against `reasoning.md` Decision Areas 1-5 and evidence dimensions from project-structure, command-architecture, DI, IO abstraction, and testing-strategy reports.
 - [x] **Proceed / Iterate:** Proceed to Sprint 2 after Go toolchain verification confirmed the skeleton builds, tests pass, and package imports are acyclic.
 
@@ -217,7 +217,7 @@
 - No existing implementation module was present at `/home/antonioborgerees/coding/agentwrap`; Sprint 1 initialized module path `github.com/antonioborgerees/agentwrap`.
 - Implemented root SDK package documentation only in `/home/antonioborgerees/coding/agentwrap/doc.go`.
 - Implemented thin executable entrypoint in `/home/antonioborgerees/coding/agentwrap/cmd/agentwrap/main.go`.
-- Implemented framework-neutral injected-IO CLI runner and tests in `/home/antonioborgerees/coding/agentwrap/internal/cli`.
+- Implemented framework-neutral injected-IO runner and tests in `/home/antonioborgerees/coding/agentwrap/internal/cli`.
 - Implemented private structured fixture loader, harness-local fake lifecycle, tests, and JSONL fixtures in `/home/antonioborgerees/coding/agentwrap/internal/testkit`.
 - Fixture list: `normal.jsonl`, `unknown.jsonl`, `malformed.jsonl`, `partial.jsonl`, `lifecycle_failure.jsonl`.
 - Scope review command: `rg "os\\.|OpenCode|opencode|type (Runtime|Session|Run|Event|Error)" -n .` from implementation repo. Findings: process-global args/stdout/stderr/exit only in `cmd/agentwrap/main.go`; fixture tests use `os.Open` for testdata; no OpenCode invocation; no public runtime/session/run/error contract types.

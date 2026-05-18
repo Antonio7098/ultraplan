@@ -7,7 +7,7 @@
 
 Build a reusable runtime wrapper SDK for starting, supervising, observing, cancelling, validating, and recovering agentic coding runtime work from product workflows. OpenCode is the first supported runtime, but the SDK must stay product-agnostic and runtime-neutral enough to support later runtimes such as Codex, Claude Code, Pi, ACP-compatible agents, and direct provider workers.
 
-The reused Go CLI study material is internal evidence about boundaries, dependency injection, IO handling, and testing discipline. It does not mean this target is becoming a CLI product.
+The reused Go study material is internal evidence about boundaries, dependency injection, IO handling, and testing discipline. It does not mean this target is becoming a CLI product.
 
 The SDK is a foundational primitive for UltraPlan, 24-hour-testers, and future tools. Product callers should not need to understand each runtime's native process model, event format, provider setup, permission behavior, output truncation behavior, or failure modes.
 
@@ -30,7 +30,7 @@ The SDK is a foundational primitive for UltraPlan, 24-hour-testers, and future t
 ## Non-Goals
 
 - Do not build UltraPlan workflows, study scoring, PRD/TRD generation, report templates, sprint roadmaps, feature planning, or source discovery inside the SDK.
-- Do not choose implementation language details, storage engines, configuration file formats, command frameworks, schema systems, or persistence backends from this brief.
+- Do not choose implementation language details, storage engines, configuration file formats, framework choices, schema systems, or persistence backends from this brief.
 - Do not rely on terminal text when structured runtime output exists.
 - Do not hide unrecoverable setup, provider, permission, validation, or runtime failures behind endless retries.
 - Do not add workflow or DAG abstractions before the lower-level runtime primitive is implemented, testable, observable, and hard to misuse.
@@ -91,7 +91,7 @@ Sprint 0 does not implement these capabilities. It records them as requirements 
 - Sprint 2 must earn the public runtime contract from runtime/session/event requirements and evidence; Sprint 0 does not choose the smallest primitive.
 - Sprint 3 and later adapter work must use structured OpenCode output and preserve native payloads where safe.
 - Runtime primitives must stay separate from UltraPlan workflow/DAG composition.
-- CLI-oriented study material is evidence about internals only, not a commitment to ship a CLI surface here.
+- Study material about executables and entrypoints is evidence about internals only, not a commitment to ship a user-facing executable surface here.
 - Use fake runtimes and fixtures before trusting real OpenCode runs.
 - Treat runtime exit success as insufficient; product success requires validation.
 - Record major decisions in `targets/agentwrap/DECISIONS.md` with requirement, evidence, tradeoff, rejected alternative, risk/follow-up, status, and date.

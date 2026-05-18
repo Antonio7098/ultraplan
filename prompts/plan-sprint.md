@@ -25,7 +25,7 @@ Use this order so the plan stays grounded and fits into context:
 
 1. Read the PRD and TRD sections relevant to the sprint.
 2. Read the selected sprint section in the roadmap.
-3. Read the evidence pack sections inside the generated sprint evidence bundle.
+3. Read (generate the cli if it is not present) the evidence pack sections inside the generated sprint evidence bundle.
 4. Read the relevant `Final Report:` sections from the bundle.
 5. Read `Per-Source Reports:` only where a sprint decision needs source-specific evidence.
 6. Read resolved code references only where implementation detail matters.

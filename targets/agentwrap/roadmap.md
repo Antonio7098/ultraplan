@@ -4,7 +4,7 @@
 
 Build the runtime wrapper SDK incrementally from the foundations upward. Each sprint should produce a small, reviewable layer that can be evaluated against the relevant study reports before the next layer starts.
 
-The reused Go CLI study material in this target is internal evidence about internals, boundaries, dependency injection, IO handling, and testing discipline. It is not a directive to ship a CLI product.
+The reused Go study material in this target is internal evidence about internals, boundaries, dependency injection, IO handling, and testing discipline. It is not a directive to ship a user-facing executable product.
 
 The guiding rule is: do not add workflow complexity until the lower-level runtime primitive is demonstrably correct, testable, observable, and hard to misuse.
 
@@ -78,7 +78,7 @@ Sprint evidence bundle commands:
 | 6 Retry, Backoff, Fallback, and Rate Limits | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/06-resilience-policies.txt @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
 | 7 Output Validation and Repair | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/07-validation-repair.txt @targets/agentwrap/reports/evidence/validation-repair.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
 | 8 Observability, Metadata, and Persistence Hooks | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/08-observability-metadata.txt @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 9 CLI Product Surface | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/09-cli-product-surface.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
+| 9 Executable Surface Review | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/09-executable-surface.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
 | 10 Second Runtime Spike | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/10-second-runtime-spike.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/observability-metadata.md` |
 | 11 UltraPlan Integration Spike | `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/11-ultraplan-integration.txt @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/validation-repair.md @targets/agentwrap/reports/evidence/session-lifecycle.md` |
 
@@ -102,7 +102,7 @@ The sprint planner may explore more source reports or repository code directly w
 - Every sprint plan cites the generated bundle path and the evidence packs used to produce it.
 - Every sprint ends with an evaluation against the same study dimensions that informed it.
 - Do not proceed to the next sprint while known foundational defects remain.
-- Keep CLI-oriented study material internal to engineering principles; do not infer a product CLI from it.
+- Keep executable-oriented study material internal to engineering principles; do not infer a user-facing executable surface from it.
 - Keep product-specific UltraPlan workflow logic out of the SDK.
 - Prefer explicit state, explicit errors, explicit lifecycle, and earned abstractions.
 - Use fake runtimes and fixtures before trusting real OpenCode runs.
@@ -147,15 +147,15 @@ Establish the repository structure, package boundaries, and test harness before 
 
 ### Scope
 
-- Create the minimal Go module and CLI skeleton.
-- Separate SDK/library surface from CLI entrypoint.
+- Create the minimal Go module and thin executable entrypoint.
+- Separate SDK/library surface from the executable entrypoint.
 - Add fake runtime fixtures and structured event fixture loading.
 - Add first tests for fake event decoding and fake run lifecycle.
 - Add no real OpenCode integration yet.
 
 ### Evidence Inputs
 
-- `evidence/cli-design.md`
+- `evidence/executable-design.md`
 - `evidence/testing-strategy.md`
 - `studies/go-cli-study/reports/final/01-project-structure.md`
 - `studies/go-cli-study/reports/final/02-command-architecture.md`
@@ -166,16 +166,16 @@ Establish the repository structure, package boundaries, and test harness before 
 ### Output
 
 - Buildable project skeleton.
-- Thin CLI entrypoint.
+- Thin executable entrypoint.
 - Fake runtime test harness.
 - Event fixture directory.
 
 ### Quality Gate
 
 - Tests can exercise SDK behavior without launching OpenCode.
-- CLI commands can be constructed without side effects.
+- Entrypoint behavior can be constructed without side effects.
 - No package cycle or unclear ownership boundary exists.
-- The skeleton can be explained as: CLI boundary -> SDK runtime primitive -> fake runtime.
+- The skeleton can be explained as: executable boundary -> SDK runtime primitive -> fake runtime.
 
 ## Sprint 2: Core Runtime Contract
 
@@ -309,7 +309,7 @@ Fail fast before expensive runtime work when setup is invalid, while preserving 
 - Define effective configuration inspection.
 - Define configuration precedence semantics without overfitting to one file format.
 - Surface unrecoverable vs transient vs degraded health states.
-- Add CLI commands for health and effective config inspection.
+- Add executable commands for health and effective config inspection.
 
 ### Evidence Inputs
 
@@ -326,7 +326,7 @@ Fail fast before expensive runtime work when setup is invalid, while preserving 
 - Health check API.
 - OpenCode health check.
 - Effective config model.
-- CLI health/config commands.
+- executable health/config commands.
 - Tests for invalid config, missing runtime, unavailable provider/model, and degraded state.
 
 ### Quality Gate
@@ -425,7 +425,7 @@ Expose enough structured state for dashboards, historical inspection, synthesis,
 - Define optional persistence interface.
 - Capture runtime, provider, model, attempts, timing, status, warnings, errors, artifacts, usage, estimated cost, and session retention metadata.
 - Add active-run and completed-run inspection.
-- Add CLI status/inspect commands.
+- Add executable status/inspect commands.
 
 ### Evidence Inputs
 
@@ -441,7 +441,7 @@ Expose enough structured state for dashboards, historical inspection, synthesis,
 - Run record model.
 - Event sink interface.
 - Optional persistence hook.
-- CLI status/inspect commands.
+- executable status/inspect commands.
 - Tests for metadata completeness and event ordering.
 
 ### Quality Gate
@@ -455,7 +455,7 @@ Expose enough structured state for dashboards, historical inspection, synthesis,
 
 ### Goal
 
-Reassess whether any user-facing convenience surface is warranted after the SDK is mature. This is a placeholder for future scope review, not a commitment to ship a CLI.
+Reassess whether any user-facing convenience surface is warranted after the SDK is mature. This is a placeholder for future scope review, not a commitment to ship a user-facing executable surface.
 
 ### Scope
 
