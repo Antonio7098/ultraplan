@@ -1,0 +1,12 @@
+globs:
+- '**/*.md'
+ignores:
+- .github/ISSUE_TEMPLATE/*.md
+- .venv/
+- assets/chezmoi.io/docs/reference/release-history.md
+config:
+  line-length: false # FIXME enable
+  no-trailing-punctuation: false # FIXME enable
+  fenced-code-language: false # FIXME enable
+  code-block-style: false # FIXME enable
+  link-image-reference-definitions: false # FIXME enable

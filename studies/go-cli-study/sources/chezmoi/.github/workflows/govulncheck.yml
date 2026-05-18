@@ -1,0 +1,36 @@
+name: govulncheck
+on:
+  pull_request:
+    branches:
+    - master
+  push:
+    branches:
+    - master
+    tags:
+    - v*
+  schedule:
+  - cron: 2 2 * * *
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  govulncheck:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+    - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd   # v6.0.2
+      with:
+        persist-credentials: false
+    - name: go-version
+      id: go-version
+      run: |
+        echo go-version="$(awk '/GO_VERSION:/ { print $2 }' .github/workflows/main.yml | tr -d \')" >> "${GITHUB_OUTPUT}"
+    - uses: ./.github/actions/setup-go
+      with:
+        go-version: ${{ steps.go-version.outputs.go-version }}
+        upload-cache: false
+    - uses: golang/govulncheck-action@b625fbe08f3bccbe446d94fbf87fcc875a4f50ee   # v1.0.4
+      with:
+        cache: false
+        go-version-input: ${{ steps.go-version.outputs.go-version }}

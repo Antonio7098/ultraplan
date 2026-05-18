@@ -1,0 +1,9 @@
+{
+  "name": "study",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Unified CLI for running UltraPlan architecture studies",
+  "bin": {
+    "study": "./src/index.ts"
+  }
+}

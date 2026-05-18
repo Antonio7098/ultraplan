@@ -1,0 +1,17 @@
+source,"Dimension: Project Structure & Boundaries","Dimension: Command Architecture","Dimension: Dependency Injection & Wiring","Dimension: Configuration Management","Dimension: Error Handling Philosophy","Dimension: IO Abstraction & Testability","Dimension: State & Context Management","Dimension: Concurrency & Async Patterns","Dimension: Terminal UX & Interaction Design","Dimension: Logging & Observability","Dimension: Testing Strategy","Dimension: Extensibility & Plugin Design","Dimension: Security & Trust Boundaries","Dimension: Performance & Resource Management","Dimension: Engineering Philosophy & Tradeoffs",total
+helm,8,8,8,8,8,7,7,7,4,8,8,8,8,7,8,112
+go-task,8,6,7,8,8,8,8,8,6,5,8,6,8,8,8,110
+rclone,8,8,4,8,8,6,8,7,6,8,8,8,6,8,8,109
+gh-cli,8,8,8,8,8,8,8,,8,5,8,7,7,8,8,107
+opencode,8,5,8,8,8,3,8,8,9,7,3,7,8,8,8,106
+lazygit,8,3,8,8,6,6,7,8,9,6,8,7,6,7,8,105
+chezmoi,8,8,8,8,8,7,7,,8,6,9,5,7,7,8,104
+restic,8,,8,8,8,8,8,8,6,6,8,4,8,8,8,104
+k9s,8,6,8,7,7,4,7,7,8,8,7,,7,6,8,98
+urfave-cli,6,8,6,7,7,7,7,10,5,3,8,6,6,6,,92
+dive,8,8,6,8,6,6,5,6,7,7,7,3,,6,8,91
+fzf,8,3,6,8,5,4,6,,9,2,8,7,7,8,9,90
+gdu,8,4,8,6,5,8,3,8,8,3,,4,5,8,8,86
+age,7,4,7,3,8,6,2,3,6,4,,8,9,8,8,83
+yq,8,6,6,,7,6,3,,3,7,8,5,6,6,8,79
+mitchellh-cli,6,6,7,4,4,8,4,6,4,3,5,4,3,,7,71

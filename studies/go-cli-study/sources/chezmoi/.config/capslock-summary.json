@@ -1,0 +1,156 @@
+{
+  "chezmoi.io/chezmoi/v2": [
+    "CAPABILITY_ARBITRARY_EXECUTION",
+    "CAPABILITY_CGO",
+    "CAPABILITY_EXEC",
+    "CAPABILITY_FILES",
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_NETWORK",
+    "CAPABILITY_OPERATING_SYSTEM",
+    "CAPABILITY_READ_SYSTEM_STATE",
+    "CAPABILITY_REFLECT",
+    "CAPABILITY_RUNTIME",
+    "CAPABILITY_SYSTEM_CALLS",
+    "CAPABILITY_UNANALYZED",
+    "CAPABILITY_UNSAFE_POINTER"
+  ],
+  "chezmoi.io/chezmoi/v2/internal/chezmoi": [
+    "CAPABILITY_ARBITRARY_EXECUTION",
+    "CAPABILITY_CGO",
+    "CAPABILITY_EXEC",
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_NETWORK",
+    "CAPABILITY_OPERATING_SYSTEM",
+    "CAPABILITY_SYSTEM_CALLS"
+  ],
+  "chezmoi.io/chezmoi/v2/internal/cmd": [
+    "CAPABILITY_ARBITRARY_EXECUTION",
+    "CAPABILITY_CGO",
+    "CAPABILITY_EXEC",
+    "CAPABILITY_FILES",
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_NETWORK",
+    "CAPABILITY_OPERATING_SYSTEM",
+    "CAPABILITY_READ_SYSTEM_STATE",
+    "CAPABILITY_REFLECT",
+    "CAPABILITY_RUNTIME",
+    "CAPABILITY_SYSTEM_CALLS",
+    "CAPABILITY_UNANALYZED",
+    "CAPABILITY_UNSAFE_POINTER"
+  ],
+  "filippo.io/age": [
+    "CAPABILITY_MODIFY_SYSTEM_STATE"
+  ],
+  "filippo.io/age/agessh": [
+    "CAPABILITY_MODIFY_SYSTEM_STATE"
+  ],
+  "github.com/Masterminds/sprig/v3": [
+    "CAPABILITY_REFLECT"
+  ],
+  "github.com/betterleaks/betterleaks/color": [
+    "CAPABILITY_FILES"
+  ],
+  "github.com/betterleaks/betterleaks/detect": [
+    "CAPABILITY_CGO",
+    "CAPABILITY_EXEC",
+    "CAPABILITY_FILES",
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_OPERATING_SYSTEM",
+    "CAPABILITY_RUNTIME",
+    "CAPABILITY_UNANALYZED"
+  ],
+  "github.com/betterleaks/betterleaks/report": [
+    "CAPABILITY_UNANALYZED"
+  ],
+  "github.com/betterleaks/betterleaks/sources": [
+    "CAPABILITY_CGO",
+    "CAPABILITY_EXEC",
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_OPERATING_SYSTEM",
+    "CAPABILITY_RUNTIME"
+  ],
+  "github.com/bodgit/sevenzip": [
+    "CAPABILITY_CGO",
+    "CAPABILITY_EXEC",
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_OPERATING_SYSTEM",
+    "CAPABILITY_RUNTIME"
+  ],
+  "github.com/fsnotify/fsnotify": [
+    "CAPABILITY_READ_SYSTEM_STATE"
+  ],
+  "github.com/go-git/go-git/v5/plumbing/transport/file": [
+    "CAPABILITY_OPERATING_SYSTEM"
+  ],
+  "github.com/go-git/go-git/v5/plumbing/transport/internal/common": [
+    "CAPABILITY_OPERATING_SYSTEM"
+  ],
+  "github.com/go-git/go-git/v5/utils/ioutil": [
+    "CAPABILITY_OPERATING_SYSTEM"
+  ],
+  "github.com/go-sprout/sprout/registry/strings": [
+    "CAPABILITY_UNANALYZED"
+  ],
+  "github.com/go-sprout/sprout/sprigin": [
+    "CAPABILITY_UNANALYZED"
+  ],
+  "github.com/go-viper/mapstructure/v2": [
+    "CAPABILITY_REFLECT"
+  ],
+  "github.com/godbus/dbus/v5": [
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_UNSAFE_POINTER"
+  ],
+  "github.com/gopasspw/gopass/internal/backend/crypto/age": [
+    "CAPABILITY_MODIFY_SYSTEM_STATE"
+  ],
+  "github.com/klauspost/compress/internal/cpuinfo": [
+    "CAPABILITY_ARBITRARY_EXECUTION"
+  ],
+  "github.com/klauspost/compress/s2": [
+    "CAPABILITY_ARBITRARY_EXECUTION"
+  ],
+  "github.com/klauspost/compress/zstd": [
+    "CAPABILITY_ARBITRARY_EXECUTION"
+  ],
+  "github.com/mholt/archives": [
+    "CAPABILITY_CGO",
+    "CAPABILITY_EXEC",
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_OPERATING_SYSTEM",
+    "CAPABILITY_RUNTIME"
+  ],
+  "github.com/rs/zerolog": [
+    "CAPABILITY_CGO",
+    "CAPABILITY_EXEC",
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_OPERATING_SYSTEM",
+    "CAPABILITY_RUNTIME"
+  ],
+  "github.com/twpayne/go-shell": [
+    "CAPABILITY_ARBITRARY_EXECUTION",
+    "CAPABILITY_CGO",
+    "CAPABILITY_RUNTIME",
+    "CAPABILITY_UNSAFE_POINTER"
+  ],
+  "github.com/zalando/go-keyring": [
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_UNSAFE_POINTER"
+  ],
+  "github.com/zalando/go-keyring/secret_service": [
+    "CAPABILITY_MODIFY_SYSTEM_STATE"
+  ],
+  "go.etcd.io/bbolt": [
+    "CAPABILITY_SYSTEM_CALLS"
+  ],
+  "go4.org/readerutil": [
+    "CAPABILITY_CGO",
+    "CAPABILITY_EXEC",
+    "CAPABILITY_MODIFY_SYSTEM_STATE",
+    "CAPABILITY_OPERATING_SYSTEM",
+    "CAPABILITY_RUNTIME"
+  ],
+  "golang.org/x/sys/unix": [
+    "CAPABILITY_SYSTEM_CALLS"
+  ]
+}

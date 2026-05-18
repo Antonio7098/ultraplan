@@ -1,0 +1,5 @@
+repo,"Runtime Contract and API Shape","Process and Session Lifecycle","Resilience, Fallback, and Validation","Workflow Composition and Observability",total
+t3code,7,8,7,7,29
+sdk-go,3,7,7,8,25
+opencode,,8,7,7,22
+go-plugin,4,8,6,3,21

@@ -1,0 +1,71 @@
+version: '3'
+
+vars:
+  ALLOWED_ENVS: ["dev", "staging", "prod"]
+  NOT_A_LIST: "this is a string"
+
+tasks:
+  default:
+    - task: missing-var
+
+  missing-var:
+    requires:
+      vars:
+        - FOO
+    cmd: echo "{{.FOO}}"
+
+  var-defined-in-task:
+    vars:
+      FOO: bar
+    requires:
+      vars:
+        - FOO
+    cmd: echo "{{.FOO}}"
+
+  validation-var-dynamic:
+    vars:
+      FOO:
+        sh: echo "one"
+    requires:
+      vars:
+        - name: FOO
+          enum: ['one', 'two']
+
+  validation-var:
+    requires:
+      vars:
+        - ENV
+        - name: FOO
+          enum: ['one', 'two']
+
+  require-before-compile:
+    requires:
+      vars: [ MY_VAR ]
+    cmd: |
+      {{range .MY_VAR | splitList " " }}
+        echo {{.}}
+      {{end}}
+
+  validation-var-ref:
+    requires:
+      vars:
+        - name: ENV
+          enum:
+            ref: .ALLOWED_ENVS
+    cmd: echo "{{.ENV}}"
+
+  validation-var-ref-invalid:
+    requires:
+      vars:
+        - name: VALUE
+          enum:
+            ref: .NOT_A_LIST
+    cmd: echo "{{.VALUE}}"
+
+  validation-var-ref-nonexistent:
+    requires:
+      vars:
+        - name: ENV
+          enum:
+            ref: .NONEXISTENT_VAR
+    cmd: echo "{{.ENV}}"

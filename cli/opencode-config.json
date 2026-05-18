@@ -1,0 +1,14 @@
+{
+  "provider": {
+    "minimax-coding-plan": {
+      "models": {
+        "MiniMax-M2.7": {
+          "limit": {
+            "context": 200000,
+            "output": 64000
+          }
+        }
+      }
+    }
+  }
+}
