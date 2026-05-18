@@ -10,20 +10,20 @@ The guiding rule is: do not add workflow complexity until the lower-level runtim
 
 Target requirements:
 
-- `targets/opencode-wrap/sources/PRD.md`
-- `targets/opencode-wrap/sources/TRD.md`
-- `targets/opencode-wrap/sources/feature-architecture.md`
+- `targets/runwrap/sources/PRD.md`
+- `targets/runwrap/sources/TRD.md`
+- `targets/runwrap/sources/feature-architecture.md`
 
 Compression layer:
 
-- `targets/opencode-wrap/reports/study-index.md`
-- `targets/opencode-wrap/reports/evidence/runtime-contract.md`
-- `targets/opencode-wrap/reports/evidence/session-lifecycle.md`
-- `targets/opencode-wrap/reports/evidence/resilience-policies.md`
-- `targets/opencode-wrap/reports/evidence/validation-repair.md`
-- `targets/opencode-wrap/reports/evidence/observability-metadata.md`
-- `targets/opencode-wrap/reports/evidence/cli-design.md`
-- `targets/opencode-wrap/reports/evidence/testing-strategy.md`
+- `targets/runwrap/reports/study-index.md`
+- `targets/runwrap/reports/evidence/runtime-contract.md`
+- `targets/runwrap/reports/evidence/session-lifecycle.md`
+- `targets/runwrap/reports/evidence/resilience-policies.md`
+- `targets/runwrap/reports/evidence/validation-repair.md`
+- `targets/runwrap/reports/evidence/observability-metadata.md`
+- `targets/runwrap/reports/evidence/cli-design.md`
+- `targets/runwrap/reports/evidence/testing-strategy.md`
 
 Primary study dimensions:
 
@@ -54,7 +54,7 @@ Supporting Go CLI dimensions:
 
 The evidence packs are selectors, not the full planning context.
 
-For sprint planning, run `study evolve` on the sprint's evidence packs and write the result to `targets/opencode-wrap/reports/sprint-evidence/`. The command expands each pack into a large planning bundle:
+For sprint planning, run `study evolve` on the sprint's evidence packs and write the result to `targets/runwrap/reports/sprint-evidence/`. The command expands each pack into a large planning bundle:
 
 - the evidence pack content
 - every linked final report from `## Source Reports`
@@ -68,18 +68,18 @@ Sprint evidence bundle commands:
 
 | Sprint | Command |
 | --- | --- |
-| 0 Target Brief and Decision Scaffold | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/00-target-brief.txt @targets/opencode-wrap/reports/evidence/runtime-contract.md @targets/opencode-wrap/reports/evidence/cli-design.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 1 Project Skeleton and Test Harness | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/01-project-skeleton.txt @targets/opencode-wrap/reports/evidence/cli-design.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 2 Core Runtime Contract | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/02-core-runtime-contract.txt @targets/opencode-wrap/reports/evidence/runtime-contract.md @targets/opencode-wrap/reports/evidence/session-lifecycle.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 3 OpenCode Structured Event Adapter | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/03-opencode-adapter.txt @targets/opencode-wrap/reports/evidence/runtime-contract.md @targets/opencode-wrap/reports/evidence/session-lifecycle.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 4 Lifecycle, Cancellation, Cleanup, and Retained Sessions | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/04-lifecycle-sessions.txt @targets/opencode-wrap/reports/evidence/session-lifecycle.md @targets/opencode-wrap/reports/evidence/observability-metadata.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 5 Health Checks and Configuration Validation | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/05-health-config.txt @targets/opencode-wrap/reports/evidence/resilience-policies.md @targets/opencode-wrap/reports/evidence/cli-design.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 6 Retry, Backoff, Fallback, and Rate Limits | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/06-resilience-policies.txt @targets/opencode-wrap/reports/evidence/resilience-policies.md @targets/opencode-wrap/reports/evidence/session-lifecycle.md @targets/opencode-wrap/reports/evidence/observability-metadata.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 7 Output Validation and Repair | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/07-validation-repair.txt @targets/opencode-wrap/reports/evidence/validation-repair.md @targets/opencode-wrap/reports/evidence/session-lifecycle.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 8 Observability, Metadata, and Persistence Hooks | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/08-observability-metadata.txt @targets/opencode-wrap/reports/evidence/observability-metadata.md @targets/opencode-wrap/reports/evidence/cli-design.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 9 CLI Product Surface | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/09-cli-product-surface.txt @targets/opencode-wrap/reports/evidence/cli-design.md @targets/opencode-wrap/reports/evidence/runtime-contract.md @targets/opencode-wrap/reports/evidence/resilience-policies.md @targets/opencode-wrap/reports/evidence/testing-strategy.md` |
-| 10 Second Runtime Spike | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/10-second-runtime-spike.txt @targets/opencode-wrap/reports/evidence/runtime-contract.md @targets/opencode-wrap/reports/evidence/session-lifecycle.md @targets/opencode-wrap/reports/evidence/resilience-policies.md @targets/opencode-wrap/reports/evidence/observability-metadata.md` |
-| 11 UltraPlan Integration Spike | `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/11-ultraplan-integration.txt @targets/opencode-wrap/reports/evidence/observability-metadata.md @targets/opencode-wrap/reports/evidence/validation-repair.md @targets/opencode-wrap/reports/evidence/session-lifecycle.md @targets/opencode-wrap/reports/evidence/cli-design.md` |
+| 0 Target Brief and Decision Scaffold | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/00-target-brief.txt @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 1 Project Skeleton and Test Harness | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/01-project-skeleton.txt @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 2 Core Runtime Contract | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/02-core-runtime-contract.txt @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 3 OpenCode Structured Event Adapter | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/03-opencode-adapter.txt @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 4 Lifecycle, Cancellation, Cleanup, and Retained Sessions | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/04-lifecycle-sessions.txt @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/observability-metadata.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 5 Health Checks and Configuration Validation | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/05-health-config.txt @targets/runwrap/reports/evidence/resilience-policies.md @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 6 Retry, Backoff, Fallback, and Rate Limits | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/06-resilience-policies.txt @targets/runwrap/reports/evidence/resilience-policies.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/observability-metadata.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 7 Output Validation and Repair | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/07-validation-repair.txt @targets/runwrap/reports/evidence/validation-repair.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 8 Observability, Metadata, and Persistence Hooks | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/08-observability-metadata.txt @targets/runwrap/reports/evidence/observability-metadata.md @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 9 CLI Product Surface | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/09-cli-product-surface.txt @targets/runwrap/reports/evidence/cli-design.md @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/resilience-policies.md @targets/runwrap/reports/evidence/testing-strategy.md` |
+| 10 Second Runtime Spike | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/10-second-runtime-spike.txt @targets/runwrap/reports/evidence/runtime-contract.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/resilience-policies.md @targets/runwrap/reports/evidence/observability-metadata.md` |
+| 11 UltraPlan Integration Spike | `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/11-ultraplan-integration.txt @targets/runwrap/reports/evidence/observability-metadata.md @targets/runwrap/reports/evidence/validation-repair.md @targets/runwrap/reports/evidence/session-lifecycle.md @targets/runwrap/reports/evidence/cli-design.md` |
 
 The sprint planner should load the PRD, TRD, feature architecture protocol, roadmap sprint section, and that generated bundle.
 
@@ -128,8 +128,8 @@ Create the working planning surface for implementation without making architectu
 
 ### Output
 
-- `targets/opencode-wrap/brief.md`
-- `targets/opencode-wrap/DECISIONS.md`
+- `targets/runwrap/brief.md`
+- `targets/runwrap/DECISIONS.md`
 - `templates/sprint-reasoning.md`
 - `templates/sprint-plan.md`
 

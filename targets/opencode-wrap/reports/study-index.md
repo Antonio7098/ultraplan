@@ -6,9 +6,9 @@ This index routes implementation planning to the right evidence packs. The packs
 
 Primary target docs:
 
-- `targets/opencode-wrap/sources/PRD.md`
-- `targets/opencode-wrap/sources/TRD.md`
-- `targets/opencode-wrap/sources/feature-architecture.md`
+- `targets/runwrap/sources/PRD.md`
+- `targets/runwrap/sources/TRD.md`
+- `targets/runwrap/sources/feature-architecture.md`
 
 Primary study:
 
@@ -53,9 +53,9 @@ For any sprint plan:
 
 1. Start with the PRD/TRD requirement sections.
 2. Use this index to select the relevant evidence packs.
-3. Run `study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/<sprint>.txt <packs...>`.
+3. Run `study evolve --top-sources 1 --output targets/runwrap/reports/sprint-evidence/<sprint>.txt <packs...>`.
 4. Plan from the generated bundle, not from the compact evidence pack alone.
-5. Record decisions in `targets/opencode-wrap/DECISIONS.md` when implementation begins.
+5. Record decisions in `targets/runwrap/DECISIONS.md` when implementation begins.
 
 ## Initial Sprint Routing
 

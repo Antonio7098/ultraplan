@@ -2,73 +2,7 @@
 
 A focused comparative study for designing a Go library that wraps agent runtimes, starting with OpenCode and leaving room for Codex, Claude Code, ACP-compatible runtimes, and direct provider integrations later.
 
-The target library is an SDK primitive, not an UltraPlan-specific framework. UltraPlan, 24-hour-testers, and other tools should be able to use it to start runtime sessions, consume structured events, apply retry/fallback policies, validate outputs, and project progress without knowing runtime internals.
-
-## Study Goal
-
-Design the foundations for a Go runtime wrapper library that can:
-
-- Run OpenCode through its structured JSON mode (`opencode run --format json`).
-- Decode native runtime events into a canonical Go event model.
-- Expose a stable API for sessions, runs, turns, artifacts, errors, usage, and lifecycle state.
-- Support graceful failure handling: health checks, rate limits, retries, fallbacks, validation, and repair loops.
-- Feed higher-level workflows without becoming the workflow product itself.
-
-## Repository Layout
-
-```
-opencode-wrap-study/
-├── sources/                        # Cloned reference repos
-│   ├── opencode/                   # Primary runtime and SDK target
-│   ├── sdk-go/                     # Temporal Go SDK workflow reference
-│   ├── go-plugin/                  # Subprocess lifecycle, handshake, RPC boundary design
-│   └── t3code/                     # Multi-runtime wrapper reference
-├── dimensions/                     # Study dimensions (formerly study-areas/)
-│   ├── 01-runtime-contract-and-api-shape.md
-│   ├── 02-process-session-lifecycle.md
-│   ├── 03-resilience-fallback-and-validation.md
-│   └── 04-workflow-composition-and-observability.md
-├── reports/
-│   ├── sources/                    # Per-source analyses by dimension
-│   └── final/                      # Synthesized reports by dimension
-└── summary.csv                     # Score summary
-```
-
-Ultraplan shared resources (at `ultraplan/` root):
-
-```
-ultraplan/
-├── prompts/                        # Shared execution prompts
-│   ├── base.md
-│   └── synthesize.md
-├── templates/                      # Shared output templates
-│   ├── repo-analysis.md
-│   └── report.md
-└── config.json                     # Shared model configuration
-```
-
-## Current Sources
-
-| Source | Why It Matters |
-| ------ | -------------- |
-| `opencode` | Primary source. Study OpenCode's SDK, server/client model, JSON event output, provider/model handling, permissions, sessions, and runtime behavior. |
-| `sdk-go` | Temporal Go SDK reference. Study durable workflow APIs, activities, retries, cancellation, metadata, and long-running orchestration boundaries. |
-| `t3code` | Best comparator. Study provider adapters, OpenCode integration, ACP support, event projection, orchestration, persistence, and multi-runtime boundaries. |
-
-## Recommended Additions
-
-Keep the first study to fewer than 4 sources. Add at most one:
-
-| Source | Why Add It |
-| ------ | ---------- |
-| `hashicorp/go-plugin` | Go subprocess/runtime boundary reference for process lifecycle, handshake, RPC boundaries, supervision, cleanup, and plugin-style adapter separation. |
-
-Useful alternates if the study shifts:
-
-| Source | Use When |
-| ------ | -------- |
-| `inngest/inngestgo` | You want more focus on developer-friendly durable step APIs, throttling, retries, and function orchestration. |
-| `dagger/dagger` | You want more focus on Go workflow composition over external execution graphs and live progress. |
+The target library is an SDK primitive, not an UltraPlan-specific framework. UltraPlan, 24-hour-testers, and other tools should use it to start runtime sessions, consume structured events, apply retry/fallback policies, validate outputs, and project progress without knowing runtime internals.
 
 ## Study Dimensions
 
@@ -96,9 +30,17 @@ Study how runtime events become workflow progress, durable state, logs, dashboar
 
 Core question: could UltraPlan show all active agents, progress, cost, model/provider metadata, and outputs by consuming canonical events only?
 
+## Current Sources
+
+| Source | Why It Matters |
+| ------ | -------------- |
+| `opencode` | Primary source. Study OpenCode's SDK, server/client model, JSON event output, provider/model handling, permissions, sessions, and runtime behavior. |
+| `sdk-go` | Temporal Go SDK reference. Study durable workflow APIs, activities, retries, cancellation, metadata, and long-running orchestration boundaries. |
+| `t3code` | Best comparator. Study provider adapters, OpenCode integration, ACP support, event projection, orchestration, persistence, and multi-runtime boundaries. |
+
 ## Non-Goals
 
-This study is not trying to design all of UltraPlan. Keep these outside the runtime wrapper unless a lower-level primitive is clearly needed:
+This study is not trying to design all of UltraPlan:
 
 - Study dimensions, source scoring, and synthesis templates.
 - PRD/TRD/feature/sprint document models.
@@ -142,80 +84,6 @@ type Event struct {
 ```
 
 This is only a sketch. The study should decide the real surface area.
-
-## CLI Usage
-
-Run from the ultraplan root.
-
-```bash
-# List available studies
-bun run cli/src/index.ts list
-
-# List sources and dimensions for this study
-bun run cli/src/index.ts opencode-wrap-study list
-
-# Study one dimension against one source
-bun run cli/src/index.ts opencode-wrap-study run 01 opencode
-
-# Run all dimension × source combinations
-bun run cli/src/index.ts opencode-wrap-study run-all --parallel 2
-
-# Stateful batch runner with retry/backoff
-bun run cli/src/index.ts opencode-wrap-study run-loop --batch-size 2
-```
-
-### Options
-
-| Flag | Description |
-| ---- | ----------- |
-| `--model <model>` | Model override. Defaults come from `ultraplan/config.json`. |
-| `--variant <effort>` | Model variant, such as `high`, `max`, or `minimal`. |
-| `--parallel N` | Max parallel invocations. |
-| `--batch-size N` | Max concurrent tasks for `run-loop`. |
-| `--dry-run` | Print generated prompts without executing. |
-| `--timeout <ms>` | Per-task timeout in milliseconds. |
-| `--dimensions "01,03"` | Filter dimensions. |
-| `--sources "opencode,t3code"` | Filter sources. |
-
-The runner invokes OpenCode with structured output:
-
-```text
-opencode run ... --format json
-```
-
-The study target library should parse that structured stream instead of treating stdout as free-form text.
-
-## How It Works
-
-1. The CLI discovers sources under `sources/`.
-2. The CLI discovers dimensions under `dimensions/`.
-3. Each dimension × source pair gets its own `opencode run` invocation.
-4. The agent reads the inlined prompt containing base instructions and the selected dimension.
-5. The agent writes per-source analysis to `reports/source/{NN}-{dimension}/{source}.md`.
-6. After all sources finish for a dimension, synthesis writes `reports/final/{NN}-{dimension}.md`.
-
-## Evidence Rules
-
-Every claim in a report should be backed by source evidence:
-
-- Use file paths and line numbers.
-- Prefer implementation, tests, schemas, and public interfaces over README claims.
-- Distinguish implemented behavior from inferred intent.
-- State `No evidence found` when a question cannot be answered within the source.
-
-## Output Structure
-
-```
-reports/
-├── sources/
-│   ├── 01-runtime-contract-and-api-shape/
-│   │   ├── opencode.md
-│   │   └── t3code.md
-│   └── ...
-└── final/
-    ├── 01-runtime-contract-and-api-shape.md
-    └── ...
-```
 
 ## Design Bias
 

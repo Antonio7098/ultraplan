@@ -1039,6 +1039,29 @@ async function cmdRunLoop(ROOT: string, opts: {
   }
 }
 
+function findEvolveCommand(target: string, sprintSlug: string): string | null {
+  const roadmapPath = join(ULTRAPLAN_ROOT, "targets", target, "roadmap.md")
+  if (!existsSync(roadmapPath)) return null
+
+  const content = readFileSync(roadmapPath, "utf-8")
+  const slugMatch = sprintSlug.match(/\d+/)
+  if (!slugMatch) return null
+
+  const sprintNum = slugMatch[0]
+  const lines = content.split("\n")
+  let inTable = false
+
+  for (const line of lines) {
+    if (line.startsWith("| ---")) { inTable = true; continue }
+    if (!inTable || !line.startsWith("|")) continue
+    if (!line.includes(sprintSlug) && !line.startsWith(`| ${sprintNum}`)) continue
+
+    const cmdMatch = line.match(/`(study evolve[^`]+)`/)
+    if (cmdMatch) return cmdMatch[1]
+  }
+  return null
+}
+
 async function cmdPlanSprint(
   target: string,
   sprintSlug: string,
@@ -1054,6 +1077,36 @@ async function cmdPlanSprint(
   if (!existsSync(targetDir)) {
     console.error(`\nError: Target "${target}" not found at targets/${target}`)
     process.exit(1)
+  }
+
+  const bundlePath = join(ULTRAPLAN_ROOT, "targets", target, "reports", "sprint-evidence", `${sprintSlug}.txt`)
+  const bundleDir = join(ULTRAPLAN_ROOT, "targets", target, "reports", "sprint-evidence")
+  if (!existsSync(bundlePath)) {
+    const evolveCmd = findEvolveCommand(target, sprintSlug)
+    if (!evolveCmd) {
+      console.error(`\nError: Evidence bundle not found at ${bundlePath}`)
+      console.error(`  Could not find evolve command for sprint "${sprintSlug}" in targets/${target}/roadmap.md`)
+      console.error(`  Generate it manually: study evolve --top-sources 1 --output ${bundlePath} <evidence-packs>`)
+      process.exit(1)
+    }
+    console.log(`\n▶ Evidence bundle not found. Generating via evolve...\n`)
+    mkdirSync(bundleDir, { recursive: true })
+    const parts = evolveCmd.split(/\s+/)
+    const topSourcesIdx = parts.indexOf("--top-sources")
+    const topSources = topSourcesIdx >= 0 ? parseInt(parts[topSourcesIdx + 1], 10) : 1
+    const outputIdx = parts.indexOf("--output")
+    const outputFile = outputIdx >= 0 ? parts[outputIdx + 1] : null
+    const fileArgs = parts.filter(p => p.startsWith("@"))
+    const resolvedArgs = fileArgs.map(a => {
+      const stripped = a.slice(1)
+      return isAbsolute(stripped) ? stripped : join(ULTRAPLAN_ROOT, stripped)
+    })
+    cmdEvolve(resolvedArgs, { topSources, outputFile: outputFile ? join(ULTRAPLAN_ROOT, outputFile) : null, noCode: false })
+    if (!existsSync(bundlePath)) {
+      console.error(`\nError: Evidence bundle still missing after evolve: ${bundlePath}`)
+      process.exit(1)
+    }
+    console.log(`\n✓ Evidence bundle generated: ${bundlePath}\n`)
   }
 
   const promptPath = join(ULTRAPLAN_ROOT, "prompts", "plan-sprint.md")
@@ -1073,6 +1126,7 @@ async function cmdPlanSprint(
     console.log(`Prompt file: ${promptPath}`)
     console.log(`Output file: ${outputFile}`)
     console.log(`Model: ${opts.model || "sprintPlanningModel"}`)
+    console.log(`Evidence bundle: ${bundlePath}`)
     if (opts.contextWindow) {
       console.log(`Context window override: ${opts.contextWindow}`)
     }

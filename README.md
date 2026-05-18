@@ -83,6 +83,9 @@ study code @studies/go-cli-study/reports/final/01-project-structure.md
 
 # Trace an evidence pack through reports to code
 study evolve @targets/opencode-wrap/reports/evidence/cli-design.md
+
+# Plan a sprint for a target
+study sprint-plan opencode-wrap 09-cli-product-surface
 ```
 
 ## Commands
@@ -104,6 +107,7 @@ study evolve @targets/opencode-wrap/reports/evidence/cli-design.md
 | `list` | List available studies |
 | `code` | Extract code references from a report |
 | `evolve` | Trace evidence packs through reports to source code |
+| `sprint-plan <target> <sprint-slug>` | Plan a sprint using `prompts/plan-sprint.md` |
 
 ## Code Extraction (`study code`)
 
@@ -214,6 +218,32 @@ Evidence packs at `targets/<target>/reports/evidence/` are the bridge between st
 - **Open Questions**: unresolved questions for the team
 
 The `evolve` command traces these links automatically: evidence → final reports → per-source reports → code.
+
+## Sprint Plan (`study sprint-plan`)
+
+Generates an evidence-grounded sprint plan from `prompts/plan-sprint.md`, using the target's PRD, TRD, roadmap, and generated evidence bundle.
+
+```bash
+# Plan sprint for a target
+study sprint-plan opencode-wrap 09-cli-product-surface
+
+# Dry run — preview the prompt without executing
+study sprint-plan opencode-wrap 09-cli-product-surface --dry-run
+
+# Override model and variant
+study sprint-plan opencode-wrap 09-cli-product-surface --model openai/gpt-5.5 --variant high
+```
+
+Writes the plan to `targets/<target>/sprints/<sprint-slug>/plan.md`. Uses `config.json` fields `sprintPlanningModel` and `sprintPlanningContextWindow` to set the model and context limit.
+
+### Options
+
+| Flag | Description |
+|------|-------------|
+| `--model <model>` | Model override (default: `sprintPlanningModel` in `config.json`) |
+| `--variant <effort>` | Model variant (`high`, `max`, `minimal`) (default: `defaultVariant`) |
+| `--dry-run` | Print the composed prompt without executing |
+| `--timeout <ms>` | Per-task timeout in ms (default: `defaultTimeoutMs`) |
 
 ## Sprint Planning And Execution
 
