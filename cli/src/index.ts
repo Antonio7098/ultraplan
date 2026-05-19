@@ -6,10 +6,11 @@ import { resolve, join, isAbsolute } from "path"
 import { homedir } from "os"
 import { processReports } from "./code.js"
 import { cmdEvolve, showEvolveUsage } from "./evolve.js"
+import { cmdInitialiseStudy } from "./initialise.js"
 
-const ULTRAPLAN_ROOT = resolve(import.meta.dirname, "../..")
-const STUDIES_DIR = join(ULTRAPLAN_ROOT, "studies")
-const OPENCODE_CONFIG_PATH = resolve(import.meta.dirname, "../opencode-config.json")
+export const ULTRAPLAN_ROOT = resolve(import.meta.dirname, "../..")
+export const STUDIES_DIR = join(ULTRAPLAN_ROOT, "studies")
+export const OPENCODE_CONFIG_PATH = resolve(import.meta.dirname, "../opencode-config.json")
 
 const BACKOFF_DELAYS = [
   0.5 * 3_600_000,
@@ -26,7 +27,7 @@ const BACKOFF_DELAYS = [
   24 * 3_600_000,
 ]
 
-interface Config {
+export interface Config {
   defaultModel: string
   primaryModel: string
   backupModel: string
@@ -39,7 +40,7 @@ interface Config {
   sprintExecutionVariant: string
 }
 
-function loadConfig(): Config {
+export function loadConfig(): Config {
   try {
     return JSON.parse(readFileSync(join(ULTRAPLAN_ROOT, "config.json"), "utf-8"))
   } catch {
@@ -47,8 +48,8 @@ function loadConfig(): Config {
   }
 }
 
-type Source = { name: string; path: string }
-type Dimension = { number: string; name: string; title: string; file: string }
+export type Source = { name: string; path: string }
+export type Dimension = { number: string; name: string; title: string; file: string }
 
 interface TaskState {
   dimensionNumber: string
@@ -237,7 +238,7 @@ function buildSynthesisPrompt(ROOT: string, dimension: Dimension, allSources: So
   ].join("\n")
 }
 
-function findOpenCode(): string {
+export function findOpenCode(): string {
   const candidates = ["opencode", join(homedir(), ".opencode", "bin", "opencode")]
   for (const c of candidates) {
     try {
@@ -248,9 +249,9 @@ function findOpenCode(): string {
   return "opencode"
 }
 
-const OPENCODE_BIN = findOpenCode()
+export const OPENCODE_BIN = findOpenCode()
 
-function runOpenCode(
+export function runOpenCode(
   prompt: string,
   studyDir: string,
   opts: {
@@ -1042,29 +1043,6 @@ async function cmdRunLoop(ROOT: string, opts: {
   }
 }
 
-function findEvolveCommand(target: string, sprintSlug: string): string | null {
-  const roadmapPath = join(ULTRAPLAN_ROOT, "targets", target, "roadmap.md")
-  if (!existsSync(roadmapPath)) return null
-
-  const content = readFileSync(roadmapPath, "utf-8")
-  const slugMatch = sprintSlug.match(/\d+/)
-  if (!slugMatch) return null
-
-  const sprintNum = slugMatch[0]
-  const lines = content.split("\n")
-  let inTable = false
-
-  for (const line of lines) {
-    if (line.startsWith("| ---")) { inTable = true; continue }
-    if (!inTable || !line.startsWith("|")) continue
-    if (!line.includes(sprintSlug) && !line.startsWith(`| ${sprintNum}`)) continue
-
-    const cmdMatch = line.match(/`(study evolve[^`]+)`/)
-    if (cmdMatch) return cmdMatch[1]
-  }
-  return null
-}
-
 async function cmdPlanSprint(
   target: string,
   sprintSlug: string,
@@ -1080,38 +1058,6 @@ async function cmdPlanSprint(
   if (!existsSync(targetDir)) {
     console.error(`\nError: Target "${target}" not found at targets/${target}`)
     process.exit(1)
-  }
-
-  const bundlePath = join(ULTRAPLAN_ROOT, "targets", target, "reports", "sprint-evidence", `${sprintSlug}.txt`)
-  const bundleDir = join(ULTRAPLAN_ROOT, "targets", target, "reports", "sprint-evidence")
-  if (!existsSync(bundlePath)) {
-    const evolveCmd = findEvolveCommand(target, sprintSlug)
-    if (!evolveCmd) {
-      console.error(`\nError: Evidence bundle not found at ${bundlePath}`)
-      console.error(`  Could not find evolve command for sprint "${sprintSlug}" in targets/${target}/roadmap.md`)
-      console.error(`  Generate it manually: study evolve --final-only --top-sources 1 --output ${bundlePath} <evidence-packs>`)
-      process.exit(1)
-    }
-    console.log(`\n▶ Evidence bundle not found. Generating via evolve...\n`)
-    mkdirSync(bundleDir, { recursive: true })
-    const parts = evolveCmd.split(/\s+/)
-    const topSourcesIdx = parts.indexOf("--top-sources")
-    const topSources = topSourcesIdx >= 0 ? parseInt(parts[topSourcesIdx + 1], 10) : 1
-    const outputIdx = parts.indexOf("--output")
-    const outputFile = outputIdx >= 0 ? parts[outputIdx + 1] : null
-    const noCode = parts.includes("--no-code")
-    const finalOnly = parts.includes("--final-only")
-    const fileArgs = parts.filter(p => p.startsWith("@"))
-    const resolvedArgs = fileArgs.map(a => {
-      const stripped = a.slice(1)
-      return isAbsolute(stripped) ? stripped : join(ULTRAPLAN_ROOT, stripped)
-    })
-    cmdEvolve(resolvedArgs, { topSources, outputFile: outputFile ? join(ULTRAPLAN_ROOT, outputFile) : null, noCode, finalOnly })
-    if (!existsSync(bundlePath)) {
-      console.error(`\nError: Evidence bundle still missing after evolve: ${bundlePath}`)
-      process.exit(1)
-    }
-    console.log(`\n✓ Evidence bundle generated: ${bundlePath}\n`)
   }
 
   const promptPath = join(ULTRAPLAN_ROOT, "prompts", "plan-sprint.md")
@@ -1131,7 +1077,6 @@ async function cmdPlanSprint(
     console.log(`Prompt file: ${promptPath}`)
     console.log(`Output file: ${outputFile}`)
     console.log(`Model: ${opts.model || "sprintPlanningModel"}`)
-    console.log(`Evidence bundle: ${bundlePath}`)
     if (opts.contextWindow) {
       console.log(`Context window override: ${opts.contextWindow}`)
     }
@@ -1199,12 +1144,10 @@ async function cmdExecuteSprint(
   const sprintDir = join(targetDir, "sprints", sprintSlug)
   const planPath = join(sprintDir, "plan.md")
   const reasoningPath = join(sprintDir, "reasoning.md")
-  const bundlePath = join(targetDir, "reports", "sprint-evidence", `${sprintSlug}.txt`)
 
   const missing: string[] = []
   if (!existsSync(planPath)) missing.push(planPath)
   if (!existsSync(reasoningPath)) missing.push(reasoningPath)
-  if (!existsSync(bundlePath)) missing.push(bundlePath)
 
   if (missing.length > 0) {
     console.error(`\nError: Cannot execute sprint "${sprintSlug}" for target "${target}". Missing required planning artefacts:\n`)
@@ -1231,7 +1174,6 @@ async function cmdExecuteSprint(
     console.log(`Prompt file: ${promptPath}`)
     console.log(`Output file: ${outputFile}`)
     console.log(`Model: ${opts.model || "sprintExecutionModel"}`)
-    console.log(`Evidence bundle: ${bundlePath}`)
     console.log("")
     return
   }
@@ -1310,6 +1252,7 @@ function cmdListStudies(): void {
   console.log("       study list")
   console.log("       study code [--output <file>] <@report-file>...")
   console.log("       study evolve [--top-sources <N>] [--output <file>] [--no-code] [--final-only] <@evidence-report>...")
+  console.log("       study initialise-study <study-init.yml> [options]")
   console.log("       study sprint-plan <target> <sprint-slug> [options]")
   console.log("       study execute-sprint <target> <sprint-slug> [options]")
   console.log("       study execute-sprint --help\n")
@@ -1434,6 +1377,54 @@ async function main() {
     const timeoutIdx = execArgs.indexOf("--timeout")
     const timeout = timeoutIdx >= 0 ? parseInt(execArgs[timeoutIdx + 1], 10) : CONFIG.defaultTimeoutMs
     await cmdExecuteSprint(target, sprintSlug, { model, variant, dryRun, timeoutMs: timeout })
+    process.exit(0)
+  }
+
+  if (args[0] === "initialise-study") {
+    const initArgs = args.slice(1)
+    if (initArgs.length < 1 || initArgs[0] === "--help" || initArgs[0] === "-h") {
+      console.error("Usage: study initialise-study <study-init.yml> [options]")
+      console.error("")
+      console.error("Initialize a new study from a YAML definition file.")
+      console.error("")
+      console.error("Arguments:")
+      console.error("  <study-init.yml>         Path to the study init YAML file")
+      console.error("")
+      console.error("Options:")
+      console.error("  --name <name>            Override study name from YAML")
+      console.error("  --repos <N>              Target number of repos (overrides YAML)")
+      console.error("  --dimensions <N>         Target number of dimensions (overrides YAML)")
+      console.error("  --model <model>          Model for research calls")
+      console.error("  --variant <effort>       Model variant (high, max, minimal)")
+      console.error("  --dry-run                Preview without creating")
+      console.error("  --force                  Overwrite existing study")
+      console.error("  --timeout <ms>           Research task timeout")
+      console.error("  --output-dir <dir>       Custom output directory (default: studies/)")
+      console.error("")
+      process.exit(0)
+    }
+    const yamlPath = initArgs[0]
+    const nameIdx = initArgs.indexOf("--name")
+    const reposIdx = initArgs.indexOf("--repos")
+    const dimsIdx = initArgs.indexOf("--dimensions")
+    const modelIdx = initArgs.indexOf("--model")
+    const variantIdx = initArgs.indexOf("--variant")
+    const dryRun = initArgs.includes("--dry-run")
+    const force = initArgs.includes("--force")
+    const timeoutIdx = initArgs.indexOf("--timeout")
+    const outputDirIdx = initArgs.indexOf("--output-dir")
+    const CONFIG = loadConfig()
+    await cmdInitialiseStudy(yamlPath, {
+      name: nameIdx >= 0 ? initArgs[nameIdx + 1] : undefined,
+      repos: reposIdx >= 0 ? parseInt(initArgs[reposIdx + 1], 10) : undefined,
+      dimensions: dimsIdx >= 0 ? parseInt(initArgs[dimsIdx + 1], 10) : undefined,
+      model: modelIdx >= 0 ? initArgs[modelIdx + 1] : undefined,
+      variant: variantIdx >= 0 ? initArgs[variantIdx + 1] : undefined,
+      dryRun,
+      force,
+      timeoutMs: timeoutIdx >= 0 ? parseInt(initArgs[timeoutIdx + 1], 10) : undefined,
+      outputDir: outputDirIdx >= 0 ? initArgs[outputDirIdx + 1] : undefined,
+    })
     process.exit(0)
   }
 

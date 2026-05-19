@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This index routes implementation planning to the right evidence packs. The packs are intentionally small, but they are not the full sprint context. For sprint planning, pass the relevant packs to `study evolve` so the CLI expands them into a large evidence bundle with final reports, per-source reports, and resolved code references.
+This index routes implementation planning to the right evidence packs. The packs are intentionally small, but they are not the full sprint context. For sprint planning, load the relevant evidence packs and open their linked final reports, per-source reports, and code references as needed.
 
 Primary target docs:
 
@@ -53,8 +53,8 @@ For any sprint plan:
 
 1. Start with the PRD/TRD requirement sections.
 2. Use this index to select the relevant evidence packs.
-3. Run `study evolve --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/<sprint>.txt <packs...>`.
-4. Plan from the generated bundle, not from the compact evidence pack alone.
+3. Load the evidence packs and their linked final reports.
+4. Open per-source reports and code references only when a concrete decision needs them.
 5. Record decisions in `targets/agentwrap/DECISIONS.md` when implementation begins.
 
 ## Initial Sprint Routing
@@ -72,4 +72,4 @@ For any sprint plan:
 
 ## Compression Boundary
 
-This index intentionally does not summarize every report. The evidence packs are the selector layer; `study evolve` is the dissemination layer. Sprint plans should cite the generated sprint evidence bundle and quote or link specific report evidence only when making a concrete decision.
+This index intentionally does not summarize every report. The evidence packs are the selector layer. Sprint plans should cite the evidence packs and quote or link specific report evidence only when making a concrete decision.

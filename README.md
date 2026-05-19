@@ -37,7 +37,7 @@ ultraplan/
         │       └── plan.md
         └── reports/
             ├── evidence/           # Evidence packs linking studies → decisions
-            └── sprint-evidence/    # Generated study evolve bundles for sprint planning
+            └── evidence-reports/   # (optional) Pre-generated evidence bundles for reference
 ```
 
 ## Studies
@@ -140,8 +140,8 @@ study evolve @targets/opencode-wrap/reports/evidence/cli-design.md \
 # Write to file
 study evolve --output bundle.txt @targets/opencode-wrap/reports/evidence/cli-design.md
 
-# Sprint planning bundle with code included
-study evolve --top-sources 1 --output targets/opencode-wrap/reports/sprint-evidence/09-cli-product-surface.txt \
+# Heavy trace with code and top 3 per-source reports
+study evolve --top-sources 3 --output trace-output.txt \
             @targets/opencode-wrap/reports/evidence/cli-design.md \
             @targets/opencode-wrap/reports/evidence/runtime-contract.md
 
@@ -221,7 +221,7 @@ The `evolve` command traces these links automatically: evidence → final report
 
 ## Sprint Plan (`study sprint-plan`)
 
-Generates an evidence-grounded sprint plan from `prompts/plan-sprint.md`, using the target's PRD, TRD, roadmap, and generated evidence bundle.
+Generates an evidence-grounded sprint plan from `prompts/plan-sprint.md`, using the target's PRD, TRD, roadmap, and referenced evidence packs.
 
 ```bash
 # Plan sprint for a target
@@ -247,13 +247,13 @@ Writes the plan to `targets/<target>/sprints/<sprint-slug>/plan.md`. Uses `confi
 
 ## Sprint Planning And Execution
 
-Sprint planning uses the target roadmap plus a generated evidence bundle.
+Sprint planning uses the target roadmap plus referenced evidence packs.
 
-1. Generate the sprint evidence bundle with the command listed in `targets/<target>/roadmap.md`.
+1. Identify the relevant evidence packs from `targets/<target>/reports/study-index.md`.
 2. Use `prompts/plan-sprint.md` to write `targets/<target>/sprints/<sprint-slug>/reasoning.md`.
 3. Use `templates/sprint-reasoning.md` to justify decisions, tradeoffs, alternatives, risks, and expected evidence.
 4. Use the reasoning document to write `targets/<target>/sprints/<sprint-slug>/plan.md`.
 5. Use `templates/sprint-plan.md` as the required sprint tracker format.
 6. Use `prompts/execute-sprint.md` to implement the approved sprint and keep the sprint tracker current.
 
-For implementation planning with code included, use `study evolve --top-sources 1`. Use `--top-sources 2` for a heavier planning bundle only when the sprint needs more source evidence.
+Evidence packs are compressed guidance (~40 lines each). Open linked final reports, per-source reports, and code references only when a concrete decision needs deeper evidence. The `study evolve` CLI command remains available as a standalone utility for ad-hoc evidence trace, but is no longer part of the planning flow.

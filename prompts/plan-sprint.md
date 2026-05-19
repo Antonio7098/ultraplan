@@ -11,13 +11,13 @@ Load these files first:
 1. Target PRD: `targets/{target}/sources/PRD.md`
 2. Target TRD: `targets/{target}/sources/TRD.md`
 3. Target feature architecture protocol, if present: `targets/{target}/sources/feature-architecture.md`
-4. Target roadmap: `targets/{target}/roadmap.md`
-5. The roadmap section for the selected sprint.
-6. The generated sprint evidence bundle from `targets/{target}/reports/sprint-evidence/`.
-7. Sprint reasoning template: `templates/sprint-reasoning.md`
-8. Sprint plan template: `templates/sprint-plan.md`
-
-If the sprint evidence bundle does not exist, generate it using the command in the roadmap before planning the sprint.
+4. Target decision log: `targets/{target}/DECISIONS.md`
+5. Target roadmap: `targets/{target}/roadmap.md`
+6. The roadmap section for the selected sprint.
+7. Target study-index: `targets/{target}/reports/study-index.md`
+8. The evidence packs referenced by the study-index for the sprint area.
+9. Sprint reasoning template: `templates/sprint-reasoning.md`
+10. Sprint plan template: `templates/sprint-plan.md`
 
 ## Evidence Loading Order
 
@@ -25,28 +25,26 @@ Use this order so the plan stays grounded and fits into context:
 
 1. Read the PRD and TRD sections relevant to the sprint.
 2. Read the selected sprint section in the roadmap.
-3. Generate the sprint evidence bundle if it is not present.
-4. Read the bundle's `Planning Load Order` and evidence pack sections.
-5. Read the relevant `Final Report:` sections from the bundle.
-6. Use the per-source manifest to open individual source reports only where a sprint decision needs source-specific evidence.
+3. Read the study-index to identify which evidence packs apply.
+4. Read the relevant evidence packs — each is a small (~40 line) compressed guidance document.
+5. When a sprint decision needs deeper evidence, open the linked `Final Report:` from the study-index or evidence pack.
+6. When a final report references per-source analysis or code snippets, open only those that inform a concrete decision.
 7. Resolve code references or inspect repository code only where implementation detail matters.
 
-The evidence pack is a selector, not the full context. The generated sprint evidence bundle is the planning source of truth, but it should be consumed in stages.
-
-Prefer sprint bundles generated with `study evolve --final-only --top-sources 1`. That format injects evidence packs and final reports, then lists per-source reports as a manifest so planning can open narrower reports on demand. Use a larger bundle only when final reports are insufficient for a specific decision.
+The evidence pack is a selector, not the full context. Do not pre-load every final report or per-source analysis. Read the pack, identify what you need, and open linked reports one at a time based on the sprint's decision needs.
 
 ## If Context Is Too Large
 
-If the generated evidence bundle does not fit into context:
+If the full set of reports does not fit into context:
 
 1. Keep the PRD, TRD, feature architecture protocol, and roadmap sprint section in context.
-2. Load only the evidence pack sections from the bundle.
+2. Load only the evidence pack sections — never pre-load all final reports.
 3. Add final report sections one at a time based on the sprint's decision needs.
-4. Use the per-source manifest to open reports one at a time, starting with the highest-scored source.
+4. Open per-source reports only when final-report evidence is insufficient for a specific decision.
 5. Add code references only for specific implementation questions.
 6. Record omitted evidence and the reason it was omitted in the sprint reasoning. Carry forward any material risk into the sprint tracker.
 
-You may inspect more source reports or repository code directly if the generated bundle does not answer a decision. Keep this exploration narrow, cite it, and tie it to a concrete requirement, tradeoff, risk, or open question.
+You may inspect more source reports or repository code directly when the evidence packs and final reports do not answer a decision. Keep this exploration narrow, cite it, and tie it to a concrete requirement, tradeoff, risk, or open question.
 
 ## Planning Rules
 

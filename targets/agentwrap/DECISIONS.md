@@ -194,6 +194,30 @@ Do not convert study recommendations into accepted architecture decisions until 
 - **Rejected Alternatives:** Hardcoding transition `from` states was rejected because it makes cleanup-after-cancel events misleading. Removing public correlation/cause fields was rejected because later persistence and replay work still need the envelope shape.
 - **Risk / Follow-up:** Full `CauseEventID` population is deferred until persistence/replay or a concrete event-causality model exists; synthetic causality would be misleading. Process-group termination remains deferred until reproduced descendant-process leakage justifies OS-specific process-tree management.
 
+### DEC-014: SDK Health Checker With Required Preflight Blocking
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** `targets/agentwrap/sprints/05-health-config/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` health and readiness; `targets/agentwrap/sources/TRD.md` health checks and preflight.
+- **Evidence Source:** Sprint 5 implementation in `/home/antonioborgerees/coding/agentwrap`; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Add an optional runtime-neutral `HealthChecker` interface with typed check IDs, health states, per-check results, aggregate reports, classified `SDKError` values, and caller-requested `RunRequest.RequireHealth` preflight blocking before OpenCode process launch.
+- **Tradeoff:** Health remains an optional adapter capability rather than a required method on `Runtime`, so callers should type-assert or receive a runtime that explicitly advertises health support.
+- **Rejected Alternatives:** Adding health methods directly to `Runtime` was rejected because it would force every future runtime to claim probe semantics before evidence exists. OpenCode-only helper functions were rejected because products need a runtime-neutral preflight contract.
+- **Risk / Follow-up:** Sprint 6 policy code must consume health classifications without adding hidden retry/fallback behavior inside adapters.
+
+### DEC-015: Source-Aware Effective Config Without SDK-Owned File Parsing
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** `targets/agentwrap/sprints/05-health-config/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/TRD.md` configuration requirements; `targets/agentwrap/sources/PRD.md` output safety.
+- **Evidence Source:** Sprint 5 implementation in `/home/antonioborgerees/coding/agentwrap`; config/redaction tests; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Represent effective configuration as a merged, source-aware SDK value with explicit source labels for defaults, adapter options, environment/config providers, caller requests, and runtime-discovered values. Secrets are represented by presence/source metadata and redacted diagnostics, not raw values.
+- **Tradeoff:** The SDK exposes merge/validation primitives but still does not choose or parse a config file format.
+- **Rejected Alternatives:** Choosing JSON/YAML/TOML config loading in the SDK was rejected as product-specific and contrary to the TRD. Relying only on `RunRequest` was rejected because callers need provenance and redacted inspection.
+- **Risk / Follow-up:** Future product integrations may add config-provider layers, but direct env/file reads should remain isolated to config/probe boundaries.
+
 ## Superseded Decisions
 
 None.

@@ -12,11 +12,11 @@ Load these files first:
 2. Sprint reasoning: `targets/{target}/sprints/{sprint-slug}/reasoning.md`
 3. Target PRD: `targets/{target}/sources/PRD.md`
 4. Target TRD: `targets/{target}/sources/TRD.md`
-5. Target roadmap: `targets/{target}/roadmap.md`
-6. Sprint evidence bundle listed in the sprint plan.
+5. Target decision log: `targets/{target}/DECISIONS.md`
+6. Target roadmap: `targets/{target}/roadmap.md`
 7. Target feature architecture protocol, if present: `targets/{target}/sources/feature-architecture.md`
 
-Load additional evidence only when the sprint plan cites it or when implementation reveals a concrete gap.
+Load additional evidence (evidence packs, final reports, per-source reports) only when the sprint plan cites it or when implementation reveals a concrete gap.
 
 ## Execution Rules
 
@@ -32,17 +32,17 @@ Load additional evidence only when the sprint plan cites it or when implementati
 
 ## Evidence And Context
 
-Use the sprint evidence bundle as supporting context, not as a script. During implementation:
+Use evidence packs and final reports as supporting context, not as a script. During implementation:
 
 1. Recheck the relevant sprint plan decision before making a design choice.
-2. Reopen cited evidence only when needed.
+2. Reopen cited evidence packs, final reports, per-source reports, or code references only when needed.
 3. Explore source reports or repository code directly only for a concrete implementation question.
 4. Cite any extra evidence added during execution in the sprint plan's `Execution Evidence` section.
 
-If the generated evidence bundle does not fit into context, use the same staged loading rule as planning:
+If the full set of evidence does not fit into context:
 
 1. Keep the sprint plan, PRD/TRD requirements, and roadmap sprint section in context.
-2. Load evidence sections tied to the current task.
+2. Load evidence packs tied to the current task — they are small (~40 lines) compressed guidance.
 3. Load final reports, per-source reports, and code references only as needed.
 4. Record omitted context when it affects confidence or risk.
 

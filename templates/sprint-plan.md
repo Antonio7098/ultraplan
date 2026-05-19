@@ -5,8 +5,7 @@
 > Created: [YYYY-MM-DD]
 > Reasoning: `targets/[target-slug]/sprints/sprint-[XX]-[name]/reasoning.md`
 > Roadmap Section: [roadmap heading]
-> Evidence Bundle: `targets/[target-slug]/reports/sprint-evidence/[bundle].txt`
-
+ 
 ## Sprint Overview
 
 - **Sprint Name:** [Insert sprint name]
@@ -24,7 +23,6 @@
 
 ## Evidence Links
 
-- `targets/[target-slug]/reports/sprint-evidence/[bundle].txt` - [Generated `study evolve` bundle used for planning]
 - [Evidence pack/final report/per-source report/code reference] - [Decision or risk it supports]
 - [Use "None - [reason]" when a section has no direct evidence link]
 
@@ -61,7 +59,7 @@
 
 - [ ] **Decision 1: [Decision Name]**
   > **Requirement:** [PRD/TRD requirement]
-  > **Evidence:** [Evidence bundle section, final report, per-source report, or code reference]
+  > **Evidence:** [Evidence pack, final report, per-source report, or code reference]
   > **Tradeoff:** [Accepted tradeoff]
   > **Rejected Alternative:** [Alternative and reason]
   > **Risk / Follow-up:** [Risk, mitigation, or open follow-up]
@@ -138,4 +136,4 @@
 
 ## Execution Evidence
 
-- [Record tests run, explicit deferrals, notable commands, generated evidence bundles, decisions, or review-ready evidence here as execution progresses]
+- [Record tests run, explicit deferrals, notable commands, evidence packs or reports consulted, decisions, or review-ready evidence here as execution progresses]

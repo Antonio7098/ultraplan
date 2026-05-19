@@ -1,0 +1,524 @@
+name: hellosales-architecture
+description: >-
+  Comparative architecture study for HelloSales — a large-scale data ingestion, AI orchestration, multi-tenant workflow
+  platform serving sales intelligence. Studies backend API architecture, workflow orchestration, data pipelines,
+  observability, concurrency, and operational governance across elite open-source systems.
+repos:
+  count: 9
+  items:
+    - name: grafana
+      url: https://github.com/grafana/grafana
+      description: >-
+        Large-scale Go backend — observability-first architecture, plugin systems, API layering, RBAC/auth, background
+        jobs, config system, enterprise operational maturity
+    - name: temporal
+      url: https://github.com/temporalio/temporal
+      description: >-
+        Elite workflow infrastructure — durable execution, retry semantics, worker architecture, task routing, state
+        persistence, queue processing, orchestration engine
+    - name: openfga
+      url: https://github.com/openfga/openfga
+      description: >-
+        Clean modern Go backend — disciplined layering, package boundaries, transport vs domain logic, interface
+        ownership, storage abstractions, testing organization
+    - name: pocketbase
+      url: https://github.com/pocketbase/pocketbase
+      description: >-
+        Masterpiece of simplicity and extensibility — plugin/hooks architecture, event handling, config ergonomics,
+        admin APIs, extension surfaces, embedded runtime
+    - name: victoriametrics
+      url: https://github.com/VictoriaMetrics/VictoriaMetrics
+      description: >-
+        Elite ingestion + storage + query architecture — ingestion pipelines, memory efficiency, batching, concurrency,
+        indexing, performance discipline at scale
+    - name: milvus
+      url: https://github.com/milvus-io/milvus
+      description: >-
+        Vector infrastructure platform — indexing systems, retrieval architecture, distributed query execution, storage
+        orchestration, hybrid search
+    - name: nats-server
+      url: https://github.com/nats-io/nats-server
+      description: >-
+        Distributed systems masterclass — concurrency model, event architecture, async processing, operational
+        simplicity, message routing, cluster management
+    - name: cli
+      url: https://github.com/cli/cli
+      description: >-
+        GitHub official CLI — command layering, API clients, pagination, auth handling, caching, HTTP architecture,
+        API-consumer patterns
+    - name: kubernetes
+      url: https://github.com/kubernetes/kubernetes
+      description: >-
+        Orchestration system — controller pattern, reconciliation loops, declarative APIs, resource lifecycle,
+        event-driven convergence, operator model
+dimensions:
+  count: 18
+  items:
+    - number: '01'
+      name: project-structure-boundaries
+      title: Project Structure & Boundaries
+      description: How projects organise code — package boundaries, module layout, separation of concerns at scale
+      purpose: >-
+        Analyzes how each project structures its codebase — package boundaries, module layout, top-level directory
+        conventions, and separation of concerns at scale. HelloSales needs a structure that scales across ingestion, AI
+        orchestration, and multi-tenant API surfaces without devolving into a monolith.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - 'Inspect top-level directory layout: identify modules, packages, and their responsibilities.'
+        - Trace how code is organised across internal vs public packages.
+        - Evaluate whether package boundaries align with domain concepts or implementation layers.
+        - Identify conventions for naming, nesting, and package dependency direction.
+      evidence:
+        - Top-level directory listing and README structure
+        - go.mod / module definition and internal vs pkg split
+        - Package dependency graph direction (cycles? acyclic layers?)
+        - Subpackage organisation patterns (by feature, layer, or domain)
+        - Mono-repo vs multi-module strategy
+      questions:
+        - How does the project keep package boundaries from eroding as it grows?
+        - Is the structure organised by domain, layer, or a hybrid?
+        - Where does internal API surface end and public SDK begin?
+        - What conventions prevent circular dependencies?
+        - How does the project structure support multiple contributors with isolated work areas?
+    - number: '02'
+      name: dependency-injection-composition
+      title: Dependency Injection & Composition
+      description: How services are wired, lifecycle management, initialization order, interface composition
+      purpose: >-
+        Examines how services are wired together — lifecycle management, initialization ordering, interface composition,
+        and dependency ownership. For HelloSales, understanding how large backends avoid global chaos during
+        construction is critical.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify the dependency injection approach (manual wiring, container, constructor injection, etc.).
+        - Trace how services are created, started, and shut down.
+        - Examine how interface boundaries are owned and composed.
+        - Look for lifecycle hooks, startup ordering, and graceful shutdown patterns.
+      evidence:
+        - DI container / wiring file or manual composition root
+        - Constructor injection patterns and interface ownership
+        - Service lifecycle management (start/stop ordering)
+        - Initialisation complexity and startup time
+        - Testing seam availability (can services be tested in isolation?)
+      questions:
+        - How does the project wire its dependency graph without global state or init() hell?
+        - Are interfaces defined by consumers or producers?
+        - How is startup ordering managed when services depend on each other?
+        - What happens during graceful shutdown — is ordering guaranteed?
+        - Can individual services be tested without booting the entire system?
+    - number: '03'
+      name: configuration-environment-management
+      title: Configuration & Environment Management
+      description: Env vars, config layering, runtime overrides, secrets, feature flags, validation
+      purpose: >-
+        Studies how configuration flows from source (env vars, config files, remote stores) through the application —
+        secrets management, feature flags, runtime overrides, and validation. Critical for multi-tenant AI systems where
+        per-customer configuration is the norm.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - 'Locate the configuration loading path: sources, merging, validation.'
+        - Identify how secrets and sensitive values are injected and isolated.
+        - Examine feature flag or runtime override mechanisms.
+        - Evaluate config change reactivity (hot-reload vs restart).
+      evidence:
+        - Config struct definitions with validation tags
+        - Environment variable binding and parsing
+        - Secret injection mechanism (Vault, env, encrypted files)
+        - Feature flag system or toggles
+        - Config file format and schema enforcement
+      questions:
+        - How does the system compose config from multiple sources (file, env, remote)?
+        - How are secrets managed without leaking into logs or version control?
+        - Can config be changed at runtime or does it require restart?
+        - How is config validated at startup vs lazily?
+        - How does the system handle missing or invalid configuration?
+    - number: '04'
+      name: http-api-surface
+      title: HTTP/API Surface Design
+      description: Routing, handlers, versioning, pagination, streaming, error contracts, middleware
+      purpose: >-
+        Analyzes HTTP API design — routing structure, handler organisation, versioning strategy, pagination conventions,
+        streaming support, error contract consistency, and middleware layering. For HelloSales this covers the public
+        and internal API surface at scale.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify route registration pattern and handler organisation.
+        - Examine error response format and consistency across endpoints.
+        - Look for versioning, pagination, filtering, and streaming patterns.
+        - Evaluate middleware layering, auth enforcement, and request validation.
+      evidence:
+        - Route registration files and HTTP framework choice
+        - Error response schema and error type hierarchy
+        - Pagination implementation (cursor vs offset, default limits)
+        - Streaming endpoints (SSE, WebSocket, chunked responses)
+        - Middleware chain organisation (auth, rate-limit, logging, recovery)
+      questions:
+        - How are routes organised and registered — by resource, version, or domain?
+        - Is there a consistent error contract clients can depend on?
+        - How does the API handle pagination at scale without performance cliffs?
+        - What middleware is global vs per-route, and how is layering managed?
+        - How is API versioning handled without duplicating handlers?
+    - number: '05'
+      name: background-jobs-async-workflows
+      title: Background Jobs & Async Workflows
+      description: Queues, retries, workers, orchestration, cancellation, scheduling, durable execution
+      purpose: >-
+        Examines how background processing is architected — queues, retries, workers, orchestration, cancellation,
+        scheduling, and durable execution. This is arguably the most important dimension for HelloSales given its
+        reliance on long-running AI pipelines and async data processing.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify the queuing/worker infrastructure (in-process, Redis, NATS, Kafka, Temporal).
+        - Trace a job from submission through execution to completion/failure.
+        - Examine retry policies, dead-letter handling, and backpressure.
+        - Look for workflow orchestration, DAG execution, or saga patterns.
+      evidence:
+        - Queue/worker abstractions and job type definitions
+        - Retry policy configuration (max attempts, backoff, jitter)
+        - Dead-letter queue or failed-job handling
+        - Workflow/orchestration engine if present
+        - Job scheduling and cron-like semantics
+      questions:
+        - How are background jobs submitted, tracked, and completed?
+        - What happens when a job fails — retry, dead-letter, or compensate?
+        - How does the system handle job duration limits and cancellation?
+        - Are workflows composed of multiple steps with state management?
+        - How is backpressure applied when the system is overloaded?
+    - number: '06'
+      name: concurrency-model
+      title: Concurrency Model
+      description: Goroutines, channels, worker pools, cancellation, backpressure, bounded concurrency
+      purpose: >-
+        Studies the concurrency architecture — goroutine lifecycle, channel usage, worker pool patterns, cancellation
+        propagation, backpressure mechanisms, and bounded concurrency. For AI/data systems, preventing concurrency from
+        becoming nondeterministic chaos is paramount.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify goroutine spawning patterns and lifecycle management.
+        - Examine channel usage for communication vs synchronization.
+        - Look for worker pool, fan-out/fan-in, and pipeline patterns.
+        - Evaluate cancellation propagation and context usage.
+      evidence:
+        - Goroutine spawning discipline with lifecycle tracking
+        - Channel types and usage patterns (signaling, streaming, pooling)
+        - Worker pool implementations and bounded concurrency
+        - context.Context usage for cancellation and deadlines
+        - sync.WaitGroup, errgroup, or semaphore patterns
+      questions:
+        - How does the project manage goroutine lifetimes without leaking?
+        - Are there bounded concurrency patterns when handling many tasks?
+        - How is cancellation propagated through multi-step operations?
+        - What patterns prevent channel deadlocks or goroutine leaks?
+        - How does the system handle backpressure under load?
+    - number: '07'
+      name: data-ingestion-processing-pipelines
+      title: Data Ingestion & Processing Pipelines
+      description: Ingestion stages, transforms, batching, validation, normalization, enrichment, ETL flow
+      purpose: >-
+        Examines how data moves through ingestion and processing pipelines — stages, transforms, batching, validation,
+        normalization, enrichment, and ETL flow. HelloSales is fundamentally a data system: raw signals become
+        structured intelligence through multi-stage pipelines.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - 'Identify the data ingestion path: how raw data enters the system.'
+        - Trace data through processing stages (validate → transform → enrich → store).
+        - Examine batching strategy, backpressure, and partial-failure handling.
+        - Look for pipeline observability and data quality checks.
+      evidence:
+        - Ingestion entry points and data format contracts
+        - Pipeline stage definitions and data flow between stages
+        - Validation and normalization logic
+        - Batching and flush semantics
+        - Error handling for malformed or partial data
+      questions:
+        - How does raw data become trustworthy structured data?
+        - What happens when a pipeline stage fails mid-batch?
+        - How is data quality validated at each pipeline stage?
+        - How does the pipeline scale with data volume without OOM?
+        - Can pipeline stages be independently deployed or scaled?
+    - number: '08'
+      name: state-management-persistence
+      title: State Management & Persistence
+      description: Repositories, transactions, caching, consistency, snapshots, workflow state, event persistence
+      purpose: >-
+        Studies how state is managed — repository patterns, transaction boundaries, caching strategy, consistency
+        models, snapshots, workflow state persistence, and event sourcing. For multi-tenant AI workflows, understanding
+        how state is maintained across long-running operations is critical.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify the storage layer abstractions and query patterns.
+        - Examine transaction boundaries and consistency guarantees.
+        - Look for caching layers, invalidation strategies, and write-behind patterns.
+        - Evaluate state persistence for long-running or resumable operations.
+      evidence:
+        - Repository/DAL abstractions and query interfaces
+        - Transaction management and isolation level choices
+        - Caching layer (in-memory, Redis, CDN) and invalidation logic
+        - Workflow/process state persistence model
+        - Migration and schema evolution strategy
+      questions:
+        - How is state accessed and mutated — direct DB, repository, or event-sourced?
+        - What consistency model does the system provide to callers?
+        - How is cache invalidation handled without stale reads?
+        - How is long-running workflow state persisted and resumed?
+        - What happens to in-flight state during schema migrations?
+    - number: '09'
+      name: observability-operational-visibility
+      title: Observability & Operational Visibility
+      description: Logging, tracing, metrics, correlation IDs, event models, debugging ergonomics
+      purpose: >-
+        Analyzes observability infrastructure — structured logging, distributed tracing, metrics collection, correlation
+        ID propagation, event models, and debugging ergonomics. For AI systems where failures cross service boundaries,
+        observability is the difference between 3am resolution and 3am chaos.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify the logging framework, format, and routing.
+        - Examine tracing instrumentation and span propagation.
+        - Look for metrics collection, dashboards, and alerting integration.
+        - Evaluate how correlation IDs flow through async boundaries.
+      evidence:
+        - Structured logging configuration (level, format, output)
+        - OpenTelemetry or tracing instrumentation
+        - Metrics exposition (Prometheus, statsd, custom)
+        - Correlation ID propagation through sync and async paths
+        - Health check and readiness endpoints
+      questions:
+        - Can an operator reconstruct a single request's full path through the system?
+        - How are structured logs routed, stored, and queried in production?
+        - What metrics indicate system health vs performance degradation?
+        - How does observability cross async boundaries (queues, workflows)?
+        - What debugging tooling exists for production issues?
+    - number: '10'
+      name: error-taxonomy-failure-handling
+      title: Error Taxonomy & Failure Handling
+      description: Retries, typed errors, propagation, wrapping, partial failure, degradation strategies
+      purpose: >-
+        Examines how the system models and handles failure — error type hierarchies, wrapping conventions, propagation
+        patterns, retry strategies, partial failure semantics, and graceful degradation. One of the most underrated
+        dimensions, especially for AI pipelines where failure is the norm, not the exception.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify the error type hierarchy and custom error definitions.
+        - Examine error wrapping and unwrapping conventions.
+        - Look for retry logic, circuit breakers, and fallback strategies.
+        - Evaluate how partial failures are reported to callers.
+      evidence:
+        - Custom error types and sentinel errors
+        - Error wrapping with stack traces and context
+        - Retry utility functions or middleware
+        - Circuit breaker or rate limiter implementations
+        - Graceful degradation and fallback paths
+      questions:
+        - How does the system distinguish client errors from server errors from transient failures?
+        - Are errors typed so callers can handle specific failure modes?
+        - What is the retry strategy — exponential backoff, jitter, max attempts?
+        - How are partial failures in batch operations reported?
+        - Does the system have circuit breakers to prevent cascade failures?
+    - number: '11'
+      name: ai-runtime-model-abstraction
+      title: AI Runtime & Model Abstraction
+      description: Provider abstraction, prompt execution, model routing, context management, retries, streaming, token accounting
+      purpose: >-
+        Analyzes how AI/ML functionality is abstracted and managed — provider abstraction layers, prompt execution
+        pipelines, model routing and selection, context window management, streaming response handling, retry strategies
+        for LLM calls, and token usage accounting. Directly maps to HelloSales's AI orchestration layer.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify AI provider abstraction layers and adapter interfaces.
+        - Examine prompt construction, template management, and context window tracking.
+        - Look for streaming response handling and partial result processing.
+        - Evaluate token counting, cost tracking, and rate-limit awareness.
+      evidence:
+        - Provider adapter interfaces and registry
+        - Prompt template system with variable injection
+        - Streaming response parsers and chunk aggregation
+        - Token counting and context window management
+        - Rate-limit handling and model fallback logic
+      questions:
+        - How does the system abstract across different AI providers without leaky abstractions?
+        - How are prompts constructed, versioned, and tested?
+        - How is context window overflow handled — truncation, summarization, or segmentation?
+        - How does streaming work end-to-end from provider to end user?
+        - How are token costs tracked and attributed to tenants/users?
+    - number: '12'
+      name: workflow-agent-orchestration
+      title: Workflow / Agent Orchestration
+      description: Graph execution, state transitions, resumability, checkpoints, DAGs, task routing
+      purpose: >-
+        Examines how complex multi-step workflows are orchestrated — graph execution engines, state transition models,
+        resumability and checkpointing, DAG-based task routing, and agent coordination. Directly critical for
+        HelloSales's AI pipeline orchestration where sales workflows span multiple stages, models, and data sources.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify the workflow execution model (DAG, state machine, actor, etc.).
+        - Examine how workflow state is persisted and resumed after interruption.
+        - Look for checkpointing, compensation (Saga), and retry-at-step semantics.
+        - Evaluate how parallel branches, joins, and error paths are modelled.
+      evidence:
+        - Workflow definition DSL or configuration model
+        - State persistence and checkpoint/recovery mechanism
+        - Step-level retry and timeout configuration
+        - Parallel execution and join patterns
+        - Compensation or rollback logic for failed workflows
+      questions:
+        - How are multi-step workflows defined, stored, and executed?
+        - What happens when a workflow is interrupted mid-step — can it resume?
+        - How are parallel workflow branches coordinated and joined?
+        - How does the system handle workflow-level timeouts and cancellations?
+        - Is there compensation logic for partial workflow failures?
+    - number: '13'
+      name: extensibility-plugin-architecture
+      title: Extensibility & Plugin Architecture
+      description: Hooks, plugin loading, extension APIs, contracts, SDK design
+      purpose: >-
+        Analyzes extensibility mechanisms — hook systems, plugin loading and lifecycle, extension API contracts, SDK
+        design patterns, and how the system stays extensible without becoming unmaintainable. Critical for HelloSales as
+        it evolves toward integrations, custom sales workflows, and customer plugins.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify the plugin/extension model and how plugins are discovered and loaded.
+        - Examine the extension contract (interface, lifecycle hooks, permissions).
+        - Look for hook points in critical paths (auth, data processing, workflow steps).
+        - Evaluate how plugin failures are isolated from the core system.
+      evidence:
+        - Plugin registration/discovery mechanism
+        - Extension interface definitions and contract versioning
+        - Lifecycle hooks (init, start, stop, health)
+        - Plugin isolation model (process, WASM, goroutine)
+        - Examples of built-in or first-party plugins
+      questions:
+        - How are plugins discovered, loaded, and verified?
+        - What extension points exist for custom business logic?
+        - How does the system prevent a misbehaving plugin from bringing down the host?
+        - How are plugin APIs versioned to prevent breakage on upgrade?
+        - What debugging and observability exists for plugin execution?
+    - number: '14'
+      name: testing-strategy-reliability
+      title: Testing Strategy & Reliability Engineering
+      description: Integration testing, end-to-end testing, harnesses, mocks, fixtures, determinism
+      purpose: >-
+        Studies testing philosophy and infrastructure — integration testing approach, end-to-end test harnesses, mocking
+        strategies, test fixtures, deterministic testing of concurrent/async code, and reliability engineering
+        practices. Essential for maintaining velocity in systems as complex as HelloSales.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify testing layers (unit, integration, e2e) and their organisation.
+        - Examine test harness infrastructure (testcontainers, fixtures, mocks).
+        - Look for deterministic testing of concurrent, async, or time-dependent code.
+        - Evaluate CI integration, test speed, and flakiness management.
+      evidence:
+        - Test directory structure and test naming conventions
+        - Integration test setup (containers, DB fixtures, network mocks)
+        - Mock/fake implementations for external dependencies
+        - Deterministic testing patterns for concurrent code
+        - CI pipeline test stages and parallelisation
+      questions:
+        - How does the project test async, concurrent, or time-dependent code deterministically?
+        - What is the balance between unit, integration, and e2e tests?
+        - How are external dependencies (DBs, APIs, queues) mocked or replaced in tests?
+        - How does the project prevent flaky tests from eroding trust?
+        - Can integration tests run locally without cloud dependencies?
+    - number: '15'
+      name: performance-resource-discipline
+      title: Performance & Resource Discipline
+      description: Memory allocation, pooling, streaming, batching, lazy loading, query optimization
+      purpose: >-
+        Examines performance and resource management — memory allocation patterns, object pooling, streaming versus
+        buffering, batching strategy, lazy loading, query optimization, and profiling discipline. For AI/data systems
+        where a single pipeline can process GBs, resource discipline separates production-ready from prototype.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify memory management patterns (pooling, reuse, zero-alloc).
+        - Examine streaming vs buffering choices in data paths.
+        - Look for batching strategies in I/O, DB, and API calls.
+        - Evaluate profiling, benchmarking, and optimisation culture.
+      evidence:
+        - Object pool or sync.Pool usage
+        - Streaming readers/writers vs in-memory buffers
+        - Batch processing parameters and flush thresholds
+        - Benchmark tests and performance regression detection
+        - Pprof or tracing-based optimisation evidence
+      questions:
+        - How does the system avoid allocating memory proportional to data size?
+        - Where does the system buffer vs stream, and what drives the choice?
+        - How are batch sizes tuned and what happens at batch boundaries?
+        - Is there a performance regression testing culture?
+        - What profiling tools are used to identify bottlenecks?
+    - number: '16'
+      name: security-multi-tenant-isolation
+      title: Security & Multi-Tenant Isolation
+      description: RBAC, auth, tenant isolation, secrets, audit trails, permission propagation
+      purpose: >-
+        Studies security architecture — authentication and authorization models, RBAC implementation, tenant isolation
+        strategies, secret management, audit trail generation, and permission propagation across service boundaries.
+        Essential for HelloSales given it handles customer sales data across organisational boundaries.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify the authN/authZ model and enforcement points.
+        - Examine tenant isolation mechanisms (data, compute, configuration).
+        - Look for audit trail generation and retention.
+        - Evaluate secret handling, encryption, and key management.
+      evidence:
+        - Auth middleware and permission-checking patterns
+        - Role/permission data model and enforcement
+        - Tenant context propagation through service calls
+        - Data isolation at the query/storage layer
+        - Audit event emission and storage
+      questions:
+        - How is authentication performed and how are sessions managed?
+        - How are authorization decisions made and enforced across API boundaries?
+        - How is tenant A prevented from accessing tenant B's data?
+        - What audit events are captured and how long are they retained?
+        - How are secrets encrypted at rest and in transit?
+    - number: '17'
+      name: developer-experience-operational-ergonomics
+      title: Developer Experience & Operational Ergonomics
+      description: Local development, tooling, migrations, scripts, onboarding, dev observability
+      purpose: >-
+        Examines developer experience and operational ergonomics — local development setup, tooling quality, migration
+        tooling, build scripts, onboarding documentation, and debugging ergonomics during development. Underrated but
+        determines how fast engineers can safely evolve the system.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Evaluate the local development setup (docker-compose, dev containers, tooling).
+        - Examine migration tooling for schema, config, and data.
+        - Look for build scripts, Makefiles, and CI/CD pipeline quality.
+        - Assess onboarding documentation and contribution guides.
+      evidence:
+        - Local development environment setup (Docker, devcontainer, scripts)
+        - Database and schema migration tooling
+        - Makefile or task runner organisation
+        - CI/CD pipeline configuration
+        - CONTRIBUTING.md, README, and onboarding documentation
+      questions:
+        - How quickly can a new engineer go from clone to running the full system?
+        - How are database schema changes tested and deployed?
+        - What tooling exists for local debugging of async/workflow code?
+        - How consistent is the build across different developer machines?
+        - How does the project balance developer velocity with production safety?
+    - number: '18'
+      name: governance-evolution-strategy
+      title: Governance & Evolution Strategy
+      description: ADRs, migration strategy, deprecation, schema evolution, compatibility, rollout patterns
+      purpose: >-
+        Analyzes architectural governance and evolution — Architecture Decision Records, migration strategies,
+        deprecation policies, schema evolution approaches, backward compatibility guarantees, and rollout patterns.
+        Aligned with ultraplan's own philosophy of evidence-driven architecture that survives years of change.
+      steps:
+        - Read prompts/base.md for execution instructions.
+        - Identify ADR or architectural decision documentation.
+        - Examine migration and deprecation strategies for APIs and schemas.
+        - Look for backward compatibility testing and semver adherence.
+        - Evaluate rollout patterns (feature flags, canary, blue-green).
+      evidence:
+        - ADR directory or architectural decision documentation
+        - Deprecation policy and migration guides
+        - Schema evolution strategy (database, API, config)
+        - Semantic versioning and compatibility testing
+        - Rollout and release engineering patterns
+      questions:
+        - How are architectural decisions documented and revisited?
+        - What is the deprecation policy for APIs and how is it communicated?
+        - How does the system evolve its data schema without downtime?
+        - How are breaking changes introduced and migrated?
+        - What rollout patterns are used to limit blast radius of changes?

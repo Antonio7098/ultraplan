@@ -4,8 +4,7 @@
 > Sprint ID: sprint-[XX]-[name]
 > Output: `targets/[target-slug]/sprints/sprint-[XX]-[name]/reasoning.md`
 > Sprint Tracker: `targets/[target-slug]/sprints/sprint-[XX]-[name]/plan.md`
-> Evidence Bundle: `targets/[target-slug]/reports/sprint-evidence/[bundle].txt`
-
+ 
 ## Overview
 
 **Sprint:** [Name]
@@ -23,9 +22,8 @@
 
 ## Evidence Basis
 
-**Evidence Bundle:** `targets/[target-slug]/reports/sprint-evidence/[bundle].txt`
 **Evidence Status:** [Complete and used / Partial with reason / Missing with reason]
-**Context Strategy:** [Full bundle loaded / Staged loading used / Additional source exploration used]
+**Context Strategy:** [All packs loaded / Staged loading used / Additional source exploration used]
 
 ### Evidence Packs Used
 
@@ -211,7 +209,7 @@ The tracker must include:
 
 - [ ] Sprint scope is fully covered.
 - [ ] Target PRD and TRD requirements are mapped.
-- [ ] Evidence bundle was read or staged according to the context strategy.
+- [ ] Evidence packs were read or staged according to the context strategy.
 - [ ] Applicable, non-applicable, and ambiguous requirements are recorded where relevant.
 - [ ] Study evidence is tied to decisions, risks, alternatives, or expected evidence.
 - [ ] Important decisions are explicitly justified.

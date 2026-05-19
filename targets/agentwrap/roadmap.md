@@ -51,54 +51,29 @@ Supporting Go internals/principles dimensions:
 - Performance
 - Engineering philosophy
 
-## Study Evolve Planning Flow
+## Evidence Loading Strategy
 
 The evidence packs are selectors, not the full planning context.
 
-For sprint planning, run `study evolve --final-only` on the sprint's evidence packs and write the result to `targets/agentwrap/reports/sprint-evidence/`. The command expands each pack into a staged planning bundle:
+For sprint planning, load the relevant evidence packs (each ~40 lines). Read the compressed guidance first, then open linked final reports only when a decision needs deeper evidence. Open per-source reports and code references only when final-report evidence is insufficient for a concrete decision.
 
-- the evidence pack content
-- every linked final report from `## Source Reports`
-- a manifest of the top per-source reports by score, with `--top-sources 1` as the default planning depth
-- bundle statistics
+The sprint planner should load the PRD, TRD, feature architecture protocol, roadmap sprint section, and the relevant evidence packs.
 
-Use `--final-only --top-sources 1` for real sprint planning. It keeps the initial packet to evidence packs and final reports, then lets the planner open individual per-source reports or code snippets only when a decision needs them. Omit `--final-only` only when the sprint genuinely needs a heavier evidence dump.
-
-Sprint evidence bundle commands:
-
-| Sprint | Command |
-| --- | --- |
-| 0 Target Brief and Decision Scaffold | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/00-target-brief.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 1 Project Skeleton and Test Harness | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/01-project-skeleton.txt @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 2 Core Runtime Contract | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/02-core-runtime-contract.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 3 OpenCode Structured Event Adapter | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/03-opencode-adapter.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 4 Lifecycle, Cancellation, Cleanup, and Retained Sessions | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/04-lifecycle-sessions.txt @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 5 Health Checks and Configuration Validation | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/05-health-config.txt @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 6 Retry, Backoff, Fallback, and Rate Limits | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/06-resilience-policies.txt @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 7 Output Validation and Repair | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/07-validation-repair.txt @targets/agentwrap/reports/evidence/validation-repair.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 8 Observability, Metadata, and Persistence Hooks | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/08-observability-metadata.txt @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 9 Executable Surface Review | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/09-executable-surface.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/testing-strategy.md` |
-| 10 Second Runtime Spike | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/10-second-runtime-spike.txt @targets/agentwrap/reports/evidence/runtime-contract.md @targets/agentwrap/reports/evidence/session-lifecycle.md @targets/agentwrap/reports/evidence/resilience-policies.md @targets/agentwrap/reports/evidence/observability-metadata.md` |
-| 11 UltraPlan Integration Spike | `study evolve --final-only --top-sources 1 --output targets/agentwrap/reports/sprint-evidence/11-ultraplan-integration.txt @targets/agentwrap/reports/evidence/observability-metadata.md @targets/agentwrap/reports/evidence/validation-repair.md @targets/agentwrap/reports/evidence/session-lifecycle.md` |
-
-The sprint planner should load the PRD, TRD, feature architecture protocol, roadmap sprint section, and that generated bundle.
-
-If the generated bundle does not fit into context:
+If the full set of reports does not fit into context:
 
 1. Load the PRD, TRD, feature architecture protocol, and roadmap sprint section first.
-2. Load the evidence pack sections from the bundle.
+2. Load the evidence pack sections.
 3. Load only the `Final Report:` sections that match the sprint decisions being made.
-4. Use the per-source manifest to open reports one source at a time, starting with the highest-scored source.
+4. Open per-source reports only when final-report evidence is insufficient.
 5. Load resolved code references only for decisions that need concrete implementation evidence.
 6. Record what was omitted from context and why in the sprint plan.
 
-The sprint planner may explore more source reports or repository code directly when the generated bundle does not provide enough evidence for a decision. That exploration should be narrow, cited in the sprint plan, and tied to a specific requirement, tradeoff, risk, or open question.
+The sprint planner may explore more source reports or repository code directly when the evidence packs and final reports do not provide enough evidence for a decision. That exploration should be narrow, cited in the sprint plan, and tied to a specific requirement, tradeoff, risk, or open question.
 
 ## Non-Negotiable Development Rules
 
 - Every sprint starts from the PRD/TRD requirement sections it satisfies.
-- Every sprint generates the matching `study evolve --top-sources 1` bundle before planning implementation.
-- Every sprint plan cites the generated bundle path and the evidence packs used to produce it.
+- Every sprint plan cites the evidence packs used to inform its decisions.
 - Every sprint ends with an evaluation against the same study dimensions that informed it.
 - Do not proceed to the next sprint while known foundational defects remain.
 - Keep executable-oriented study material internal to engineering principles; do not infer a user-facing executable surface from it.
