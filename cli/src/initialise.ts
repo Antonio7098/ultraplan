@@ -1,4 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs"
+import { execSync } from "child_process"
 import { join } from "path"
 import yaml from "js-yaml"
 import { ULTRAPLAN_ROOT, STUDIES_DIR, runOpenCode, loadConfig, OPENCODE_CONFIG_PATH, type Config } from "./index.js"
@@ -202,6 +203,7 @@ export async function cmdInitialiseStudy(yamlPath: string, opts: {
   variant?: string
   dryRun?: boolean
   force?: boolean
+  noClone?: boolean
   timeoutMs?: number
   outputDir?: string
 }) {
@@ -266,11 +268,14 @@ export async function cmdInitialiseStudy(yamlPath: string, opts: {
     console.log("\nWould create:\n")
     console.log(`  ${studyDir}/`)
     console.log(`  ${studyDir}/dimensions/  (${config.dimensions.count} .md files)`)
-    console.log(`  ${studyDir}/sources/     (${config.repos.count} entries)`)
+    console.log(`  ${studyDir}/sources/     (${config.repos.count} repos → git clone --depth 1)`)
     console.log(`  ${studyDir}/reports/source/`)
     console.log(`  ${studyDir}/reports/final/`)
     console.log(`  ${studyDir}/study-init.yml`)
     console.log(`  ${studyDir}/README.md`)
+    if (opts.noClone) {
+      console.log("\n  (skipping clone: --no-clone)")
+    }
     console.log("")
     return
   }
@@ -343,8 +348,6 @@ export async function cmdInitialiseStudy(yamlPath: string, opts: {
 
   if (opts.force && existsSync(studyDir)) {
     console.log(`  ⚠ Removing existing study directory (--force)`)
-    // rmSync doesn't exist in fs, use execSync instead
-    const { execSync } = await import("child_process")
     execSync(`rm -rf "${studyDir}"`)
   }
   mkdirSync(join(studyDir, "dimensions"), { recursive: true })
@@ -412,6 +415,34 @@ study ${config.name} status
   writeFileSync(join(studyDir, "README.md"), studyReadme, "utf-8")
   console.log(`  ✓ README.md written`)
 
+  if (!opts.noClone) {
+    console.log(`\n▶ Cloning repos into sources/...\n`)
+    const sourcesDir = join(studyDir, "sources")
+    let cloned = 0
+    let failed = 0
+    for (const repo of config.repos.items) {
+      const dest = join(sourcesDir, repo.name)
+      if (existsSync(dest)) {
+        console.log(`  ○ ${repo.name} already exists, skipping`)
+        cloned++
+        continue
+      }
+      try {
+        console.log(`  ○ Cloning ${repo.name}...`)
+        execSync(`git clone --depth 1 "${repo.url}" "${dest}"`, {
+          stdio: "pipe",
+          timeout: 120_000,
+        })
+        console.log(`  ✓ ${repo.name} cloned`)
+        cloned++
+      } catch (err) {
+        console.error(`  ✗ ${repo.name} failed: ${err instanceof Error ? err.message : String(err)}`)
+        failed++
+      }
+    }
+    console.log(`\n  Cloned: ${cloned}, failed: ${failed}`)
+  }
+
   console.log(`\n✓ Study "${config.name}" initialised at ${studyDir}`)
   console.log(`  Dimensions: ${config.dimensions.items.length}`)
   console.log(`  Repos:      ${config.repos.items.length}`)
@@ -426,10 +457,17 @@ study ${config.name} status
     console.log(`     Edit study-init.yml and re-run or populate sources/ manually.`)
   }
 
-  console.log(`\nNext steps:`)
-  console.log(`  1. Populate sources/ with git clones of the listed repos:`)
-  console.log(`     git clone <url> ${studyDir}/sources/<name>`)
-  console.log(`  2. Review and edit dimension files in ${studyDir}/dimensions/`)
-  console.log(`  3. Run: study ${config.name} run-all`)
-  console.log("")
+  if (opts.noClone) {
+    console.log(`\nNext steps:`)
+    console.log(`  1. Populate sources/ with git clones:`)
+    console.log(`     git clone <url> ${join(studyDir, "sources")}/<name>`)
+    console.log(`  2. Review and edit dimension files in ${join(studyDir, "dimensions")}/`)
+    console.log(`  3. Run: study ${config.name} run-all`)
+    console.log("")
+  } else {
+    console.log(`\nNext steps:`)
+    console.log(`  1. Review and edit dimension files in ${join(studyDir, "dimensions")}/`)
+    console.log(`  2. Run: study ${config.name} run-all`)
+    console.log("")
+  }
 }

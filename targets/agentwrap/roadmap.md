@@ -372,6 +372,14 @@ Make successful runtime execution subordinate to caller-defined product success 
 - `studies/go-cli-study/reports/final/05-error-handling.md`
 - `studies/go-cli-study/reports/final/11-testing-strategy.md`
 
+### OpenCode Internals Evidence
+
+OpenCode's `StructuredOutputError` (`session/prompt.ts:1834-1849`) demonstrates how structured output is injected as a tool and validated at decode time — missing or malformed structured output raises a typed error rather than returning partial data to the caller. The `StructuredOutput` tool definition enforces schema compliance at the model level before any result reaches the consumer.
+
+For repair flows, OpenCode's `SessionProcessor.Handle` (`session/processor.ts:823`) shows dual-write persistence: tool results are persisted as `ToolPart` records with explicit state transitions (`pending → running → completed | error`). The processor's `updateToolCall()`, `completeToolCall()`, `failToolCall()` methods provide a per-part lifecycle that repair attempts can reuse. Same-session repair maps to OpenCode's session continuation pattern: forking (`session.fork()`) or continuing (`SessionProcessor.process()`) within the same retained session.
+
+Session continuation and `parentID` tracking (`session/session.ts`) enable repair flows where a repair prompt runs in the same session context. This avoids context loss across repair attempts while preserving the causal chain.
+
 ### Output
 
 - Validator API.
@@ -409,6 +417,26 @@ Expose enough structured state for dashboards, historical inspection, synthesis,
 - `studies/go-cli-study/reports/final/10-logging-observability.md`
 - `studies/go-cli-study/reports/final/14-performance.md`
 - `studies/go-cli-study/reports/final/15-philosophy.md`
+
+### OpenCode Internals Evidence
+
+OpenCode has **two parallel event systems** with different strengths:
+
+1. **EventV2** (`packages/core/src/event.ts:34-59`): Typed event registry with `EventV2.define({ type, version?, aggregate?, schema })`. Events carry `{ id, type, data, version, location?, metadata? }`. `EventV2.subscribe(definition)` returns typed `Stream<Payload>`; `EventV2.Service` is backed by Effect `PubSub` with per-type lazy PubSubs and a global `all()` stream. Sync handlers (`EventV2.sync(handler)`) run synchronously before PubSub publish — ideal for bridging to persistence.
+
+2. **Bus system** (`bus/bus-event.ts`): Legacy `BusEvent.define(type, properties)` with `{ id, type, properties }` shape. In-process pub/sub via `Bus.Service` backed by Effect `PubSub`. Per-instance isolation via `InstanceState`. `GlobalBus` (`bus/global.ts`) bridges events across instances.
+
+The full **session event catalog** (`packages/core/src/session-event.ts:402`) defines 27+ event types across lifecycles: `SessionLifecycle` (AgentSwitched, ModelSwitched, Prompted), `Step` (Started/Ended/Failed), `Text` (Started/Delta/Ended), `Reasoning` (Started/Delta/Ended), `Tool` (Input.Started/Delta/Ended, Called, Progress, Success, Failed), `Shell` (Started/Ended), `Retried`, `Compaction` (Started/Delta/Ended). All share `Base: { timestamp, sessionID }`. Tokens are structured as `{ input, output, reasoning, cache: { read, write } }`.
+
+**Session.Info** (`session/session.ts`) provides the canonical metadata schema: `id`, `slug`, `projectID`, `directory`, `parentID` (for forks), `title`, `agent`, `model: { id, providerID, variant? }`, `version`, `tokens: { input, output, reasoning, cache }`, `cost`, `time: { created, updated, compacting?, archived? }`, `summary`, `permission`, `revert`, `share`.
+
+**SSE streaming** (`handlers/event.ts`): `GET /event` subscribes to all bus events via SSE with `{ type, data }` framing, 10-second heartbeat, and `InstanceDisposed` termination.
+
+**SyncEvent projection** (`sync/index.ts:167-183`): Uses SQLite immediate transactions for durable write-ahead. Events are persisted with sequence numbers, then projected into read model tables.
+
+**SessionStatus** (`session/status.ts:12-27`): In-memory `Map<SessionID, Info>` with typed states (`idle | retry | busy`). Published as `session.status` bus events. The `run` CLI subscribes to status events to detect session completion.
+
+**OTEL integration** (`core/src/effect/observability.ts:70-96`): Tracer setup with `service.name` attribute, `OTEL_DIAGNOSTICS` env flag, schema-validated span attributes.
 
 ### Output
 
@@ -448,6 +476,16 @@ Reassess whether any user-facing convenience surface is warranted after the SDK 
 - `studies/go-cli-study/reports/final/10-logging-observability.md`
 - `studies/go-cli-study/reports/final/11-testing-strategy.md`
 
+### OpenCode Internals Evidence
+
+OpenCode's **external SDK client** (`packages/sdk/js/src/v2/client.ts`) shows the factory-pattern entrypoint: `createOpencodeClient({ baseUrl, directory?, headers?, fetch? })` returns a typed `OpencodeClient` with methods grouped by domain (`session.*`, `config.*`, `event.subscribe()`, `file.*`, `mcp.*`, `provider.*`, `permission.*`). Header-based directory/workspace routing (`x-opencode-directory`, `x-opencode-workspace`) keeps the URL path clean.
+
+The **CLI command architecture** (`cli/cmd/*`) uses `effectCmd({ command, describe, builder, instance?, handler })` to bridge yargs with Effect handlers. The `run` command (`cli/cmd/run.ts:852`) supports three modes: non-interactive (single prompt, stream events to stdout), interactive local (in-process server + TUI), and interactive attach (remote server). The `--format json` flag produces per-line `JSON.stringify({ type, timestamp, sessionID, ...data })` — the reference pattern for structured CLI output.
+
+**Plugin hooks** (`packages/plugin/src/index.ts`) define the extensibility surface: `Hooks` interface with `hook`, `config`, `tool`, `auth`, `provider`, `chat.message`, `chat.params`, `chat.headers`, `permission.ask`, `command.execute.before`, `tool.execute.before/after`, `shell.env`, `experimental.*`.
+
+**Configuration loading** (`config/config.ts`) demonstrates a well-tested precedence chain: managed config → cloud/console → remote well-known → global → env var path → project-local → env inline override. The `mergeConfigConcatArrays` deep merge and JSONC support are production-proven patterns.
+
 ### Output
 
 - Determination on whether any additional surface is needed.
@@ -484,6 +522,16 @@ Prove the abstraction is real by adding a minimal second runtime or runtime simu
 - `studies/opencode-wrap-study/reports/final/03-resilience-fallback-and-validation.md`
 - `studies/opencode-wrap-study/reports/final/04-workflow-composition-and-observability.md`
 
+### OpenCode Internals Evidence
+
+OpenCode's **external SDK client** (`packages/sdk/js/src/v2/client.ts`) demonstrates the HTTP/REST contract for a second runtime: `createOpencodeClient({ baseUrl })` connects to `opencode serve` and provides typed `session.*`, `config.*`, `event.subscribe()` (SSE), and `permission.reply()` methods. The `OpencodeServer` helper (`packages/sdk/js/src/server.ts`) spawns the `opencode serve` binary and parses the URL from stdout — proving the subprocess-launch pattern works.
+
+The **InstanceState** pattern (`effect/instance-state.ts`) shows per-directory scoped state using `ScopedCache` — each project directory gets isolated state, avoiding cross-project contamination. This is a model for how the SDK wrapper can manage multiple runtime instances.
+
+The **Runner state machine** (`effect/runner.ts:217`) enforces session concurrency with `Idle | Running | Shell | ShellThenRun` transitions. `Busy` is a `Schema.TaggedErrorClass` — the SDK must surface this as a typed error (409 Conflict equivalent) so callers can handle concurrent-access failures.
+
+The **`--format json` event output** (`cli/cmd/run.ts`) with per-line `{ type, timestamp, sessionID, ...data }` provides the reference wire format for a second runtime that does not implement EventV2. A second runtime that only supports this output format must still be mappable to canonical events without losing metadata.
+
 ### Output
 
 - Minimal second runtime implementation or simulator.
@@ -516,6 +564,18 @@ Validate that the SDK primitive supports UltraPlan-style workflows without absor
 - `evidence/observability-metadata.md`
 - `evidence/validation-repair.md`
 - `studies/opencode-wrap-study/reports/final/04-workflow-composition-and-observability.md`
+
+### OpenCode Internals Evidence
+
+OpenCode's **session fork/continue** pattern (`session/session.ts`) is the natural entry point for UltraPlan-style multi-step workflows: `session.create()` → `session.prompt()` → validate → `session.fork()` for repair or continuation. The `parentID` field provides session tree navigation for audit.
+
+The **`--format json` event stream** (`cli/cmd/run.ts`) shows what UltraPlan would consume via the SDK: structured events with `type` discrimination (tool_use, step_start, step_finish, text, reasoning, error) and `sessionID` for correlation. The `event.subscribe()` SSE stream (`handlers/event.ts`) provides the live event path for real-time progress in UltraPlan's TUI or dashboard.
+
+The **EventV2 subscription pattern** (`packages/core/src/event.ts:84-153`) demonstrates how UltraPlan can consume typed events without parsing raw logs: call `EventV2.subscribe(Step.Ended)` to get a typed stream of step completion events with cost/tokens/metadata. The `SessionEvent.All` tagged union (`packages/core/src/session-event.ts`) provides the complete event catalog for UltraPlan's dashboard filters.
+
+The **plugin hooks** (`packages/plugin/src/index.ts`) define the integration boundary: `Hooks.tool.definition` and `Hooks.tool.execute.before/after` are the seams where UltraPlan would inject product-specific tool validation or observability without modifying the SDK.
+
+The **SyncEvent projection** (`sync/index.ts:167-183`) with immediate transactions provides the persistence pattern: events are written durably with sequence numbers, then projected into read model tables. UltraPlan can use this pattern to build its own event store without coupling to the SDK's storage layer.
 
 ### Output
 

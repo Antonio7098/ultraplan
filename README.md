@@ -9,7 +9,8 @@ ultraplan/
 ├── cli/                            # Global CLI tool (study command)
 │   ├── src/index.ts                # Entry point — all commands
 │   ├── src/code.ts                 # Code reference extraction
-│   └── src/evolve.ts               # Evidence-to-code trace
+│   ├── src/evolve.ts               # Evidence-to-code trace
+│   └── src/initialise.ts           # Study initialisation
 ├── config.json                     # Shared model configuration
 ├── prompts/                        # Shared execution prompts
 │   ├── base.md
@@ -46,6 +47,7 @@ ultraplan/
 |-------|-------|---------|
 | `go-cli-study` | Elite Go CLI architectures | age, chezmoi, dive, fzf, gdu, gh-cli, go-task, helm, k9s, lazygit, mitchellh-cli, opencode, rclone, restic, urfave-cli, yq |
 | `opencode-wrap-study` | Agent runtimes & SDK integration | go-plugin, opencode, sdk-go, t3code |
+| `hellosales-architecture` | Large-scale data ingestion, AI orchestration & multi-tenant workflows | grafana, temporal, openfga, pocketbase, victoriametrics, milvus, nats-server, cli, kubernetes |
 
 ## Targets
 
@@ -65,6 +67,12 @@ study list
 
 # List sources and dimensions for a specific study
 study go-cli-study list
+
+# Initialise a new study from a YAML definition (with git clone)
+study initialise-study ./my-study.yml
+
+# Dry-run initialisation (preview without creating files)
+study initialise-study ./my-study.yml --dry-run
 
 # Study one dimension against one source
 study go-cli-study run 01 opencode
@@ -86,6 +94,9 @@ study evolve @targets/opencode-wrap/reports/evidence/cli-design.md
 
 # Plan a sprint for a target
 study sprint-plan opencode-wrap 09-cli-product-surface
+
+# Execute a sprint
+study execute-sprint opencode-wrap 09-cli-product-surface
 ```
 
 ## Commands
@@ -105,9 +116,86 @@ study sprint-plan opencode-wrap 09-cli-product-surface
 | Command | Description |
 |---------|-------------|
 | `list` | List available studies |
+| `initialise-study <study-init.yml>` | Initialise a new study from YAML definition |
 | `code` | Extract code references from a report |
 | `evolve` | Trace evidence packs through reports to source code |
 | `sprint-plan <target> <sprint-slug>` | Plan a sprint using `prompts/plan-sprint.md` |
+| `execute-sprint <target> <sprint-slug>` | Execute a sprint using `prompts/execute-sprint.md` |
+
+## Study Initialisation (`study initialise-study`)
+
+Creates a new study from a YAML definition file. Generates the directory structure, dimension markdown files, and clones all source repositories.
+
+```yaml
+# study-init.yml
+name: my-study
+description: "What this study investigates"
+repos:
+  count: 6             # target number of repos (can exceed items — research fills gaps)
+  items:
+    - name: repo-name
+      url: https://github.com/user/repo
+      description: "Why this repo matters"
+dimensions:
+  count: 4             # target number of dimensions
+  items:
+    - number: 01
+      name: dimension-slug
+      title: "Dimension Title"
+      description: "Brief description"
+      purpose: "Full analysis purpose text (optional — used in .md files)"
+      steps:            # optional — used in dimension .md files
+        - "Step 1 description"
+        - "Step 2 description"
+      evidence:         # optional
+        - "Evidence item 1"
+      questions:        # optional
+        - "Question 1?"
+```
+
+```bash
+# Create a study from a YAML definition
+study initialise-study ./study-init.yml
+
+# Preview without creating files
+study initialise-study ./study-init.yml --dry-run
+
+# Overwrite an existing study
+study initialise-study ./study-init.yml --force
+
+# Override study name, repo count, or dimension count
+study initialise-study ./study-init.yml --name my-study --repos 8 --dimensions 6
+
+# Skip cloning repos into sources/
+study initialise-study ./study-init.yml --no-clone
+
+# Use a custom model for research calls
+study initialise-study ./study-init.yml --model openai/gpt-5.5
+```
+
+### How It Works
+
+1. Reads the YAML definition and applies CLI overrides (`--name`, `--repos`, `--dimensions`).
+2. If `repos.items.length < repos.count`, calls OpenCode to research and suggest additional repositories (writes results to `.init-cache/research-repos.json`).
+3. If `dimensions.items.length < dimensions.count`, calls OpenCode to research and suggest additional dimensions (writes results to `.init-cache/research-dimensions.json`).
+4. Generates `dimensions/{NN}-{name}.md` files with Purpose, Steps, Evidence, Questions, and Rating sections.
+5. Clones all repositories into `sources/` (shallow clone: `git clone --depth 1`).
+6. Writes `study-init.yml` with the full config and a `README.md` with usage instructions.
+
+### Options
+
+| Flag | Description |
+|------|-------------|
+| `--name <name>` | Override study name from YAML |
+| `--repos <N>` | Target number of repos (overrides YAML) |
+| `--dimensions <N>` | Target number of dimensions (overrides YAML) |
+| `--model <model>` | Model for OpenCode research calls |
+| `--variant <effort>` | Model variant (`high`, `max`, `minimal`) |
+| `--dry-run` | Preview without creating files or cloning |
+| `--force` | Overwrite existing study directory |
+| `--no-clone` | Skip cloning repos into sources/ |
+| `--timeout <ms>` | Research task timeout |
+| `--output-dir <dir>` | Custom output directory (default: `studies/`) |
 
 ## Code Extraction (`study code`)
 

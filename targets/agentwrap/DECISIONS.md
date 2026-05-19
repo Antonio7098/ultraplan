@@ -218,9 +218,84 @@ Do not convert study recommendations into accepted architecture decisions until 
 - **Rejected Alternatives:** Choosing JSON/YAML/TOML config loading in the SDK was rejected as product-specific and contrary to the TRD. Relying only on `RunRequest` was rejected because callers need provenance and redacted inspection.
 - **Risk / Follow-up:** Future product integrations may add config-provider layers, but direct env/file reads should remain isolated to config/probe boundaries.
 
+### DEC-016: Policy Runner Wraps Runtime Attempts Instead Of Adapters Retrying Internally
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** `targets/agentwrap/sprints/06-resilience-policies/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` graceful degradation and runtime abstraction; `targets/agentwrap/sources/TRD.md` retry, fallback, and backoff requirements.
+- **Evidence Source:** Sprint 6 implementation in `/home/antonioborgerees/coding/agentwrap`; `targets/agentwrap/reports/evidence/resilience-policies.md`; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Add `PolicyRunner` as a runtime-neutral wrapper around existing `Runtime` attempts. Runtime adapters continue to report explicit attempt outcomes; policy execution owns retry, fallback, backoff, rate-limit events, cancellation-aware waits, and attempt metadata.
+- **Tradeoff:** The SDK gains a public orchestration layer before a second production runtime exists.
+- **Rejected Alternatives:** Adding retry/fallback methods to `Runtime` was rejected because it would force every adapter to own policy semantics. Implementing retry in the OpenCode adapter was rejected because it would hard-code one flow and leak adapter-specific behavior into product logic.
+- **Risk / Follow-up:** Keep `PolicyRunner` scoped to resilience attempts. Do not expand it into workflow/DAG composition without new requirements and evidence.
+
+### DEC-017: Explicit Policy Context And Conservative Built-In Decisions
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** `targets/agentwrap/sprints/06-resilience-policies/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/TRD.md` retry/fallback/backoff policy inspection requirements and error model.
+- **Evidence Source:** Sprint 6 `BasicPolicy` and policy tests in `/home/antonioborgerees/coding/agentwrap`; `studies/go-cli-study/reports/final/05-error-handling.md`; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Policy decisions are made through `ResiliencePolicy.Decide(context.Context, PolicyContext) (PolicyDecision, error)`. `PolicyContext` carries request, attempt, prior attempts, current result/error, target, alternatives, rate-limit info, and a minimal validation placeholder. The built-in `BasicPolicy` retries only classified retryable failures within explicit bounds, does not retry unknown or unrecoverable failures by default, and falls back only to configured alternatives.
+- **Tradeoff:** Callers must opt into retry/fallback behavior instead of receiving broad automatic recovery.
+- **Rejected Alternatives:** Static retry structs only were rejected because they cannot express caller-defined fallback/session decisions. Callback-only hooks were rejected because they encourage hidden side effects and mutable policy state.
+- **Risk / Follow-up:** Sprint 7 should revisit the minimal validation placeholder when real validation results exist.
+
+### DEC-018: Attempt History And Policy Decisions Are First-Class Run Metadata
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** `targets/agentwrap/sprints/06-resilience-policies/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` observability and metadata; `targets/agentwrap/sources/TRD.md` metadata requirements and retry/fallback attempt relationships.
+- **Evidence Source:** Sprint 6 implementation in `metadata.go` and `policy.go`; policy tests proving failed attempts remain visible after success; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Store per-attempt summaries in `RunMetadata.Attempts` and policy decisions in `RunMetadata.Policy`. Attempt summaries include attempt number, target index, runtime run ID, parent logical run ID, runtime/provider/model context, safe request fields, session metadata, timing, status, error category, rate-limit metadata, and native metadata references.
+- **Tradeoff:** Run metadata grows before durable persistence is implemented.
+- **Rejected Alternatives:** Reusing only the single `RunMetadata.Attempt` field was rejected because it cannot explain retry/fallback chains. Hiding failed attempts after a later success was rejected because graceful fallback must remain auditable.
+- **Risk / Follow-up:** Sprint 8 persistence should store `Attempts` and `Policy.Decisions` so attempt history survives process lifetime.
+
+### DEC-019: Rate Limits Have Dedicated Metadata And Policy Events
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** `targets/agentwrap/sprints/06-resilience-policies/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` graceful rate-limit handling; `targets/agentwrap/sources/TRD.md` rate-limit handling and canonical event model.
+- **Evidence Source:** Sprint 6 `RateLimitInfo`, `EventRateLimit` policy emission, and tests for rate-limit retry/backoff behavior; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Represent rate limits with `RateLimitInfo` and surface them through policy context, attempt metadata, and canonical `rate_limit` events. `BasicPolicy` can retry rate limits only when configured and honors `RetryAfter`/reset timing before generic backoff.
+- **Tradeoff:** Real OpenCode/provider-specific rate-limit detection remains limited until fixtures or live evidence prove exact signal shapes.
+- **Rejected Alternatives:** Treating rate limits as generic retryable errors was rejected because callers need policy-visible provider/model and retry timing metadata. Broad untested provider text parsing was rejected as fragile.
+- **Risk / Follow-up:** Add adapter-local OpenCode rate-limit parsing only when fixture or live samples are available.
+
+### DEC-020: Session Continuity Is Explicit Per Policy Decision
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** `targets/agentwrap/sprints/06-resilience-policies/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` retained runtime context; `targets/agentwrap/sources/TRD.md` retry/fallback retained-session requirements.
+- **Evidence Source:** Sprint 6 policy decision/request derivation and session metadata tests; `targets/agentwrap/reports/evidence/session-lifecycle.md`; DEC-011; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Policy decisions can explicitly set session behavior using existing `SessionAction` values, and attempt metadata records the requested and resolved session relationship. Built-in policy behavior does not silently force same-session retry.
+- **Tradeoff:** Conservative defaults may require callers to configure session reuse when they want retained context.
+- **Rejected Alternatives:** Always retrying in the same session was rejected because malformed/unknown failures can leave context unsafe. Always starting fresh was rejected because it discards useful retained context when a policy intentionally wants it.
+- **Risk / Follow-up:** OpenCode same-session continuation remains best-effort until live runtime evidence verifies durable behavior.
+
+### DEC-021: Minimal Core Status, Event, Error, And Policy Fact Model
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** Post-Sprint 6 architecture cleanup before Sprint 7.
+- **Requirement Source:** `targets/agentwrap/sources/TRD.md` runtime interface, structured events, error model, retry/fallback policy, and observability requirements; `targets/agentwrap/roadmap.md` Sprints 7+ validation/repair and observability scope.
+- **Evidence Source:** `targets/agentwrap/reports/opencode-internals-report.md`; implementation cleanup in `/home/antonioborgerees/coding/agentwrap`; `GOCACHE=/tmp/agentwrap-gocache go test ./...`; real OpenCode smoke `AGENTWRAP_OPENCODE_SMOKE=1 GOCACHE=/tmp/agentwrap-gocache go test ./opencode -run TestRealOpenCodeSmoke -count=1 -timeout 3m` run outside the sandbox.
+- **Decision:** Keep the SDK core model small and facts-first. Public run outcome uses `RunStatus` with only `starting`, `running`, `completed`, `failed`, and `cancelled`. Recovery phases such as retry, fallback, validation, repair, health, and cleanup are represented as events or metadata, not core run states. The canonical `Event` envelope contains only `ID`, `RunID`, `SessionID`, `Time`, `Type`, `Payload`, and `Raw`; SDK event projection is stored as payload metadata and exposed through `Event.Kind()`. `SDKError` stores failure facts such as category, operation, user/debug detail, status code, response headers/body, provider/model/runtime, exit/signal/native type, retry-after, metadata, and cause. Retry/fallback/user-actionability/unrecoverability are policy decisions made from facts at decision time, not boolean truth stored on the error. `BasicPolicy` owns default classification and exposes `ShouldRetry` / `ShouldFallback` hooks for callers to override strategy.
+- **Tradeoff:** This is a breaking cleanup: older callers and tests that relied on lifecycle states such as `retrying`, `fallback`, `validating`, `repairing`, `cleaned_up`, event envelope fields such as `Sequence`, `TurnID`, `CorrelationID`, `CauseEventID`, `Context`, or error booleans must move to payload metadata, run metadata, or policy hooks.
+- **Rejected Alternatives:** Mirroring OpenCode's exact 4 internal runner states was rejected because `agentwrap` needs caller-facing terminal statuses. Keeping the previous 14-state lifecycle was rejected because it mixed execution status with policy phases. Keeping event category and correlation fields in the canonical envelope was rejected because they were SDK projections rather than native event facts. Keeping `Retryable`/`Fallbackable`/`UserActionable`/`Unrecoverable` on `SDKError` was rejected because agentwrap-level retryability can differ from OpenCode-level retryability and must be strategy-owned.
+- **Risk / Follow-up:** DEC-005, DEC-006, DEC-013, and DEC-017 are superseded where they describe the older envelope, error booleans, lifecycle vocabulary, or built-in retry classification. Sprint 7 validation/repair must build on fact-based errors and policy hooks rather than reintroducing lifecycle states for repair phases. Sprint 8 persistence should store event payload kind and policy metadata explicitly because those fields are no longer top-level event envelope fields.
+
 ## Superseded Decisions
 
-None.
+- DEC-005 is superseded where it requires sequence, correlation, cause, context, or category fields in the canonical event envelope.
+- DEC-006 is superseded where it requires retryable, fallbackable, user-actionable, or unrecoverable booleans on `SDKError`.
+- DEC-013 is superseded where it requires public correlation fields or a broader lifecycle vocabulary beyond minimal run status.
+- DEC-017 is superseded where it says `BasicPolicy` retries only pre-classified retryable failures or treats unrecoverable error flags as default policy truth.
 
 ## Open Decision Backlog
 

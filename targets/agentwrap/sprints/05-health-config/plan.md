@@ -257,4 +257,10 @@
   - `required preflight blocks invalid model` verifies a missing model is rejected as `ErrorModelUnavailable` before `opencode run`.
 - Real smoke command outside sandbox: `env GOCACHE=/tmp/agentwrap-gocache AGENTWRAP_OPENCODE_HEALTH_SMOKE=1 go test ./opencode -run TestRealOpenCodeHealthSmoke -count=1 -timeout 8m -v` passed on 2026-05-19.
 - Real smoke implementation finding: `opencode run --help` returned exit 0 with help text on stderr, so the structured-output health probe now inspects both stdout and stderr.
+- Review feedback addressed on 2026-05-19:
+  - `RequiredHealthFailure` now fails when an explicitly required check is missing from the health report.
+  - Caller-provided health metadata and nested metadata slices are redacted before they can appear in health reports.
+  - OpenCode probes now run from the requested workdir and stream-detect provider/model/structured-output tokens independently from the bounded diagnostic sample.
+  - Authentication readiness now checks auth markers only on the requested provider line.
+  - Re-ran `env GOCACHE=/tmp/agentwrap-gocache go test ./...` and the outside-sandbox real health smoke command successfully.
 - Updated `/home/antonioborgerees/coding/agentwrap/README.md`, `/home/antonioborgerees/coding/agentwrap/doc.go`, and `targets/agentwrap/DECISIONS.md` (`DEC-014`, `DEC-015`).

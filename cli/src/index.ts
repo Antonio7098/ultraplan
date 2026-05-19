@@ -500,20 +500,15 @@ function cmdStatus(ROOT: string): void {
   const grandTotal = analysisTotal + synthTotal
   const grandCompleted = analysisCompleted + synthCompleted
 
-  console.log(`\nRun started: ${state.createdAt}`)
-  console.log(`Last updated: ${state.updatedAt}`)
-  console.log(`Batch size: ${state.batchSize}`)
-  console.log(`Status: ${state.isComplete ? "✓ Complete" : "▶ In progress"}`)
-  console.log(`\nAnalyses: ${analysisCompleted}/${analysisTotal} (${analysisPct}%)`)
-  console.log(`  Completed: ${analysisCompleted}  Running: ${analysisRunning}  Failed: ${analysisFailed}  Pending: ${analysisPending}`)
-  if (synthTotal > 0) {
-    console.log(`Synthesis: ${synthCompleted}/${synthTotal}  Running: ${synthRunning}  Failed: ${synthFailed}  Pending: ${synthPending}`)
-  }
-  console.log(`Total: ${grandCompleted}/${grandTotal}`)
-  console.log("")
+  const dimCount = new Set(state.tasks.map(t => t.dimensionNumber)).size
+
+  console.log(`\nStarted: ${state.createdAt}`)
+  console.log(`Updated: ${state.updatedAt}`)
+  console.log(`Status: ${state.isComplete ? "✓ Complete" : "▶ In progress"}  |  Batch: ${state.batchSize}`)
 
   if (analysisFailed > 0 || analysisPending > 0 || synthFailed > 0 || synthPending > 0) {
-    console.log("Remaining Analysis Tasks:")
+    console.log("")
+    console.log("Remaining:")
     for (const t of state.tasks) {
       if (t.status === "completed") continue
       const label = `${t.dimensionTitle} × ${t.sourceName}`
@@ -542,6 +537,14 @@ function cmdStatus(ROOT: string): void {
     }
     console.log("")
   }
+
+  console.log(`Dimensions: ${dimCount}  |  Analyses: ${analysisCompleted}/${analysisTotal} (${analysisPct}%)`)
+  if (synthTotal > 0) {
+    console.log(`Synthesis:  ${synthCompleted}/${synthTotal}  |  Total: ${grandCompleted}/${grandTotal}`)
+  } else {
+    console.log(`Total:      ${grandCompleted}/${grandTotal}`)
+  }
+  console.log("")
 }
 
 function cmdList(ROOT: string): void {
@@ -1398,6 +1401,7 @@ async function main() {
       console.error("  --variant <effort>       Model variant (high, max, minimal)")
       console.error("  --dry-run                Preview without creating")
       console.error("  --force                  Overwrite existing study")
+      console.error("  --no-clone               Skip cloning repos into sources/")
       console.error("  --timeout <ms>           Research task timeout")
       console.error("  --output-dir <dir>       Custom output directory (default: studies/)")
       console.error("")
@@ -1411,6 +1415,7 @@ async function main() {
     const variantIdx = initArgs.indexOf("--variant")
     const dryRun = initArgs.includes("--dry-run")
     const force = initArgs.includes("--force")
+    const noClone = initArgs.includes("--no-clone")
     const timeoutIdx = initArgs.indexOf("--timeout")
     const outputDirIdx = initArgs.indexOf("--output-dir")
     const CONFIG = loadConfig()
@@ -1422,6 +1427,7 @@ async function main() {
       variant: variantIdx >= 0 ? initArgs[variantIdx + 1] : undefined,
       dryRun,
       force,
+      noClone,
       timeoutMs: timeoutIdx >= 0 ? parseInt(initArgs[timeoutIdx + 1], 10) : undefined,
       outputDir: outputDirIdx >= 0 ? initArgs[outputDirIdx + 1] : undefined,
     })
