@@ -1089,7 +1089,7 @@ async function cmdPlanSprint(
     if (!evolveCmd) {
       console.error(`\nError: Evidence bundle not found at ${bundlePath}`)
       console.error(`  Could not find evolve command for sprint "${sprintSlug}" in targets/${target}/roadmap.md`)
-      console.error(`  Generate it manually: study evolve --top-sources 1 --output ${bundlePath} <evidence-packs>`)
+      console.error(`  Generate it manually: study evolve --final-only --top-sources 1 --output ${bundlePath} <evidence-packs>`)
       process.exit(1)
     }
     console.log(`\n▶ Evidence bundle not found. Generating via evolve...\n`)
@@ -1099,12 +1099,14 @@ async function cmdPlanSprint(
     const topSources = topSourcesIdx >= 0 ? parseInt(parts[topSourcesIdx + 1], 10) : 1
     const outputIdx = parts.indexOf("--output")
     const outputFile = outputIdx >= 0 ? parts[outputIdx + 1] : null
+    const noCode = parts.includes("--no-code")
+    const finalOnly = parts.includes("--final-only")
     const fileArgs = parts.filter(p => p.startsWith("@"))
     const resolvedArgs = fileArgs.map(a => {
       const stripped = a.slice(1)
       return isAbsolute(stripped) ? stripped : join(ULTRAPLAN_ROOT, stripped)
     })
-    cmdEvolve(resolvedArgs, { topSources, outputFile: outputFile ? join(ULTRAPLAN_ROOT, outputFile) : null, noCode: false })
+    cmdEvolve(resolvedArgs, { topSources, outputFile: outputFile ? join(ULTRAPLAN_ROOT, outputFile) : null, noCode, finalOnly })
     if (!existsSync(bundlePath)) {
       console.error(`\nError: Evidence bundle still missing after evolve: ${bundlePath}`)
       process.exit(1)
@@ -1307,7 +1309,7 @@ function cmdListStudies(): void {
   console.log("\nUsage: study <study-name> <command> [args]")
   console.log("       study list")
   console.log("       study code [--output <file>] <@report-file>...")
-  console.log("       study evolve [--top-sources <N>] [--output <file>] [--no-code] <@evidence-report>...")
+  console.log("       study evolve [--top-sources <N>] [--output <file>] [--no-code] [--final-only] <@evidence-report>...")
   console.log("       study sprint-plan <target> <sprint-slug> [options]")
   console.log("       study execute-sprint <target> <sprint-slug> [options]")
   console.log("       study execute-sprint --help\n")
@@ -1370,21 +1372,28 @@ async function main() {
 
   if (args[0] === "evolve") {
     const evolveArgs = args.slice(1)
+    if (evolveArgs.includes("--help") || evolveArgs.includes("-h")) {
+      showEvolveUsage()
+      process.exit(0)
+    }
     const topSourcesIdx = evolveArgs.indexOf("--top-sources")
     const topSources = topSourcesIdx >= 0 ? parseInt(evolveArgs[topSourcesIdx + 1], 10) : 5
     const outputIdx = evolveArgs.indexOf("--output")
     const outputFile = outputIdx >= 0 ? evolveArgs[outputIdx + 1] : null
     const noCode = evolveArgs.includes("--no-code")
+    const finalOnly = evolveArgs.includes("--final-only")
 
     const flagIndices = new Set<number>()
     if (topSourcesIdx >= 0) { flagIndices.add(topSourcesIdx); flagIndices.add(topSourcesIdx + 1) }
     if (outputIdx >= 0) { flagIndices.add(outputIdx); flagIndices.add(outputIdx + 1) }
     const noCodeIdx = evolveArgs.indexOf("--no-code")
     if (noCodeIdx >= 0) flagIndices.add(noCodeIdx)
+    const finalOnlyIdx = evolveArgs.indexOf("--final-only")
+    if (finalOnlyIdx >= 0) flagIndices.add(finalOnlyIdx)
 
     const fileArgs = evolveArgs.filter((_, i) => !flagIndices.has(i))
 
-    cmdEvolve(fileArgs, { topSources, outputFile, noCode })
+    cmdEvolve(fileArgs, { topSources, outputFile, noCode, finalOnly })
     process.exit(0)
   }
 

@@ -104,6 +104,7 @@ interface EvolveOptions {
   topSources: number
   outputFile: string | null
   noCode: boolean
+  finalOnly: boolean
 }
 
 interface ReportEntry {
@@ -128,13 +129,14 @@ const DEFAULT_OPTIONS: EvolveOptions = {
   topSources: 5,
   outputFile: null,
   noCode: false,
+  finalOnly: false,
 }
 
 export function cmdEvolve(fileArgs: string[], opts: Partial<EvolveOptions>): void {
   const options = { ...DEFAULT_OPTIONS, ...opts }
 
   if (fileArgs.length === 0) {
-    console.error("Usage: study evolve [--top-sources <N>] [--output <file>] [--no-code] <@evidence-report>...")
+    console.error("Usage: study evolve [--top-sources <N>] [--output <file>] [--no-code] [--final-only] <@evidence-report>...")
     process.exit(1)
   }
 
@@ -229,6 +231,33 @@ export function cmdEvolve(fileArgs: string[], opts: Partial<EvolveOptions>): voi
   }
 
   // Phase 3: render evidence packs
+  outputParts.push(`════════════════════════════════════════════════════════`)
+  outputParts.push(`Planning Load Order`)
+  outputParts.push(`════════════════════════════════════════════════════════`)
+  outputParts.push("")
+  outputParts.push(`This bundle is a staged planning source, not a request to load every report at once.`)
+  outputParts.push("")
+  outputParts.push(`1. Read the evidence packs and the selected roadmap sprint section first.`)
+  outputParts.push(`2. Read final reports below only for decisions in the sprint scope.`)
+  outputParts.push(`3. Use the per-source manifest to open individual source reports only when a final report is not specific enough.`)
+  outputParts.push(`4. Resolve code references or inspect repository code only for concrete implementation questions.`)
+  outputParts.push("")
+  outputParts.push(`Included final reports:`)
+  for (const sr of allFinalReports) {
+    outputParts.push(`- [${sr.type}] ${sr.label}`)
+  }
+  outputParts.push("")
+  outputParts.push(`Available per-source reports:`)
+  for (const { sr, perSource: perSourceReports } of finalReportsWithPerSource) {
+    if (perSourceReports.length === 0) continue
+    outputParts.push(`- ${sr.label}`)
+    for (const ps of perSourceReports) {
+      outputParts.push(`  - ${ps.name} (${ps.score}/10): ${ps.path}`)
+    }
+  }
+  outputParts.push("")
+
+  // Phase 4: render evidence packs
   for (const ev of uniqueEvidence) {
     const evContent = ev.content
     reportLog.push({
@@ -244,7 +273,7 @@ export function cmdEvolve(fileArgs: string[], opts: Partial<EvolveOptions>): voi
     outputParts.push("")
   }
 
-  // Phase 4: render deduplicated final reports + per-source + code
+  // Phase 5: render deduplicated final reports + optional per-source + code
   for (const { sr, perSource: perSourceReports } of finalReportsWithPerSource) {
     const label = `[${sr.type === "primary" ? "PRIMARY" : "SUPPORTING"}] ${sr.label}`
     const srContent = readReport(sr.path)
@@ -261,7 +290,7 @@ export function cmdEvolve(fileArgs: string[], opts: Partial<EvolveOptions>): voi
     outputParts.push(srContent.trimEnd())
     outputParts.push("")
 
-    if (!options.noCode) {
+    if (!options.noCode && !options.finalOnly) {
       const finalRepos = parseReposTable(srContent, dirname(sr.path))
       const refs = findCodeRefs(srContent, finalRepos, sr.path)
       const codeOutput = dedupedCode(refs)
@@ -275,7 +304,7 @@ export function cmdEvolve(fileArgs: string[], opts: Partial<EvolveOptions>): voi
       }
     }
 
-    if (perSourceReports.length > 0) {
+    if (perSourceReports.length > 0 && !options.finalOnly) {
       const limitLabel = options.topSources > 0 && options.topSources < perSourceReports.length
         ? ` (top ${options.topSources} by score)`
         : ""
@@ -328,21 +357,29 @@ export function cmdEvolve(fileArgs: string[], opts: Partial<EvolveOptions>): voi
   outputParts.push(`  ${evidenceCount} evidence pack(s)`)
   outputParts.push(`  ${finalCount} final report(s)`)
   outputParts.push(`  ${perSourceCount} per-source report(s)`)
+  if (options.finalOnly) {
+    const availablePerSourceCount = finalReportsWithPerSource.reduce((sum, r) => sum + r.perSource.length, 0)
+    outputParts.push(`  ${availablePerSourceCount} per-source report(s) listed in manifest, not injected`)
+  }
   outputParts.push(``)
   outputParts.push(`  Total lines:        ${totalLines.toLocaleString()}`)
   outputParts.push(`  Total characters:   ${totalChars.toLocaleString()}`)
   outputParts.push(`  Estimated tokens:   ${estimatedTokens.toLocaleString()}  (~4 chars/token)`)
   outputParts.push(``)
-  outputParts.push(`Code reference resolution:`)
-  outputParts.push(`  Total refs found:   ${stats.total}`)
-  outputParts.push(`  Rendered unique:    ${stats.rendered}`)
-  outputParts.push(`  Duplicates skipped: ${stats.duplicateSkipped}`)
-  outputParts.push(`  Resolved:           ${stats.resolved}`)
-  outputParts.push(`  Unresolved (total): ${stats.unresolved}`)
-  outputParts.push(`    ├─ .md self-refs:  ${stats.unresolvedMdSelfRefs}  (cross-refs to analysis files, not code)`)
-  outputParts.push(`    └─ code refs:      ${stats.unresolvedCode}`)
-  const pct = stats.total > 0 ? (stats.resolved / stats.total * 100).toFixed(1) : "0.0"
-  outputParts.push(`  Resolution rate:    ${pct}%`)
+  if (options.finalOnly) {
+    outputParts.push(`Code reference resolution: skipped (--final-only)`)
+  } else {
+    outputParts.push(`Code reference resolution:`)
+    outputParts.push(`  Total refs found:   ${stats.total}`)
+    outputParts.push(`  Rendered unique:    ${stats.rendered}`)
+    outputParts.push(`  Duplicates skipped: ${stats.duplicateSkipped}`)
+    outputParts.push(`  Resolved:           ${stats.resolved}`)
+    outputParts.push(`  Unresolved (total): ${stats.unresolved}`)
+    outputParts.push(`    ├─ .md self-refs:  ${stats.unresolvedMdSelfRefs}  (cross-refs to analysis files, not code)`)
+    outputParts.push(`    └─ code refs:      ${stats.unresolvedCode}`)
+    const pct = stats.total > 0 ? (stats.resolved / stats.total * 100).toFixed(1) : "0.0"
+    outputParts.push(`  Resolution rate:    ${pct}%`)
+  }
   outputParts.push(``)
 
   const finalOutput = outputParts.join("\n")
@@ -356,10 +393,11 @@ export function cmdEvolve(fileArgs: string[], opts: Partial<EvolveOptions>): voi
 }
 
 export function showEvolveUsage(): void {
-  console.log("  study evolve [--top-sources <N>] [--output <file>] [--no-code] <@evidence-report>...")
+  console.log("  study evolve [--top-sources <N>] [--output <file>] [--no-code] [--final-only] <@evidence-report>...")
   console.log("    Trace evidence packs through final reports, per-source reports, and code.")
   console.log("    --top-sources <N>  Include top N per-source reports by score (default: 5, 0 = all)")
   console.log("    --output <file>    Write output to file instead of stdout")
   console.log("    --no-code          Skip code extraction (reports only)")
+  console.log("    --final-only       Include evidence packs and final reports only; list per-source reports as a manifest")
   console.log("")
 }

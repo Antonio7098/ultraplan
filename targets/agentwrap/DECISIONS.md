@@ -146,6 +146,54 @@ Do not convert study recommendations into accepted architecture decisions until 
 - **Rejected Alternatives:** Requiring OpenCode/provider setup for default tests was rejected as brittle. Omitting the real-runtime smoke path was rejected because the roadmap requires one.
 - **Risk / Follow-up:** Run the smoke in an environment with configured provider/auth and record the result before relying on live OpenCode behavior operationally.
 
+### DEC-010: Primary Run Status And Cleanup Outcome Are Separate
+
+- **Status:** Accepted
+- **Date:** 2026-05-18
+- **Sprint:** `targets/agentwrap/sprints/04-lifecycle-sessions/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/TRD.md` run and session lifecycle cleanup requirements; `targets/agentwrap/roadmap.md` Sprint 4 scope.
+- **Evidence Source:** `targets/agentwrap/reports/sprint-evidence/04-lifecycle-sessions.txt`; implementation in `/home/antonioborgerees/coding/agentwrap`; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Preserve `RunResult.Status` and `RunResult.Err` as the primary run outcome, and report cleanup separately through canonical lifecycle events plus `RunMetadata.Cleanup` with `ErrorCleanup` when cleanup fails.
+- **Tradeoff:** Callers must inspect both the primary result and cleanup metadata to understand the full terminal condition.
+- **Rejected Alternatives:** Replacing a successful, failed, or cancelled result with `cleaned_up` was rejected because it hides the primary outcome. Treating cleanup failure as the primary error after a successful run was rejected because it makes runtime success ambiguous.
+- **Risk / Follow-up:** Sprint 8 persistence should store cleanup diagnostics alongside final result metadata without changing the primary status semantics. Public graceful-vs-force cleanup fields are deferred until callers need policy decisions from that distinction; adapter-local process cleanup still tracks graceful and force attempts internally.
+
+### DEC-011: OpenCode Session Continuation Is Best-Effort Unless Verified
+
+- **Status:** Accepted
+- **Date:** 2026-05-18
+- **Sprint:** `targets/agentwrap/sprints/04-lifecycle-sessions/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` retained runtime context; `targets/agentwrap/sources/TRD.md` retained-session operations.
+- **Evidence Source:** `targets/agentwrap/reports/sprint-evidence/04-lifecycle-sessions.txt`; OpenCode adapter implementation and tests in `/home/antonioborgerees/coding/agentwrap/opencode`.
+- **Decision:** Represent retained-session requests with runtime-neutral action and relationship metadata. The OpenCode adapter passes same-session continuation through `--session` as best-effort metadata, while fork, replace, and release actions fail before process launch.
+- **Tradeoff:** The SDK can represent required retained-session flows now, but OpenCode continuation is not claimed as durable session retention until live/runtime evidence verifies the behavior.
+- **Rejected Alternatives:** Inferring all session behavior from `SessionID` and `WantSession` was rejected because fresh, forked, replaced, released, unsupported, and best-effort outcomes are ambiguous. Building a durable session manager was rejected as persistence scope.
+- **Risk / Follow-up:** Run and record a real OpenCode same-session smoke before marking continuation fully supported.
+
+### DEC-012: Silent OpenCode Runs Must Respect SDK Timeouts Before Sprint 6 Rate-Limit Work
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** `targets/agentwrap/sprints/04-lifecycle-sessions/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/TRD.md` run and session lifecycle, cancellation, cleanup, and error model requirements; `targets/agentwrap/roadmap.md` Sprint 4 lifecycle quality gate and Sprint 6 rate-limit scope.
+- **Evidence Source:** Live OpenCode smoke investigation on 2026-05-19 with `openai/gpt-5.5`; implementation in `/home/antonioborgerees/coding/agentwrap/opencode`; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Fix silent-run timeout correctness in the OpenCode adapter now by making structured output scanning context-aware and by classifying context-derived decode termination as timeout or cancellation rather than malformed-event failure.
+- **Tradeoff:** The adapter remains strict about structured stream integrity and still does not attempt rate-limit-specific recovery or fallback behavior.
+- **Rejected Alternatives:** Waiting until Sprint 6 was rejected because a run that ignores the SDK timeout violates core lifecycle guarantees independently of rate-limit policy. Treating context-derived scanner termination as malformed output was rejected because it obscures the real terminal condition. Silently downgrading oversized structured records was rejected for now because it weakens strict stream semantics without sufficient evidence.
+- **Risk / Follow-up:** Sprint 6 still owns typed rate-limit detection, retry/backoff/fallback policy, and user-visible `OnRateLimit` behavior. If large native records become a real issue, revisit scanner size/error handling with evidence rather than silently skipping records.
+
+### DEC-013: Lifecycle Events Track Actual Run State, With Causal Graph Deferred
+
+- **Status:** Accepted
+- **Date:** 2026-05-19
+- **Sprint:** `targets/agentwrap/sprints/04-lifecycle-sessions/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/TRD.md` explicit lifecycle states and observability requirements; `targets/agentwrap/roadmap.md` Sprint 4 lifecycle state machine quality gate.
+- **Evidence Source:** Implementation review finding that cleanup after caller cancellation could emit `from=running` after the run had already transitioned to `cancelled`; regression tests in `/home/antonioborgerees/coding/agentwrap/opencode`; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Track lifecycle state on each run and emit lifecycle transitions from the actual prior state. Populate `CorrelationID` with the run ID for lifecycle, session, and projected native events so all events from one run can be grouped.
+- **Tradeoff:** Local lifecycle/session events are sent best-effort through the buffered event channel even after run context cancellation so terminal lifecycle evidence can still be observed.
+- **Rejected Alternatives:** Hardcoding transition `from` states was rejected because it makes cleanup-after-cancel events misleading. Removing public correlation/cause fields was rejected because later persistence and replay work still need the envelope shape.
+- **Risk / Follow-up:** Full `CauseEventID` population is deferred until persistence/replay or a concrete event-causality model exists; synthetic causality would be misleading. Process-group termination remains deferred until reproduced descendant-process leakage justifies OS-specific process-tree management.
+
 ## Superseded Decisions
 
 None.

@@ -25,12 +25,15 @@ Use this order so the plan stays grounded and fits into context:
 
 1. Read the PRD and TRD sections relevant to the sprint.
 2. Read the selected sprint section in the roadmap.
-3. Read (generate the cli if it is not present) the evidence pack sections inside the generated sprint evidence bundle.
-4. Read the relevant `Final Report:` sections from the bundle.
-5. Read `Per-Source Reports:` only where a sprint decision needs source-specific evidence.
-6. Read resolved code references only where implementation detail matters.
+3. Generate the sprint evidence bundle if it is not present.
+4. Read the bundle's `Planning Load Order` and evidence pack sections.
+5. Read the relevant `Final Report:` sections from the bundle.
+6. Use the per-source manifest to open individual source reports only where a sprint decision needs source-specific evidence.
+7. Resolve code references or inspect repository code only where implementation detail matters.
 
-The evidence pack is a selector, not the full context. The generated sprint evidence bundle is the planning source of truth.
+The evidence pack is a selector, not the full context. The generated sprint evidence bundle is the planning source of truth, but it should be consumed in stages.
+
+Prefer sprint bundles generated with `study evolve --final-only --top-sources 1`. That format injects evidence packs and final reports, then lists per-source reports as a manifest so planning can open narrower reports on demand. Use a larger bundle only when final reports are insufficient for a specific decision.
 
 ## If Context Is Too Large
 
@@ -39,7 +42,7 @@ If the generated evidence bundle does not fit into context:
 1. Keep the PRD, TRD, feature architecture protocol, and roadmap sprint section in context.
 2. Load only the evidence pack sections from the bundle.
 3. Add final report sections one at a time based on the sprint's decision needs.
-4. Add per-source reports one at a time, starting with the highest-scored source.
+4. Use the per-source manifest to open reports one at a time, starting with the highest-scored source.
 5. Add code references only for specific implementation questions.
 6. Record omitted evidence and the reason it was omitted in the sprint reasoning. Carry forward any material risk into the sprint tracker.
 
