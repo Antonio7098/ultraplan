@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T11:26:30.868Z",
+  "updatedAt": "2026-05-20T11:27:04.096Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -1844,12 +1844,12 @@
       "dimensionNumber": "03",
       "dimensionName": "configuration-environment-management",
       "dimensionTitle": "Dimension: Configuration & Environment Management",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
-      "lastError": "Dependent analysis files missing on resume",
+      "lastError": null,
       "lastAttemptAt": "2026-05-20T11:26:30.868Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T11:27:01.508Z"
     },
     {
       "dimensionNumber": "04",

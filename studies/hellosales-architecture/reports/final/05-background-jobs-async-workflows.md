@@ -23,514 +23,385 @@
 
 ## Executive Summary
 
-Background job processing across the eight studied sources spans a wide spectrum from rudimentary fire-and-forget goroutines to industrial-grade durable execution platforms. Only one source (Temporal) provides a complete implementation across all five dimension questions: job submission/tracking, retry/dead-letter handling, duration limits/cancellation, workflow orchestration, and backpressure. The majority rely on in-process goroutine patterns with no durability guarantees, simple polling with backoff, or message broker primitives that require significant application-level wiring to approach production-grade job processing. The most common gap is the absence of a dead-letter queue — most systems either retry indefinitely or silently drop failed work.
+Background job processing across the studied sources falls into three architectural clusters: **in-process goroutine/queue systems**, **external message broker systems**, and **purpose-built durable execution platforms**. Only one source (Temporal) achieves exemplar-level implementation; the majority have meaningful gaps in retry policies, dead-letter handling, workflow orchestration, and backpressure. The most common anti-pattern is treating exponential backoff as sufficient retry infrastructure without dead-letter queues, jitter, or cancellation propagation. For HelloSales specifically, which requires long-running AI pipelines, the absence of durable execution infrastructure in most sources is a critical gap.
 
 ## Core Thesis
 
-Background job architectures split fundamentally along a durability axis: systems that treat jobs as ephemeral in-memory events (cli, openfga, pocketbase) versus systems that persist job state to durable storage (temporal, nats-server, grafana, milvus, victoriametrics). The durable systems further diverge on whether they provide workflow orchestration (temporal) or only queue primitives (nats-server, grafana, milvus). For HelloSales specifically — which relies on long-running AI pipelines — none of the ephemeral systems are suitable without external augmentation. The choice is between adopting Temporal as a dedicated workflow platform or building on JetStream/Kubernetes primitives with significant additional investment in retry policies, DLQ handling, and observability.
+Background job architecture is fundamentally shaped by a system's tolerance for complexity versus its need for durability. Systems optimized for simplicity (cli, pocketbase) use in-process goroutines with fire-and-forget semantics and no persistence. Systems that need reliability within a single node (milvus, openfga, grafana) layer priority queues, lease-based claiming, and bounded channels but cannot survive node crashes. Systems that need distributed reliability either adopt external brokers (nats-server with JetStream) or purpose-built durable execution (temporal). The divergence is not quality-based but constraint-based: a CLI tool has different durability requirements than a distributed time-series database.
 
 ## Rating Summary
 
 | Source | Score | Approach | Main Strength | Main Concern |
 |--------|-------|----------|---------------|--------------|
-| temporal | 9 | Durable execution platform | Complete retry/DLQ/scheduling/cancellation semantics | Operational complexity, workflow determinism requirements |
-| grafana | 6 | Dual-queue (in-memory + K8s API) | Lease-based claiming with rollback, Loki job history | No DLQ, no workflow orchestration, fixed worker count |
-| milvus | 6 | In-process schedulers with etcd coordination | Two-phase queues, priority scheduling, slot-based node assignment | No DLQ, per-component scheduler fragmentation, task loss on crash |
-| nats-server | 6 | JetStream durable streams | Subject-based routing, pull consumers, ack semantics | Advisory-only DLQ, no native workflow, backoff as static array |
-| openfga | 5 | MPMC pipeline workers | Bounded queue backpressure, cycle detection, message pooling | No retry, no DLQ, no durability, in-process only |
-| victoriametrics | 5 | FastQueue + evaluation timer | Hybrid memory/file persistence, chunked queue with metainfo | No per-job tracking, infinite retry or silent drop, no DLQ |
-| cli | 4 | External delegation + polling | Exponential backoff polling, bounded errgroup concurrency | No local persistence, no DLQ, polling inefficiency, external dependency |
-| pocketbase | 3 | Simple cron + FireAndForget | Minimal footprint, panic recovery, dual DB pool | No job persistence, no retry for async failures, no DLQ, single-node only |
+| cli | 4/10 | External API delegation + polling | Lightweight, simple | No local durability, no DLQ, polling inefficiency |
+| grafana | 6/10 | K8s API + in-memory scheduler | Lease-based claiming, multi-tenant fairness | No DLQ, no workflow engine, fixed workers |
+| milvus | 6/10 | In-process priority queues + goroutines | Priority scheduling, action chains | No persistence, no DLQ, per-component duplication |
+| nats-server | 6/10 | JetStream durable streams + pull consumers | Durable streams, ack semantics | No native DLQ, backoff as array not algorithm |
+| openfga | 5/10 | MPMC pipeline + concurrency pools | Bounded queue backpressure, message pools | No retry, no DLQ, context as only timeout |
+| pocketbase | 3/10 | Cron scheduler + FireAndForget | Zero dependencies, panic recovery | No job queue, no retry, no cancellation |
+| temporal | 9/10 | Durable execution platform | Event sourcing, DLQ, workflows, scheduling | Operational complexity, replay determinism |
+| victoriametrics | 5/10 | FastQueue + remote write retry | Hybrid memory/file persistence | No job concept, infinite retry, no DLQ |
 
 ## Approach Models
 
-### 1. Durable Execution Platform (temporal)
+### In-Process Goroutine Workers
 
-Temporal implements the most complete model: workflow-as-code with deterministic replay, event-sourced state persistence, built-in retry policies with jitter, native dead-letter queue management with merge/delete workflows, scheduled workflows with cron-like semantics, and task-queue-based work distribution. It is the only source with true multi-step workflow orchestration and saga/compensation patterns.
+**Represented by:** cli, pocketbase, openfga (pipeline variant)
 
-### 2. Message Broker with Consumer Groups (nats-server)
+These systems use Go's native concurrency model as the job processing substrate. Workers are goroutines; queues are channels; backpressure is channel blocking. No external infrastructure is required.
 
-JetStream provides durable stream storage, pull-based consumers for work distribution, and acknowledgement semantics. Jobs are messages published to subjects; consumers process and ack. Retry is configured via `BackOff []time.Duration` arrays. No native DLQ — advisory events notify when `MaxDeliver` is exceeded, requiring clients to implement DLQ routing.
+- **cli**: HTTP POST to external CAPI + polling with `time.Ticker` + `errgroup.SetLimit()` for bounded concurrency
+- **pocketbase**: Cron scheduler with `time.Ticker` + `FireAndForget` goroutines with panic recovery
+- **openfga**: MPMC bounded ring buffer queues + concurrency pools + cycle group coordination
 
-### 3. Kubernetes API as Job Store (grafana)
+### External Broker / Queue Infrastructure
 
-Grafana uses Kubernetes etcd as a job persistence layer via custom resources. Jobs are claimed atomically using label selectors with resource version conflict handling. The Kubernetes informer provides notifications on job creation. Job history is archived to Loki. No DLQ; expired jobs are marked failed and cleaned up.
+**Represented by:** nats-server (JetStream)
 
-### 4. In-Process Priority Queues with Goroutine Workers (milvus)
+Message brokers provide durable message storage separate from the processing node. Jobs are messages; consumers subscribe or pull.
 
-Milvus uses per-component schedulers (querycoord, datacoord, proxy, rootcoord) with two-phase pending/running queues. Tasks are Go structs with `Cancel`, `Fail`, `Wait`, `Status`. Retry uses exponential backoff without jitter. No DLQ. Coordination via etcd for cluster topology, not for task persistence.
+- **nats-server**: JetStream streams with `MaxDeliver`/`BackOff` arrays, pull-based consumers, advisory-only DLQ on max delivery exceeded
 
-### 5. Bounded Channel Pipeline Workers (openfga)
+### Kubernetes API as Queue
 
-OpenFGA uses MPMC (multi-producer multi-consumer) bounded ring-buffer queues for inter-worker communication. Workers are goroutines connected via typed channels. Backpressure is natural — `Send()` blocks when the buffer is full. No retry, no DLQ, no durability. Cycle groups handle quiescence detection for cyclic dataflows.
+**Represented by:** grafana (provisioning system)
 
-### 6. Persistent Queue for Data Ingestion (victoriametrics)
+The Kubernetes API (etcd) serves as a persistent job store. Jobs are Custom Resources; claiming uses label updates with optimistic concurrency.
 
-VictoriaMetrics is not a job system but a data sink. `FastQueue` provides hybrid in-memory/file persistence for failed remote writes. Exponential backoff with jitter for retries. Queue drops oldest blocks when size limits are exceeded. No per-job tracking, no DLQ. vmalert uses `time.Ticker` for periodic rule evaluation.
+- **grafana**: `Insert()` writes K8s resources, `Claim()` uses atomic label updates, lease renewal loop prevents expiry, Loki archives completed jobs
 
-### 7. External API Delegation with Polling (cli)
+### In-Process Priority Queue Systems
 
-The CLI delegates job execution to a remote Copilot Agent Interface (CAPI) service via HTTP. Jobs are tracked via polling with exponential backoff. No local queue, no DLQ, no workflow orchestration. Concurrency is bounded via `errgroup.SetLimit()`.
+**Represented by:** milvus, victoriametrics
 
-### 8. Minimal Cron + FireAndForget (pocketbase)
+These systems implement multi-queue architectures with pending/running phases, priority levels, and goroutine-based workers coordinated via in-memory data structures.
 
-PocketBase provides only an in-process cron scheduler with 1-minute minimum resolution and a `FireAndForget` goroutine wrapper with panic recovery. No job persistence, no retry for async failures, no DLQ, no backpressure. SQLite lock contention has retry but this is DB-level, not job-level.
+- **milvus**: Per-component schedulers with `PriorityQueue` + `ConcurrentMap`, action chain execution, TSO allocation, adaptive rate limiting for streaming
+- **victoriametrics**: `FastQueue` hybrid memory+file persistence, chunked disk queue, `BackoffTimer` with jitter for remote write retry
+
+### Durable Execution Platform
+
+**Represented by:** temporal
+
+A purpose-built platform providing workflow-as-code with full state persistence, event sourcing, and built-in orchestration.
+
+- **temporal**: Event-sourced workflow state in PostgreSQL/Cassandra, `ExponentialRetryPolicy` with jitter, `temporal-sys-dlq-workflow` for DLQ handling, `temporal-sys-scheduler` for cron-like scheduling, backlog age tracking
 
 ## Pattern Catalog
 
-### Pattern: Exponential Backoff with Jitter
+### Pattern 1: Lease-Based Job Claiming
 
-**What it solves**: Prevents thundering herd when many jobs retry simultaneously after a shared failure.
+**Problem:** How to ensure only one worker processes a job in a multi-node environment without a central coordinator.
 
-**Sources**: temporal (`common/backoff/retrypolicy.go:178-187`), victoriametrics (`lib/timeutil/backoff_timer.go:32-47`)
+**Sources:** grafana, milvus (via etcd session)
 
-**Why it works**: Jitter randomizes retry timing across workers, spreading load during recovery. Temporal adds 20% randomization; VictoriaMetrics uses a similar approach.
+**Mechanism:** Worker atomically updates job resource with a claim timestamp/lable. Resource version conflicts prevent double-claim. A background renewal loop prevents lease expiry during processing.
 
-**When to copy**: Any retry scenario with more than a handful of concurrent workers.
+**Evidence:** `grafana/pkg/registry/apis/provisioning/jobs/persistentstore.go:150-161` (resource version conflicts), `grafana/pkg/registry/apis/provisioning/jobs/driver.go:266-320` (lease renewal loop)
 
-**When overkill**: Low-traffic systems with single or infrequent retries where thundering herd is unlikely.
+**When to copy:** When jobs must be distributed across multiple nodes using only existing infrastructure (K8s), and at-least-once semantics are acceptable.
 
-### Pattern: Lease-Based Job Claiming
+**When overkill:** Single-node deployments, or when an external queue broker (NATS/Kafka) is available.
 
-**What it solves**: Prevents double-processing when multiple workers can claim the same job.
+### Pattern 2: Two-Phase Queue (Pending/Running)
 
-**Sources**: grafana (`pkg/registry/apis/provisioning/jobs/persistentstore.go:150-161`)
+**Problem:** How to track job lifecycle from submission through active processing while enabling cancellation and backpressure.
 
-**Why it works**: Uses Kubernetes resource version as optimistic locking. Atomic claim/update via API server conflict detection.
+**Sources:** milvus, grafana
 
-**When to copy**: Distributed systems where multiple consumers may contend for the same job.
+**Mechanism:** Separate collections for pending (waiting for resources) and running (actively processed). Tasks transition between phases based on resource availability and progress.
 
-**When overkill**: Single-process systems with goroutine workers sharing memory.
+**Evidence:** `milvus/internal/datacoord/task/global_scheduler.go:54-55` (PriorityQueue pending, ConcurrentMap running), `milvus/internal/querycoordv2/task/scheduler.go:159` (per-node task buckets)
 
-**Risk**: Clock skew between nodes can cause premature expiry or double-claim. grafana does not appear to have explicit clock skew mitigation.
+**When to copy:** When jobs have variable resource requirements and need to be staged before execution.
 
-### Pattern: Two-Phase Queue (Pending/Running)
+**When overkill:** Simple fire-and-forget workloads with bounded parallelism.
 
-**What it solves**: Separates job wait time from execution time, enabling fair scheduling and capacity management.
+### Pattern 3: Bounded MPMC Queue with Extension
 
-**Sources**: milvus (`internal/datacoord/task/global_scheduler.go:54-55`), grafana (in-memory scheduler)
+**Problem:** How to prevent unbounded memory growth while allowing throughput bursts.
 
-**Why it works**: Jobs move from a shared pending pool to per-worker running state only when resources are available. Enables priority ordering and backpressure at the pending stage.
+**Sources:** openfga
 
-**When to copy**: Systems with heterogeneous job types or variable job duration where you want to prevent long jobs from blocking short ones.
+**Mechanism:** Ring buffer queue with bounded capacity. When full, senders park. If extension budget remains, `Send()` doubles buffer capacity under write lock before parking.
 
-### Pattern: MPMC Bounded Queue Backpressure
+**Evidence:** `openfga/internal/containers/mpmc/queue.go:42` (Queue struct), `openfga/internal/containers/mpmc/queue.go:241-256` (buffer extension and blocking)
 
-**What it solves**: Prevents memory exhaustion when producers outpace consumers.
+**When to copy:** Pipeline architectures with variable-depth stages where memory must be bounded but latency spikes should be absorbed.
 
-**Sources**: openfga (`internal/containers/mpmc/queue.go:251-256`)
+**When overkill:** When external queue infrastructure is available and horizontal scaling is required.
 
-**Why it works**: Senders block on a `full` channel when the ring buffer is exhausted. Natural backpressure without explicit flow control logic.
+### Pattern 4: Exponential Backoff with Jitter
 
-**When to copy**: Pipeline-based processing where workers are coupled to producers.
+**Problem:** How to retry failed jobs without creating thundering herd on recovery.
 
-**Risk**: Senders can block indefinitely if receivers fail to keep up and buffer extensions are exhausted.
+**Sources:** temporal, milvus, nats-server (limited)
 
-### Pattern: Heartbeat Lease Renewal
+**Mechanism:** Retry intervals increase exponentially, with randomization (jitter) added to spread retry attempts over time.
 
-**What it solves**: Detects worker crashes and enables job recovery without permanent loss.
+**Evidence:** `temporal/common/backoff/retrypolicy.go:178-187` (20% jitter via `addJitter()`), `milvus/pkg/util/retry/retry.go:112` (pure exponential doubling, no jitter)
 
-**Sources**: grafana (`pkg/registry/apis/provisioning/jobs/driver.go:266-320`)
+**When to copy:** Any retry scenario with multiple competing workers or clients.
 
-**Why it works**: A background goroutine periodically renews the job's lease. If 3 consecutive renewals fail, the `leaseExpired` channel closes and the job is re-queued.
+**When overkill:** Single-consumer scenarios with predictable failure modes.
 
-**When to copy**: Long-running jobs where you need crash detection but cannot use context cancellation.
+### Pattern 5: Progress Debouncing
 
-**Risk**: The 30-second default expiry in grafana may be too short for jobs with variable duration. No explicit per-job timeout configuration.
+**Problem:** How to update job progress without overwhelming observability systems.
 
-### Pattern: Progress Debouncing
+**Sources:** grafana, victoriametrics (via queue metrics)
 
-**What it solves**: Avoids overwhelming the API server with rapid progress updates from fast-moving jobs.
+**Mechanism:** Progress updates are batched — immediate if last update > 500ms ago or job finished, otherwise every 5 seconds.
 
-**Sources**: grafana (`pkg/registry/apis/provisioning/jobs/progress.go:17-37`)
+**Evidence:** `grafana/pkg/registry/apis/provisioning/jobs/progress.go:17-37` (`maybeNotifyProgress()`)
 
-**Why it works**: Progress is sent immediately if more than 500ms has passed or the job is finished; otherwise batched and sent at most every 5 seconds.
+**When to copy:** Long-running jobs where progress updates could be frequent and noisy.
 
-**When to copy**: Jobs with high-frequency progress updates in systems where API calls are expensive.
+### Pattern 6: Deterministic Backoff Array
 
-### Pattern: Deterministic Job Naming
+**Problem:** How to define predictable, operator-visible retry delays.
 
-**What it solves**: Enables idempotent job creation and easy job discovery.
+**Sources:** nats-server
 
-**Sources**: grafana (`pkg/registry/apis/provisioning/jobs/persistentstore.go:525-540`)
+**Mechanism:** `BackOff []time.Duration` is an explicit array of durations, not computed. Each delivery failure increments index into array.
 
-**Why it works**: Job names are generated from action type rather than random UUIDs, making jobs findable by name pattern and preventing duplicate creation.
+**Evidence:** `server/consumer.go:98` (ConsumerConfig BackOff field), `server/consumer.go:5805-5808` (index bounds handling)
 
-### Pattern: Worker Interface Pattern
+**When to copy:** When operators need explicit control over retry timing and observability into delay values is required.
 
-**What it solves**: Allows pluggable job handlers without changing the job dispatch infrastructure.
+**When overkill:** Complex retry scenarios where algorithmic backoff with jitter is preferred.
 
-**Sources**: grafana (`pkg/registry/apis/provisioning/jobs/queue.go:45-54`)
+### Pattern 7: Hybrid Memory + File Persistence Queue
 
-**Why it works**: A `Worker` interface with `IsSupported()` and `Process()` methods allows SyncWorker, MigrationWorker, DeleteWorker, etc. to be registered and dispatched by the same infrastructure.
+**Problem:** How to combine low-latency in-memory queuing with durability guarantees.
 
-### Pattern: Context-Propagated Cancellation
+**Sources:** victoriametrics
 
-**What it solves**: Clean shutdown of async operations without orphaning goroutines.
+**Mechanism:** In-memory channel first; when full, writes go to file-based disk queue. Reads try in-memory first, then disk queue. Chunk files track offsets for crash recovery.
 
-**Sources**: cli (`pkg/cmd/agent-task/create/create.go:248`), milvus (`task.go:92`), openfga (`pipeline.go:242`)
+**Evidence:** `victoriametrics/lib/persistentqueue/fastqueue.go:18-40` (FastQueue struct), `victoriametrics/lib/persistentqueue/persistentqueue.go:30-64` (file-based queue with offsets)
 
-**Why it works**: `ctx` is passed through all async operations. When `ctx.Done()` fires (timeout or cancellation), all operations respect it.
+**When to copy:** Data ingestion pipelines where eventual delivery is acceptable and memory pressure is a concern.
 
-**When to copy**: Any Go-based async system.
+**When overkill:** When external queue infrastructure provides sufficient durability.
 
-**Risk**: Cancellation is best-effort. Operations must explicitly check `ctx.Err()`.
+### Pattern 8: Event-Sourced Workflow State
 
-### Pattern: Pull-Based Consumer Work Distribution
+**Problem:** How to make workflow state durable, queryable, and replayable across failures.
 
-**What it solves**: Decouples producers from consumers, enabling elastic scaling and load-aware polling.
+**Sources:** temporal
 
-**Sources**: nats-server (`server/consumer.go:456`), temporal (task queue model)
+**Mechanism:** All state changes recorded as immutable history events. Workflows can be replayed from any checkpoint. Event store enables fan-out queries and cross-namespace replication.
 
-**Why it works**: Workers request messages rather than having them pushed. This prevents worker overwhelm and allows SDKs to implement sticky execution for cache locality.
+**Evidence:** `temporal/service/worker/scheduler/workflow.go` (full scheduler implementation), `temporal/common/backoff/retrypolicy.go` (retry policies)
 
-### Pattern: Hybrid In-Memory/File Persistence (FastQueue)
+**When to copy:** When workflows must survive node crashes, require audit trails, or need the ability to replay for debugging.
 
-**What it solves**: Low-latency writes with durability fallback for spikes.
-
-**Sources**: victoriametrics (`lib/persistentqueue/fastqueue.go:18-40`)
-
-**Why it works**: In-memory channel for hot path; file-based queue activates when memory is saturated. Chunks are 500MB+ with JSON metainfo for crash recovery.
-
-**When to copy**: High-throughput data ingestion where occasional remote storage unavailability must not cause data loss.
-
-### Pattern: Round-Robin Tenant Fairness
-
-**What it solves**: Prevents a single tenant from monopolizing a shared queue.
-
-**Sources**: grafana (`pkg/util/scheduler/queue.go:172-209`)
-
-**Why it works**: Iterates through tenants in round-robin order when selecting the next job to dequeue. No tenant can starve others regardless of job volume.
+**When overkill:** Simple request/response background tasks with no need for durable state.
 
 ## Key Differences
 
 ### Durability vs. Simplicity
 
-The primary split is between systems that persist job state (temporal, nats-server, grafana, milvus, victoriametrics) and those that treat jobs as ephemeral (cli, openfga, pocketbase). Persistent systems can recover from worker crashes; ephemeral systems lose in-flight work. For HelloSales AI pipelines — which are long-running and expensive — only persistent approaches are viable.
+**High durability (temporal, nats-server JetStream):** These systems treat message persistence as foundational. Temporal uses PostgreSQL/Cassandra as event store; JetStream stores messages in streams with configurable retention.
 
-### Queue Primitive vs. Workflow Engine
+**Low durability (cli, pocketbase, openfga):** These systems optimize for simplicity. Jobs exist only in memory or in-flight. Process crash = job loss.
 
-nats-server JetStream provides queue primitives (streams, consumers, ack policies) but no workflow orchestration. Temporal provides both queue semantics AND workflow-as-code with deterministic replay. grafana and milvus sit in between: job queues with no multi-step coordination. openfga provides pipeline workers but no durable workflow state. HelloSales needs to evaluate whether queue primitives are sufficient for its AI pipeline use case or whether the added complexity of a workflow engine is justified.
+**Partial durability (milvus, grafana, victoriametrics):** These use hybrid approaches — in-memory for speed but with some form of persistence or checkpointing. milvus loses tasks on node crash; grafana loses in-memory scheduler jobs; victoriametrics persists queue to disk.
 
-### DLQ Implementation
+### Retry Depth
 
-Temporal is the only source with a native, operator-accessible DLQ (`temporal-sys-dlq-workflow` with delete and merge types). nats-server publishes advisories on max delivery exceeded but requires client-side DLQ routing. grafana, milvus, openfga, pocketbase, victoriametrics, and cli have no DLQ — failed jobs are either retried indefinitely or silently dropped.
+**Shallow retry (openfga, pocketbase):** No formal retry mechanism. openfga uses `WithCancelOnError()` (first error cancels all); pocketbase only retries DB lock contention.
+
+**Configurable retry (temporal, milvus, nats-server, grafana):** Exponential backoff with max attempts configuration. temporal adds jitter; nats-server uses array; milvus/grafana use doubling without jitter.
+
+**Infinite retry (victoriametrics):** Remote writes retry indefinitely until success or explicit drop. Appropriate for metrics ingestion but problematic for bounded job completion.
+
+### Dead-Letter Handling
+
+**Native DLQ (temporal):** Built-in `temporal-sys-dlq-workflow` with merge/delete operations and configurable batch sizes.
+
+**Advisory-only (nats-server):** `JSConsumerDeliveryExceededAdvisory` published but no automatic routing. Client must implement DLQ pattern externally.
+
+**No DLQ (cli, openfga, pocketbase, milvus, victoriametrics):** Failed jobs are logged, returned as errors, or silently dropped. No visibility into failure chain.
+
+### Workflow Orchestration
+
+**None (cli, grafana, milvus, nats-server, openfga, pocketbase, victoriametrics):** These systems implement single-step job processing. grafana has pluggable worker interface but no multi-step composition; milvus has action chains but no persistent workflow state.
+
+**Full orchestration (temporal):** Workflows are Go code with signals, queries, side effects, child workflows, and buffered starts. The scheduler workflow implements cron semantics with overlap policies, catchup windows, and jitter.
 
 ### Backpressure Mechanisms
 
-- **Bounded queue blocking**: openfga (MPMC), grafana (per-tenant limit of 100)
-- **Rate limiting**: nats-server (MaxAckPending, MaxWaiting), victoriametrics (rate limiter, concurrency limiter)
-- **Adaptive throttling**: milvus (Normal/Slowdown/Reject/Recovery states), victoriametrics (queue blocked metric)
-- **Task queue backlog hints**: temporal (BacklogCountHint influences SDK polling behavior)
-- **None**: cli, pocketbase
+**Queue-based blocking (openfga MPMC, milvus priority queue):** Senders block when queue is full, creating natural backpressure.
 
-### Retry Policy Implementation
+**Rate limiting (temporal, victoriametrics, openfga throttler):** Explicit rate limiters cap throughput; clients block on throttle channel.
 
-| Source | Exponential | Jitter | Max Attempts | Backoff Array |
-|--------|-------------|--------|--------------|---------------|
-| temporal | Yes | Yes (20%) | Yes | No — computed |
-| nats-server | Yes | No | Yes (-1=infinite) | Yes — explicit |
-| milvus | Yes | No | Per-usage | No |
-| victoriametrics | Yes | Yes | No (infinite) | No |
-| grafana | Yes | No | 5 retries | No |
-| cli | Yes | No | Per-usage | No |
-| openfga | No | No | No | No |
-| pocketbase | No (fixed intervals) | No | 12 (DB locks only) | Yes — fixed |
+**Slow consumer disconnect (nats-server):** Server marks clients as slow and may disconnect them when outbound write blocks.
 
-### Job Duration Limits
-
-Most systems rely on `context.Context` deadline propagation rather than hard per-job timeouts. grafana uses lease-based expiry (30s default). VictoriaMetrics uses `maxQueueDuration` and `sendTimeout`. Only temporal provides explicit `StartToCloseTimeout`, `WorkflowExecutionTimeout`, and activity-level timeout enforcement.
+**No backpressure (pocketbase, cli):** When saturated, these systems either fail requests or allow unbounded resource consumption.
 
 ## Tradeoffs
 
-### Using an External Queue vs. In-Process Scheduling
-
-**Benefit** (external queue): Durability, horizontal scaling, cluster-wide visibility, operational tooling.
-**Cost** (external queue): Additional infrastructure dependency, network hops, operational complexity.
-**Best-fit**: Production systems requiring reliability and multi-node distribution.
-**Failure mode**: Queue broker becomes a single point of failure or performance bottleneck.
-**Alternative**: In-process goroutine scheduling (milvus, openfga) for low-latency, single-node workloads.
-
-### Exponential Backoff with Jitter vs. Fixed Intervals
-
-**Benefit** (jitter): Prevents thundering herd on shared failures.
-**Cost** (jitter): Less predictable retry timing; debugging harder.
-**Best-fit**: High-concurrency systems with potential for correlated failures.
-**Failure mode**: Jitter that is too high can delay recovery unnecessarily.
-**Alternative**: Fixed backoff intervals (pocketbase) for simple cases or low-frequency retries.
-
-### Pull-Based vs. Push-Based Consumers
-
-**Benefit** (pull): Workers control pace; prevents overwhelm; enables sticky execution.
-**Cost** (pull): Higher latency for job delivery; requires workers to poll.
-**Best-fit**: Work distribution across variable-capacity workers.
-**Failure mode**: Polling overhead when many workers are idle.
-**Alternative**: Push-based (grafana informer notifications) for low-latency delivery.
-
-### Advisory-Only DLQ vs. Native DLQ Routing
-
-**Benefit** (advisory-only): Flexibility — clients implement DLQ matching their needs.
-**Cost** (advisory-only): Operational burden; DLQ is not automatic; requires custom implementation.
-**Best-fit**: Systems where DLQ behavior varies by job type.
-**Failure mode**: Failed jobs are lost if clients don't implement DLQ routing.
-**Alternative**: Native DLQ routing (temporal) for automatic, standard handling.
-
-### In-Memory vs. Persistent Job State
-
-**Benefit** (in-memory): Lower latency, simpler code, no serialization overhead.
-**Cost** (in-memory): Job loss on crash; no visibility into in-flight jobs.
-**Best-fit**: Short-lived, restartable jobs; development environments.
-**Failure mode**: Any crash loses all pending work.
-**Alternative**: Persistent job state (K8s resources, JetStream, database) for production reliability.
-
-### Single-Process vs. Distributed Scheduling
-
-**Benefit** (single-process): Simpler deployment, no coordination overhead, no clock skew issues.
-**Cost** (single-process): No horizontal scaling, no fault tolerance, single-node only.
-**Best-fit**: Lightweight tools, single-instance deployments.
-**Failure mode**: Node failure loses all work; cannot scale horizontally.
-**Alternative**: Distributed scheduling (temporal, milvus cluster, grafana multi-pod) for HA and scaling.
+| Pattern | Benefit | Cost | Best-fit | Failure Mode |
+|---------|---------|------|----------|--------------|
+| In-process queue | Low latency, no network hops | Task loss on crash | Single-node, low-stakes tasks | Node crash loses all pending work |
+| Goroutine workers | Familiar Go pattern, easy composition | Hard to limit/cancel across boundaries | Concurrent request handling | Context cancellation is best-effort |
+| Lease claiming via K8s | No new infrastructure dependencies | Clock skew, no cross-cluster guarantee | K8s-native deployments | Clock skew causes premature expiry or double-claim |
+| Exponential backoff (no jitter) | Predictable intervals | Thundering herd on recovery | Isolated retry scenarios | All failed tasks retry simultaneously |
+| Exponential backoff + jitter | Spread retry load | Less predictable | Multi-worker retry scenarios | Slightly more complex configuration |
+| No DLQ | Simpler code | No visibility into failures, no retry | Low-stakes, high-volume tasks | Failed tasks invisible, data loss |
+| External broker (JetStream) | Durable, horizontally scalable | Additional operational burden | Distributed systems needing durability | Broker becomes SPOF unless clustered |
+| Durable execution (Temporal) | Complete reliability, workflows | Significant operational complexity | Critical business workflows | Replay determinism requirements |
+| Hybrid memory+file queue | Speed + durability | Disk I/O complexity | Data ingestion with durability needs | Chunk file corruption risk |
 
 ## Decision Guide
 
-### When to Use Temporal
+**Choose in-process goroutines + channels when:**
+- Single-node deployment only
+- Jobs are fire-and-forget or checked synchronously
+- Can tolerate job loss on restart
+- No external dependencies desired
 
-Choose Temporal when:
-- Workflows have multiple steps with state that must survive crashes
-- You need guaranteed at-least-once execution with built-in retry and DLQ
-- Your team can handle operational complexity (SQL/Cassandra/MySQL + Temporal cluster)
-- You need cron-like scheduling with overlap policies and catchup windows
-- You want workflow-as-code that is testable and version-controllable
+**Choose Kubernetes API-as-queue when:**
+- Already running on Kubernetes
+- Jobs need to survive pod restarts (but not node crashes)
+- Prefer declarative job definitions over imperative code
+- Can tolerate clock skew issues in lease management
 
-### When to Use JetStream (nats-server)
+**Choose external message broker (NATS JetStream, Kafka) when:**
+- Need horizontal worker scaling
+- Jobs must survive broker node failures
+- Multi-tenant with consumer group isolation needed
+- Can accept additional infrastructure operational burden
 
-Choose JetStream when:
-- You need durable message delivery but not full workflow orchestration
-- Your jobs are relatively flat (single step or simple fan-out)
-- You can implement DLQ routing in your application
-- You want lower operational complexity than Temporal
-- Subject-based routing aligns with your domain model
+**Choose durable execution platform (Temporal) when:**
+- Workflows require multi-step state persistence
+- Must survive cluster failures without losing in-progress work
+- Audit trails and replay debugging are important
+- Can accept significant operational complexity
 
-### When to Use Kubernetes API as Job Store (grafana model)
-
-Choose this approach when:
-- Your application already runs on Kubernetes
-- You want to avoid additional queue infrastructure
-- You can accept the limitations of etcd (no message durability beyond resource creation)
-- Lease-based claiming is acceptable for your failure model
-
-### When to Use In-Process Schedulers
-
-Choose in-process scheduling (milvus, openfga model) when:
-- Latency is critical and network hops are unacceptable
-- Jobs are short-lived and restartable
-- You don't need multi-node distribution
-- Your workload fits in a single process
-
-### When to Avoid Dedicated Job Infrastructure
-
-Avoid dedicated job infrastructure (pocketbase, basic cli model) when:
-- Async work is truly fire-and-forget (logging, non-critical notifications)
-- Your tool is a lightweight CLI that shouldn't have infrastructure dependencies
-- Reliability is not critical and restarts are acceptable
+**Avoid Temporal when:**
+- Simple request/response background tasks only
+- Team lacks operational maturity for distributed systems
+- Cost/complexity outweighs reliability needs
 
 ## Practical Tips
 
-### Patterns to Copy
+1. **Always add jitter to exponential backoff.** Without it, thundering herd will overwhelm your system on recovery. See `temporal/common/backoff/retrypolicy.go:178-187`.
 
-1. **Exponential backoff with jitter** for any retry scenario with concurrent workers. See `common/backoff/retrypolicy.go:178-187` in temporal for reference implementation.
+2. **Implement DLQ from day one.** Even a simple file-based DLQ (write failed jobs to a file) provides visibility and replay capability. None of the studied systems without DLQ had good failure observability.
 
-2. **Lease-based job claiming with rollback** for distributed job distribution. See grafana's `persistentstore.go:177-209` for the rollback function pattern.
+3. **Use bounded queues for backpressure, not unbounded goroutines.** `errgroup.SetLimit()` (cli), MPMC bounded queues (openfga), and semaphore-based concurrency limiters (victoriametrics, pocketbase) prevent memory exhaustion under load.
 
-3. **Two-phase pending/running queues** for capacity management and fair scheduling across job types.
+4. **Lease renewal loops must handle cancellation.** grafana's `leaseRenewalLoop()` closes `leaseExpired` channel after 3 failures, but cancellation propagation to the worker `Process()` method is missing. This is a common gap.
 
-4. **Progress debouncing** to reduce API load for high-frequency updates. See grafana `progress.go:17-37`.
+5. **Separate pending/running task collections enables cancellation and backpressure.** milvus's two-phase queue pattern allows cancelling tasks before they start processing.
 
-5. **Deterministic job naming** from action type for idempotent job creation.
+6. **For cron scheduling, use a catchup window and jitter.** temporal's scheduler workflow demonstrates this: `CatchupWindow` of 365 days, jitter config, and overlap policies prevent missed runs and duplicate executions.
 
-6. **Pull-based consumer model** for decoupling producers from consumers and enabling elastic worker scaling.
-
-7. **Hybrid memory/file persistence** (FastQueue pattern) for high-throughput scenarios requiring durability.
-
-8. **Worker interface pattern** for pluggable job handlers without changing dispatch infrastructure.
-
-### Patterns to Avoid or Delay
-
-1. **No retry mechanism** (openfga, pocketbase async) until you've confirmed your jobs are idempotent or failure is acceptable.
-
-2. **Polling-only job tracking** (cli) for anything beyond development/low-reliability scenarios. Prefer webhooks or server-sent events.
-
-3. **Infinite retry without DLQ** (victoriametrics) unless you're certain data loss is acceptable and indefinite delivery is required.
-
-4. **1-minute cron resolution** (pocketbase) for any job needing sub-minute scheduling.
-
-5. **Advisory-only max-delivery** (nats-server) without implementing explicit DLQ routing — you'll lose jobs silently.
-
-### Decision Rules
-
-- **Job duration > 30 seconds OR must survive process crash**: Use persistent job state (Temporal, JetStream, K8s API, or database-backed queue).
-- **Multi-step workflows with state**: Use Temporal or build a custom state machine on top of JetStream/streams.
-- **Low-latency, single-node, restartable jobs**: In-process goroutine schedulers may suffice.
-- **Multi-tenant with fair resource sharing**: Round-robin tenant scheduling (grafana) or weighted fair queuing.
-- **Need for observability into failed jobs**: Must have DLQ; only Temporal provides this natively.
+7. **Context cancellation is best-effort, not guaranteed.** Every system that uses `ctx` for cancellation has gaps where goroutines continue running. Always combine with explicit cancellation signals for critical paths.
 
 ## Anti-Patterns / Caution Signs
 
-### Brittle Signs
+**Silent data loss:**
+- nats-server max delivery exceeded with no DLQ → message deleted
+- victoriametrics HTTP 409/400/415 → block dropped without notification
+- pocketbase FireAndForget errors → logged only
 
-- **No DLQ and no retry limit**: Jobs either retry forever or fail silently with no visibility.
-- **Polling with no timeout strategy**: Polling that returns `(nil, nil)` on timeout (cli) is a silent failure mode.
-- **No per-job timeout**: Systems where jobs can run indefinitely with no cancellation mechanism.
-- **Fixed backoff without jitter**: All workers retry at identical intervals, causing thundering herd.
-- **No progress tracking**: No visibility into whether a long-running job is making progress or stuck.
+**No job timeout enforcement:**
+- pocketbase cron jobs run forever with no timeout
+- milvus no per-task hard timeout, relies on context cancellation
+- openfga context deadline is sole duration limit
 
-### Over-Coupled Signs
+**No retry visibility:**
+- openfga first-error cancels all pool goroutines
+- cli polling timeout returns `(nil, nil)` silently
+- grafana expired jobs marked as `JobStateError` and archived, no retry
 
-- **Per-component scheduler fragmentation** (milvus): Each component reinvents similar scheduling patterns, making cross-cutting retry policies impossible.
-- **Workflow logic embedded in client applications** (nats-server without DLQ routing): Multi-step coordination must be built and maintained in every client.
-- **In-memory job state with no recovery**: Jobs lost on any crash, with no way to determine what was in-flight.
+**Infinite retry without circuit breaker:**
+- victoriametrics retries forever until success
+- milvus retry loops may never reach terminal state
 
-### Hard-to-Operate Signs
+**Context leaks:**
+- milvus `baseTask.cancel` stored but not automatically called on scheduler Stop
+- openfga workers may start before context cancellation is checked in `Build()`
 
-- **No observability into queue depth**: Systems that provide no metrics on pending/running/completed jobs.
-- **Clock skew sensitivity** (lease-based claiming): Without explicit clock sync monitoring, lease expiry becomes unpredictable.
-- **No cancellation propagation**: Workers that don't respect context cancellation make graceful deployments impossible.
-- **Blocking send on full queue**: MPMC queues that park senders indefinitely when exhausted can cause request hangs.
-
-### Hard-to-Evolve Signs
-
-- **No job versioning**: Jobs that cannot be upgraded without breaking in-flight instances.
-- **No workflow abstraction**: Application code that directly manages job state transitions instead of using a workflow engine.
+**Queue overflow silent failures:**
+- victoriametrics oldest blocks dropped when `maxPendingBytes` exceeded
+- grafana per-tenant queue (100 items) blocks or discards depending on config
 
 ## Notable Absences
 
-### No Native Saga/Compensation Pattern
+**No source implements:**
+- Native priority queue with preemption (only priority levels for scheduling order)
+- Built-in saga/compensation pattern
+- Automatic workflow checkpointing (only temporal provides full durable state)
+- Multi-tenant job isolation with quota enforcement (grafana has per-tenant limits but no global backpressure)
 
-Only Temporal provides explicit support for saga patterns and compensating transactions. All other sources either don't need multi-step workflows (CLI tools, data ingestion systems) or lack compensation mechanisms entirely.
+**DLQ is universally weak:**
+- temporal: Excellent native DLQ
+- nats-server: Advisory only
+- All others: No DLQ at all
 
-### No Distributed Cross-Server Scheduling
-
-nats-server header-based message scheduling works for single-server scheduled messages but cannot coordinate across a cluster without external coordination. grafana's cron is single-node. PocketBase's cron is single-instance. Only temporal provides true distributed scheduled workflow execution.
-
-### No Adaptive Backoff Beyond Rate Limiting
-
-While several systems have rate limiting, none implement adaptive backoff that adjusts retry strategy based on failure classification (transient vs. permanent). milvus comes closest with `Unrecoverable(err)` fast-fail, but retry strategy is still static per-usage.
-
-### No Native Priority Queue with Preemption
-
-Most systems treat all jobs equally or use simple priority levels (milvus has Normal/High). No source implements preemption — the ability to interrupt a running low-priority job to run a high-priority one.
-
-### No Built-In Workflow Versioning
-
-Temporal provides `SchedulerWorkflowVersion` constants for non-breaking workflow upgrades, but other sources have no formal workflow versioning mechanism. Jobs are typically versioned by their handler code, not by an explicit versioning policy.
+**No evidence of distributed tracing integration** within job processing cores (only SDK-level instrumentation in temporal).
 
 ## Per-Source Notes
 
-### temporal
-The benchmark implementation. Retry with jitter, native DLQ, workflow-as-code with deterministic replay, scheduled workflows, backlog tracking, priority rate limiting. The primary complexity is operational — requires a full Temporal cluster plus a persistence store. The scheduler workflow's CHASM migration suggests even Temporal is evolving its internal execution model.
+**cli (4/10):** Delegated job execution to external CAPI service is a valid architectural choice for a CLI tool, but introduces dependency on external service availability. Polling with backoff is simple but inefficient. No local durability means job state is lost on process exit.
 
-### grafana
-A pragmatic hybrid: in-memory scheduler for low-latency multi-tenant work, Kubernetes API for durable job persistence. Notable for lease-based claiming with rollback, Loki job history, and worker interface pattern. Gaps: no DLQ, no workflow orchestration, fixed worker count, no explicit cancellation propagation to workers.
+**grafana (6/10):** The K8s API-as-queue pattern is clever for K8s-native deployments but relies on clock synchronization. The lease renewal + cleanup pattern is sound. Missing DLQ and workflow orchestration are the main gaps.
 
-### milvus
-Sophisticated multi-component scheduling with priority queues, slot-based node assignment, and TSO timestamp allocation. The two-phase pending/running model is well-designed. Weaknesses: per-component scheduler fragmentation (duplicated code), no DLQ, no jitter in backoff, task loss on node crash.
+**milvus (6/10):** Per-component schedulers are well-optimized for their specific tasks (query, data, index), but duplication across components is concerning. Priority-based scheduling and action chains show sophistication. No durable task persistence is the critical gap.
 
-### nats-server
-JetStream provides production-grade durable streams and pull-based consumers. The advisory-only DLQ is the main gap — requires client implementation. Backoff as a static array (no jitter) is another limitation. Subject-based routing is a different mental model from queue-based systems.
+**nats-server (6/10):** JetStream provides solid durable messaging primitives. Pull consumers and subject-based routing align with NATS philosophy. Advisory-only DLQ and backoff as array (not algorithm) are the main limitations.
 
-### openfga
-Well-engineered pipeline workers with MPMC bounded queues, cycle detection, and message pooling. The bounded queue backpressure is elegant. However, no retry, no DLQ, no durability — suitable for in-process authorization resolution but not for production job processing.
+**openfga (5/10):** The MPMC bounded queue + pipeline pattern is well-engineered for authorization queries. Cycle group coordination is sophisticated. But the absence of retry and DLQ makes it unsuitable for long-running background jobs.
 
-### victoriametrics
-FastQueue is a solid persistent queue for data ingestion scenarios. The hybrid memory/file design balances latency and durability. However, infinite retry and silent drop on 409/400/415 are not appropriate for general job processing. vmalert's timer-based evaluation is not a job queue.
+**pocketbase (3/10):** The lightweight, self-contained philosophy is coherent for its target use case (single-node embedded backend). But the 1-minute cron resolution, no job timeout, and no cancellation make it unsuitable for AI pipelines.
 
-### cli
-The external delegation + polling model is appropriate for a CLI tool that offloads work to a remote service. However, the polling inefficiency, silent timeout `(nil, nil)` return, and lack of any local job visibility make it unsuitable for production backend services.
+**temporal (9/10):** The gold standard for background job and async workflow systems. Event sourcing, DLQ workflows, scheduler with catchup windows, backlog age tracking — all demonstrate mature thinking. Minor gaps: no deadline propagation to child workflows, no per-workflow priority for multi-tenant isolation.
 
-### pocketbase
-Explicitly designed as a lightweight, self-contained backend. The simplicity is a feature for its target use case (small self-hosted deployments). However, for HelloSales AI pipelines, it has severe gaps: no job persistence, no retry for async failures, no DLQ, no backpressure, single-node only.
+**victoriametrics (5/10):** FastQueue is well-designed for data ingestion. The hybrid memory+file persistence and chunked queue approach are sophisticated. But infinite retry without DLQ is inappropriate for job systems; it's designed for eventually-consistent metrics delivery.
 
 ## Open Questions
 
-1. **What is the appropriate job persistence model for HelloSales AI pipelines?** The sources show a clear split between ephemeral in-memory and durable persistent approaches. AI pipelines likely require durability given their cost and duration, pointing toward Temporal or JetStream-based solutions.
+1. **For HelloSales specifically:** Given the requirement for long-running AI pipelines, is Temporal or a similar durable execution platform viable? If operational complexity is prohibitive, what is the minimum viable alternative?
 
-2. **Should HelloSales implement a native DLQ or rely on advisory notifications?** Only Temporal provides native DLQ routing. JetStream advisories require custom client implementation. The operational cost of implementing DLQ routing must be weighed against the flexibility of custom behavior.
+2. **DLQ implementation:** Across all sources, DLQ remains the most consistently missing feature. What DLQ pattern would be appropriate for HelloSales — a separate stream (nats-server approach), a database table, or a workflow-based system (temporal approach)?
 
-3. **How should job cancellation interact with in-progress AI work?** Context propagation handles cancellation initiation, but AI pipeline steps may not be interruptible. What is the semantics when a 10-minute AI inference is cancelled mid-execution?
+3. **Backpressure signaling:** Most sources handle backpressure implicitly. Should HelloSales implement explicit backpressure signals to clients about queue depth, or is implicit backpressure via HTTP 429 sufficient?
 
-4. **What is the retry budget for failed AI pipeline steps?** Most systems either retry indefinitely (data loss acceptable) or have fixed limits. AI pipelines may need typed retry policies — some steps idempotent and retryable, others not.
-
-5. **Is polling acceptable for HelloSales job tracking?** Polling is simple but inefficient. Server-sent events, webhooks, or persistent connections (gRPC streaming) provide better latency but add infrastructure complexity.
-
-6. **Should HelloSales adopt Temporal as a dedicated workflow platform or build on JetStream primitives?** Temporal's operational complexity is significant. JetStream provides queue primitives but requires significant additional investment in retry, DLQ, and observability.
-
-7. **How does multi-tenant isolation work for AI pipeline job scheduling?** grafana's round-robin tenant fairness is one approach. VictoriaMetrics' per-URL queue limits is another. What isolation model fits HelloSales multi-tenant requirements?
+4. **Clock skew handling:** grafana's lease-based claiming has known clock skew risks. What mechanisms would ensure reliable job claiming in a HelloSales multi-node deployment?
 
 ## Evidence Index
 
-- `pkg/cmd/agent-task/capi/job.go:17-35` — Job struct definition (cli)
-- `pkg/cmd/agent-task/capi/client.go:15-16` — HTTP job submission (cli)
-- `pkg/cmd/agent-task/create/create.go:207-261` — Exponential backoff polling (cli)
-- `pkg/cmd/release/shared/upload.go:114-131` — Bounded errgroup concurrency (cli)
-- `internal/codespaces/rpc/invoker.go:271-293` — Heartbeat ticker (cli)
-- `pkg/util/scheduler/queue.go:91-118` — In-memory multi-tenant queue (grafana)
-- `pkg/util/scheduler/queue.go:172-209` — Round-robin tenant fairness (grafana)
-- `pkg/registry/apis/provisioning/jobs/persistentstore.go:150-161` — Atomic job claiming via resource version (grafana)
-- `pkg/registry/apis/provisioning/jobs/persistentstore.go:177-209` — Job claim rollback function (grafana)
-- `pkg/registry/apis/provisioning/jobs/driver.go:266-320` — Lease renewal loop (grafana)
-- `pkg/registry/apis/provisioning/jobs/expired_job_cleanup.go:87-135` — Expired job cleanup (grafana)
-- `pkg/registry/apis/provisioning/jobs/progress.go:17-37` — Progress debouncing (grafana)
-- `pkg/registry/apis/provisioning/jobs/queue.go:45-54` — Worker interface (grafana)
-- `pkg/util/retryer/retryer.go:18-47` — Generic retry utility (grafana)
-- `internal/querycoordv2/task/scheduler.go:382` — Task scheduler interface (milvus)
-- `internal/querycoordv2/task/task.go:73` — Task interface (milvus)
-- `internal/datacoord/task/global_scheduler.go:48` — Global task scheduler (milvus)
-- `internal/proxy/task_scheduler.go:443` — Proxy task scheduler (milvus)
-- `pkg/util/retry/retry.go:39` — Retry package (milvus)
-- `pkg/util/retry/options.go:46` — Retry options (milvus)
-- `internal/querycoordv2/task/scheduler.go:1084` — Failed load cache (milvus)
-- `pkg/streaming/util/ratelimit/adaptive_rate_limit_controller.go:34` — Adaptive rate limiting states (milvus)
-- `server/stream.go:50-130` — Stream config (nats-server)
-- `server/consumer.go:88-141` — Consumer config (nats-server)
-- `server/consumer.go:97-98` — MaxDeliver and BackOff (nats-server)
-- `server/consumer.go:333-341` — Ack policies (nats-server)
-- `server/jetstream_events.go:120-132` — Max delivery exceeded advisory (nats-server)
-- `server/consumer.go:470` — Redelivery queue (nats-server)
-- `server/consumer.go:2872-2904` — addToRedeliverQueue (nats-server)
-- `server/consumer.go:5927-6044` — checkPending timer (nats-server)
-- `server/scheduler.go:35-44` — Hash-wheel timer for scheduling (nats-server)
-- `server/ipqueue.go:64-84` — ipQueue backpressure (nats-server)
-- `server/client.go:155,1442-1447` — Slow consumer tracking (nats-server)
-- `internal/listobjects/pipeline/pipeline.go:98` — Pipeline builder (openfga)
-- `internal/listobjects/pipeline/pipeline.go:399-410` — Pipeline worker start (openfga)
-- `internal/containers/mpmc/queue.go:42` — MPMC queue struct (openfga)
-- `internal/containers/mpmc/queue.go:251-256` — MPMC backpressure (openfga)
-- `internal/concurrency/concurrency.go:10-21` — Concurrency pool (openfga)
-- `internal/throttler/throttler.go:26` — Throttler interface (openfga)
-- `internal/listobjects/pipeline/internal/worker/cycle.go:99` — Cycle group (openfga)
-- `tools/cron/cron.go:20-28` — Cron scheduler (pocketbase)
-- `tools/cron/cron.go:81-107` — Cron job registration (pocketbase)
-- `tools/routine/routine.go:13-35` — FireAndForget (pocketbase)
-- `core/db_retry.go:43-62` — DB lock retry (pocketbase)
-- `core/base.go:1305-1310` — File delete semaphore (pocketbase)
-- `common/backoff/retrypolicy.go:49-55` — Exponential retry policy (temporal)
-- `common/backoff/retrypolicy.go:178-187` — Jitter implementation (temporal)
-- `service/worker/dlq/workflow.go:139-146` — DLQ workflow types (temporal)
-- `service/worker/dlq/workflow.go:179-191` — DLQ retry policies (temporal)
-- `service/matching/backlog_manager.go:39-56` — Backlog manager interface (temporal)
-- `service/matching/backlog_age_tracker.go:15-17` — Backlog age tracker (temporal)
-- `service/worker/scheduler/workflow.go:71-72` — Scheduler workflow prefix (temporal)
-- `service/worker/scheduler/workflow.go:195-214` — Tweakable policies (temporal)
-- `service/history/history_engine.go:635-636` — Workflow cancellation (temporal)
-- `service/matching/backlog_manager.go:27-29` — Persistence retry policy (temporal)
-- `lib/persistentqueue/fastqueue.go:18-40` — FastQueue struct (victoriametrics)
-- `lib/persistentqueue/fastqueue.go:186-229` — Queue write (victoriametrics)
-- `lib/persistentqueue/persistentqueue.go:30-64` — File-based queue (victoriametrics)
-- `lib/persistentqueue/persistentqueue.go:355-382` — Queue drop on size (victoriametrics)
-- `lib/timeutil/backoff_timer.go:9-47` — Backoff timer (victoriametrics)
-- `app/vmagent/remotewrite/client.go:416-515` — Remote write retry (victoriametrics)
-- `lib/writeconcurrencylimiter/concurrencylimiter.go:103-136` — Concurrency limiter (victoriametrics)
-- `app/vmalert/rule/group.go:731-757` — vmalert group executor (victoriametrics)
+| Evidence | Source | File:Line |
+|----------|--------|-----------|
+| Job struct with ID, SessionID, Status, Result | cli | `pkg/cmd/agent-task/capi/job.go:17-35` |
+| Exponential backoff polling | cli | `pkg/cmd/agent-task/create/create.go:207-261` |
+| errgroup bounded concurrency | cli | `pkg/cmd/release/shared/upload.go:114-131` |
+| K8s lease-based claiming | grafana | `pkg/registry/apis/provisioning/jobs/persistentstore.go:150-161` |
+| Lease renewal loop | grafana | `pkg/registry/apis/provisioning/jobs/driver.go:266-320` |
+| In-memory round-robin scheduler | grafana | `pkg/util/scheduler/queue.go:172-209` |
+| Two-phase task scheduler | milvus | `internal/datacoord/task/global_scheduler.go:54-55` |
+| Exponential backoff retry | milvus | `pkg/util/retry/retry.go:112` |
+| Adaptive rate limiting | milvus | `pkg/streaming/util/ratelimit/adaptive_rate_limit_controller.go:83` |
+| JetStream ConsumerConfig BackOff | nats-server | `server/consumer.go:98` |
+| MaxDeliver advisory | nats-server | `server/jetstream_events.go:120-132` |
+| Pull consumer with ipQueue | nats-server | `server/consumer.go:456` |
+| MPMC bounded queue | openfga | `internal/containers/mpmc/queue.go:42` |
+| Concurrency pool with cancel-on-error | openfga | `internal/concurrency/concurrency.go:16-21` |
+| Cycle group for pipeline coordination | openfga | `internal/listobjects/pipeline/internal/worker/cycle.go:99` |
+| Cron scheduler with ticker | pocketbase | `tools/cron/cron.go:20-28` |
+| FireAndForget with panic recovery | pocketbase | `tools/routine/routine.go:13-35` |
+| ExponentialRetryPolicy with jitter | temporal | `common/backoff/retrypolicy.go:178-187` |
+| DLQ workflow for merge/delete | temporal | `service/worker/dlq/workflow.go:139-146` |
+| Scheduler workflow with catchup | temporal | `service/worker/scheduler/workflow.go:195-214` |
+| Backlog age tracking | temporal | `service/matching/backlog_age_tracker.go:15-17` |
+| FastQueue hybrid memory+file | victoriametrics | `lib/persistentqueue/fastqueue.go:18-40` |
+| BackoffTimer with jitter | victoriametrics | `lib/timeutil/backoff_timer.go:9-47` |
+| Queue blocked metric | victoriametrics | `app/vmagent/remotewrite/remotewrite.go:932-937` |
 
 ---
 
