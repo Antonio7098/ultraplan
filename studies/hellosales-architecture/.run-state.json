@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T20:10:32.008Z",
+  "updatedAt": "2026-05-20T20:12:40.700Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -1437,12 +1437,12 @@
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "nats-server",
-      "status": "running",
+      "status": "completed",
       "attempts": 2,
       "lastError": "Exit code 0 but analysis file was not generated",
       "lastAttemptAt": "2026-05-20T20:08:48.173Z",
       "nextRetryAt": "2026-05-20T19:41:26.598Z",
-      "completedAt": null
+      "completedAt": "2026-05-20T20:12:40.693Z"
     },
     {
       "dimensionNumber": "15",
@@ -1533,10 +1533,10 @@
       "dimensionName": "security-multi-tenant-isolation",
       "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
       "sourceName": "milvus",
-      "status": "pending",
-      "attempts": 0,
+      "status": "running",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:12:40.700Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1545,10 +1545,10 @@
       "dimensionName": "security-multi-tenant-isolation",
       "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
       "sourceName": "nats-server",
-      "status": "pending",
-      "attempts": 0,
+      "status": "running",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:12:40.700Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1943,10 +1943,21 @@
       "dimensionNumber": "14",
       "dimensionName": "testing-strategy-reliability",
       "dimensionTitle": "Dimension: Testing Strategy & Reliability Engineering",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "lastError": null,
       "lastAttemptAt": "2026-05-20T20:08:48.173Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-20T20:10:42.571Z"
+    },
+    {
+      "dimensionNumber": "15",
+      "dimensionName": "performance-resource-discipline",
+      "dimensionTitle": "Dimension: Performance & Resource Discipline",
+      "status": "running",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-20T20:12:40.700Z",
       "nextRetryAt": null,
       "completedAt": null
     }
