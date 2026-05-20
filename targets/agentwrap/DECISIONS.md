@@ -38,6 +38,90 @@ Do not convert study recommendations into accepted architecture decisions until 
 
 ## Accepted Decisions
 
+### DEC-027: Observability Records Are Runtime-Neutral SDK Snapshots
+
+- **Status:** Accepted
+- **Date:** 2026-05-20
+- **Sprint:** `targets/agentwrap/sprints/09-observability-metadata/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` observability and metadata; `targets/agentwrap/sources/TRD.md` metadata and persistence requirements.
+- **Evidence Source:** Sprint 9 implementation in `/home/antonioborgerees/coding/agentwrap/observability.go`; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Expose `RunRecord` and `RunEventRecord` as inspectable SDK snapshots built from canonical events, `RunResult`, and existing metadata types rather than requiring products to reconstruct active/completed state from raw event streams.
+- **Tradeoff:** Adds a public snapshot model alongside `RunMetadata`, but keeps active projections, latest-event summaries, event counts, and persistence safety facts explicit.
+- **Rejected Alternatives:** Treating `RunMetadata` as the complete durable record was rejected because it lacks active projection and event-retention fields. Leaving records entirely to callers was rejected because active and historical inspection are PRD/TRD requirements.
+- **Risk / Follow-up:** Keep records aligned with existing metadata types; avoid adding parallel attempt, permission, validation, repair, or artifact models.
+
+### DEC-028: Observability Uses A Wrapper, Not Adapter-Local Persistence
+
+- **Status:** Accepted
+- **Date:** 2026-05-20
+- **Sprint:** `targets/agentwrap/sprints/09-observability-metadata/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/TRD.md` observability, event sink, concurrency, and optional persistence requirements.
+- **Evidence Source:** Sprint 9 `ObservingRuntime` implementation; existing Sprint 8 `ValidatingRuntime` wrapper pattern; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Implement event projection, sink fan-out, and run-store updates in root-package `ObservingRuntime` around any `Runtime`, keeping OpenCode and future adapters storage-agnostic.
+- **Tradeoff:** The wrapper owns event forwarding/order and sink failure semantics, which requires focused tests for ordering, failure behavior, and run isolation.
+- **Rejected Alternatives:** Adapter-local persistence was rejected because it couples OpenCode mechanics to SDK durability and duplicates logic for future runtimes. Requiring callers to drain events and build every projection themselves was rejected because it fails the SDK inspection requirement.
+- **Risk / Follow-up:** Future high-volume event workloads may need bounded buffering or retention controls beyond the current synchronous sink/store calls.
+
+### DEC-029: Persistence Is Optional And Backend-Neutral
+
+- **Status:** Accepted
+- **Date:** 2026-05-20
+- **Sprint:** `targets/agentwrap/sprints/09-observability-metadata/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/TRD.md` persistence requirements; `targets/agentwrap/sources/PRD.md` evidence preservation and historical inspection.
+- **Evidence Source:** Sprint 9 `RunStore`, `RunInspector`, and `MemoryRunStore` implementation; store and wrapper tests; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Define backend-neutral `EventSink`, `RunStore`, and `RunInspector` contracts and ship only a deterministic in-memory reference store in the SDK.
+- **Tradeoff:** Production durability remains caller-provided until a product integration selects a concrete backend.
+- **Rejected Alternatives:** Built-in SQLite or file persistence was rejected as premature because the TRD explicitly avoids prescribing storage technology. Persisting only final `RunResult` values was rejected because it cannot support active dashboards or event history.
+- **Risk / Follow-up:** A future product integration must choose, test, and document its durable store backend.
+
+### DEC-030: Unsafe Raw Payload Bytes Are Omitted By Default
+
+- **Status:** Accepted
+- **Date:** 2026-05-20
+- **Sprint:** `targets/agentwrap/sprints/09-observability-metadata/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` output safety; `targets/agentwrap/sources/TRD.md` security/secrets and structured runtime events.
+- **Evidence Source:** Sprint 9 raw payload omission tests in `/home/antonioborgerees/coding/agentwrap/observability_test.go`; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Persist canonical safe payload fields by default and record raw payload presence, source, encoding, safety, and omission reason when unsafe native bytes are dropped.
+- **Tradeoff:** Default records contain less native forensic detail, but avoid leaking unsafe payloads or secrets through normal persistence.
+- **Rejected Alternatives:** Persisting all native raw payloads verbatim was rejected because existing `RawPayload.Safe` semantics require callers to treat native bytes as sensitive unless explicitly safe.
+- **Risk / Follow-up:** Add a caller-owned redaction/retention policy before encouraging unsafe raw payload persistence in production.
+
+### DEC-024: Runtime-Neutral Validation Wrapper
+
+- **Status:** Accepted
+- **Date:** 2026-05-20
+- **Sprint:** `targets/agentwrap/sprints/08-validation-repair/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` output validation; `targets/agentwrap/sources/TRD.md` output and artifact validation; `targets/agentwrap/roadmap.md` Sprint 8.
+- **Evidence Source:** Sprint 8 implementation in `/home/antonioborgerees/coding/agentwrap`; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Implement output validation as a root-package `ValidatingRuntime` wrapper around any `Runtime`, with public validation specs/results and built-in file, directory, artifact, Markdown-template, JSON, metadata, and caller-defined validators.
+- **Tradeoff:** Adds one orchestration wrapper and a small request-level validation spec, but keeps validation behavior out of runtime adapters.
+- **Rejected Alternatives:** Adapter-local validation was rejected because it would duplicate product success logic per runtime. Leaving validation entirely to callers was rejected because policy, events, metadata, and repair need shared validation facts.
+- **Risk / Follow-up:** Keep built-ins generic; product-specific report semantics should remain caller-defined validators.
+
+### DEC-025: Validation And Repair Are First-Class Observable Phases
+
+- **Status:** Accepted
+- **Date:** 2026-05-20
+- **Sprint:** `targets/agentwrap/sprints/08-validation-repair/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/TRD.md` run lifecycle, error model, metadata, and repair/reprompt requirements.
+- **Evidence Source:** Sprint 8 implementation in `/home/antonioborgerees/coding/agentwrap/lifecycle.go`, `/home/antonioborgerees/coding/agentwrap/metadata.go`, and `/home/antonioborgerees/coding/agentwrap/validation.go`; validation wrapper tests.
+- **Decision:** Add `validating` and `repairing` run statuses plus `RunMetadata.Validation` and `RunMetadata.Repair`; emit canonical validation events for validation and repair start/result facts.
+- **Tradeoff:** The public lifecycle grows, but validation and repair are now inspectable without reconstructing them from opaque metadata.
+- **Rejected Alternatives:** Events-only validation and metadata-only repair were rejected because they hide product-success phases from active-run observers.
+- **Risk / Follow-up:** Sprint 9 persistence should store these phase facts without changing primary run outcome semantics.
+
+### DEC-026: Repair Defaults To Same-Session Continuation And Inherited Permissions
+
+- **Status:** Accepted
+- **Date:** 2026-05-20
+- **Sprint:** `targets/agentwrap/sprints/08-validation-repair/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` retained runtime context and permissions; `targets/agentwrap/sources/TRD.md` repair/reprompt and permissions/sandboxing; `targets/agentwrap/roadmap.md` Sprint 8.
+- **Evidence Source:** Sprint 8 fake-runtime tests for repair success, repair exhaustion, unsupported same-session repair, cancellation, and permission denial; `env GOCACHE=/tmp/agentwrap-gocache go test ./...`.
+- **Decision:** Bounded repair attempts default to `SessionActionContinue`, inherit the original request's workdir, provider/model, sandbox, permission mode, and `PermissionPolicy`, and preserve permission denials as `ErrorPermission` rather than validation errors.
+- **Tradeoff:** Repair may fail under the original permission posture even if broader permissions could fix the output.
+- **Rejected Alternatives:** Fresh-session repair by default was rejected because it loses useful retained context. Permission broadening during repair was rejected because it bypasses caller intent.
+- **Risk / Follow-up:** OpenCode same-session repair remains best-effort until a gated live smoke validates the native runtime path.
+
 ### DEC-001: Root SDK Package With Thin Executable Entrypoint
 
 - **Status:** Accepted
