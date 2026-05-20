@@ -378,6 +378,20 @@ function validateCompletedTasks(ROOT: string, state: RunState, allSources: Sourc
       s.lastAttemptAt = null
       s.lastError = "Synthesis report file missing on resume"
       fixed++
+      continue
+    }
+    const analysisFilesExist = allSources.every(src => {
+      const analysisPath = join(ROOT, "reports/source", `${s.dimensionNumber}-${s.dimensionName}`, `${src.name}.md`)
+      return existsSync(analysisPath)
+    })
+    if (!analysisFilesExist) {
+      console.log(`  ⚠ Synthesis "${s.dimensionTitle}" completed but analysis files missing — resetting to pending`)
+      s.status = "pending"
+      s.attempts = 0
+      s.completedAt = null
+      s.lastAttemptAt = null
+      s.lastError = "Dependent analysis files missing on resume"
+      fixed++
     }
   }
   return fixed
@@ -682,6 +696,7 @@ async function cmdRunAll(ROOT: string, opts: {
   )
 
   generateSummary(ROOT)
+  gitCommitAndPush("chore: update summary.csv and final reports")
   console.log("\n✓ All studies completed")
 }
 
@@ -758,11 +773,14 @@ async function cmdRunLoop(ROOT: string, opts: {
     const now = Date.now()
 
     for (const d of allDimensions) {
-      const allSourcesDone = allSources.every(s =>
-        state.tasks.find(t => t.dimensionNumber === d.number && t.sourceName === s.name)?.status === "completed"
-      )
-      const synthExists = state.synthesisTasks.find(s => s.dimensionNumber === d.number)
-      if (allSourcesDone && !synthExists) {
+      const allSourcesDone = allSources.every(s => {
+        const task = state.tasks.find(t => t.dimensionNumber === d.number && t.sourceName === s.name)
+        if (task?.status !== "completed") return false
+        const analysisPath = join(ROOT, "reports/source", `${d.number}-${d.name}`, `${s.name}.md`)
+        return existsSync(analysisPath)
+      })
+      const synthTask = state.synthesisTasks.find(s => s.dimensionNumber === d.number)
+      if (allSourcesDone && !synthTask) {
         state.synthesisTasks.push({
           dimensionNumber: d.number,
           dimensionName: d.name,
@@ -956,9 +974,18 @@ async function cmdRunLoop(ROOT: string, opts: {
         }
 
         if (code === 0) {
-          analysisTask.status = "completed"
-          analysisTask.completedAt = new Date().toISOString()
-          console.log(`  ✓ [${analysisTask.dimensionTitle} × ${analysisTask.sourceName}] analysis written`)
+          const analysisPath = join(ROOT, "reports/source", `${analysisTask.dimensionNumber}-${analysisTask.dimensionName}`, `${analysisTask.sourceName}.md`)
+          if (existsSync(analysisPath)) {
+            analysisTask.status = "completed"
+            analysisTask.completedAt = new Date().toISOString()
+            console.log(`  ✓ [${analysisTask.dimensionTitle} × ${analysisTask.sourceName}] analysis written`)
+          } else {
+            analysisTask.status = "failed"
+            const delay = getBackoffDelay(analysisTask.attempts)
+            analysisTask.lastError = "Exit code 0 but analysis file was not generated"
+            analysisTask.nextRetryAt = delay > 0 ? new Date(Date.now() + delay).toISOString() : null
+            console.log(`  ✗ [${analysisTask.dimensionTitle} × ${analysisTask.sourceName}] exit 0 but file missing, retry in ${formatDuration(delay)}`)
+          }
         } else {
           analysisTask.status = "failed"
           const delay = getBackoffDelay(analysisTask.attempts)
@@ -1031,7 +1058,9 @@ async function cmdRunLoop(ROOT: string, opts: {
           } else {
             synthTask.status = "completed"
             synthTask.completedAt = new Date().toISOString()
+            synthTask.lastError = null
             console.log(`  ✓ Synthesis [${synthTask.dimensionTitle}] report written`)
+            gitCommitAndPush(`chore: add final report for ${synthTask.dimensionTitle}`)
           }
         } else {
           synthTask.status = "failed"
@@ -1196,6 +1225,16 @@ async function cmdExecuteSprint(
   } else {
     console.error(`\n✗ Sprint execution failed (exit code ${code})`)
     process.exit(code)
+  }
+}
+
+function gitCommitAndPush(message: string): void {
+  try {
+    execSync(`git add -A`, { cwd: ULTRAPLAN_ROOT, stdio: "pipe" })
+    execSync(`git commit -m "${message.replace(/"/g, '\\"')}"`, { cwd: ULTRAPLAN_ROOT, stdio: "pipe" })
+    execSync(`git push`, { cwd: ULTRAPLAN_ROOT, stdio: "pipe" })
+  } catch {
+    // commit or push may fail (nothing to commit, no remote, etc.) — that's fine
   }
 }
 
