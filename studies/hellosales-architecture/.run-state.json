@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T07:34:20.897Z",
+  "updatedAt": "2026-05-20T09:15:50.665Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -297,11 +297,11 @@
       "dimensionName": "configuration-environment-management",
       "dimensionTitle": "Dimension: Configuration & Environment Management",
       "sourceName": "pocketbase",
-      "status": "failed",
-      "attempts": 1,
+      "status": "running",
+      "attempts": 3,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T07:30:55.317Z",
-      "nextRetryAt": "2026-05-20T08:04:20.897Z",
+      "lastAttemptAt": "2026-05-20T09:15:50.665Z",
+      "nextRetryAt": "2026-05-20T09:15:42.870Z",
       "completedAt": null
     },
     {
@@ -465,11 +465,11 @@
       "dimensionName": "background-jobs-async-workflows",
       "dimensionTitle": "Dimension: Background Jobs & Async Workflows",
       "sourceName": "kubernetes",
-      "status": "pending",
-      "attempts": 0,
-      "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "status": "failed",
+      "attempts": 2,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T08:17:07.802Z",
+      "nextRetryAt": "2026-05-20T09:21:19.223Z",
       "completedAt": null
     },
     {
@@ -537,60 +537,60 @@
       "dimensionName": "background-jobs-async-workflows",
       "dimensionTitle": "Dimension: Background Jobs & Async Workflows",
       "sourceName": "victoriametrics",
-      "status": "pending",
-      "attempts": 1,
+      "status": "completed",
+      "attempts": 2,
       "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": "2026-05-19T19:22:22.257Z",
+      "lastAttemptAt": "2026-05-20T07:36:21.301Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T07:41:41.843Z"
     },
     {
       "dimensionNumber": "06",
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "cli",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T07:36:21.301Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T07:41:01.138Z"
     },
     {
       "dimensionNumber": "06",
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "grafana",
-      "status": "pending",
-      "attempts": 1,
+      "status": "completed",
+      "attempts": 2,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T14:09:26.031Z",
+      "lastAttemptAt": "2026-05-20T07:42:51.921Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T07:49:10.837Z"
     },
     {
       "dimensionNumber": "06",
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "kubernetes",
-      "status": "pending",
-      "attempts": 1,
+      "status": "completed",
+      "attempts": 2,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T14:09:26.031Z",
+      "lastAttemptAt": "2026-05-20T07:42:51.921Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T07:47:51.451Z"
     },
     {
       "dimensionNumber": "06",
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "milvus",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T07:42:51.921Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T07:50:53.666Z"
     },
     {
       "dimensionNumber": "06",
@@ -598,10 +598,10 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "nats-server",
       "status": "pending",
-      "attempts": 0,
-      "lastError": null,
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "attempts": 2,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T08:28:04.066Z",
+      "nextRetryAt": "2026-05-20T08:24:58.464Z",
       "completedAt": null
     },
     {
@@ -609,12 +609,12 @@
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "openfga",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T07:50:53.676Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T07:54:48.396Z"
     },
     {
       "dimensionNumber": "06",
@@ -622,10 +622,10 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "pocketbase",
       "status": "pending",
-      "attempts": 0,
-      "lastError": null,
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "attempts": 2,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T08:28:04.066Z",
+      "nextRetryAt": "2026-05-20T08:24:30.403Z",
       "completedAt": null
     },
     {
@@ -634,10 +634,10 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "temporal",
       "status": "pending",
-      "attempts": 0,
-      "lastError": null,
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "attempts": 1,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T07:54:58.467Z",
+      "nextRetryAt": "2026-05-20T08:32:30.976Z",
       "completedAt": null
     },
     {
@@ -646,10 +646,10 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "victoriametrics",
       "status": "pending",
-      "attempts": 0,
-      "lastError": null,
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "attempts": 1,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T07:54:58.467Z",
+      "nextRetryAt": "2026-05-20T08:30:06.503Z",
       "completedAt": null
     },
     {
@@ -657,12 +657,12 @@
       "dimensionName": "data-ingestion-processing-pipelines",
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "cli",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T07:54:58.467Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T08:01:01.664Z"
     },
     {
       "dimensionNumber": "07",
@@ -670,10 +670,10 @@
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "grafana",
       "status": "pending",
-      "attempts": 0,
-      "lastError": null,
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "attempts": 1,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T08:02:30.988Z",
+      "nextRetryAt": "2026-05-20T08:35:33.357Z",
       "completedAt": null
     },
     {
@@ -681,48 +681,48 @@
       "dimensionName": "data-ingestion-processing-pipelines",
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "kubernetes",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T08:02:30.988Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T08:11:44.948Z"
     },
     {
       "dimensionNumber": "07",
       "dimensionName": "data-ingestion-processing-pipelines",
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "milvus",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T08:02:30.988Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T08:12:04.851Z"
     },
     {
       "dimensionNumber": "07",
       "dimensionName": "data-ingestion-processing-pipelines",
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "nats-server",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T08:12:04.854Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T08:16:32.156Z"
     },
     {
       "dimensionNumber": "07",
       "dimensionName": "data-ingestion-processing-pipelines",
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "openfga",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T08:12:04.854Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T08:17:07.798Z"
     },
     {
       "dimensionNumber": "07",
@@ -730,10 +730,10 @@
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "pocketbase",
       "status": "pending",
-      "attempts": 0,
-      "lastError": null,
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "attempts": 1,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T08:17:07.802Z",
+      "nextRetryAt": "2026-05-20T08:52:20.206Z",
       "completedAt": null
     },
     {
@@ -741,12 +741,12 @@
       "dimensionName": "data-ingestion-processing-pipelines",
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "temporal",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T08:17:07.802Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T08:21:56.159Z"
     },
     {
       "dimensionNumber": "07",
@@ -754,10 +754,10 @@
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "victoriametrics",
       "status": "pending",
-      "attempts": 0,
-      "lastError": null,
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "attempts": 1,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T08:22:20.213Z",
+      "nextRetryAt": "2026-05-20T08:56:20.078Z",
       "completedAt": null
     },
     {
@@ -765,24 +765,24 @@
       "dimensionName": "state-management-persistence",
       "dimensionTitle": "Dimension: State Management & Persistence",
       "sourceName": "cli",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T08:22:20.213Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T08:28:04.055Z"
     },
     {
       "dimensionNumber": "08",
       "dimensionName": "state-management-persistence",
       "dimensionTitle": "Dimension: State Management & Persistence",
       "sourceName": "grafana",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T08:22:20.213Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T08:27:32.347Z"
     },
     {
       "dimensionNumber": "08",
@@ -790,9 +790,9 @@
       "dimensionTitle": "Dimension: State Management & Persistence",
       "sourceName": "kubernetes",
       "status": "pending",
-      "attempts": 0,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T08:28:04.066Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1976,21 +1976,21 @@
       "dimensionNumber": "03",
       "dimensionName": "configuration-environment-management",
       "dimensionTitle": "Dimension: Configuration & Environment Management",
-      "status": "completed",
+      "status": "running",
       "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T07:24:20.315Z",
+      "lastError": "Dependent analysis files missing on resume",
+      "lastAttemptAt": "2026-05-20T09:15:50.665Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T07:30:02.506Z"
+      "completedAt": null
     },
     {
       "dimensionNumber": "04",
       "dimensionName": "http-api-surface",
       "dimensionTitle": "Dimension: HTTP/API Surface Design",
-      "status": "failed",
-      "attempts": 3,
+      "status": "running",
+      "attempts": 4,
       "lastError": "Synthesis completed (exit 0) but report file was not generated",
-      "lastAttemptAt": "2026-05-20T07:30:55.317Z",
+      "lastAttemptAt": "2026-05-20T09:15:50.665Z",
       "nextRetryAt": "2026-05-20T09:03:36.589Z",
       "completedAt": null
     },
@@ -1998,10 +1998,10 @@
       "dimensionNumber": "05",
       "dimensionName": "background-jobs-async-workflows",
       "dimensionTitle": "Dimension: Background Jobs & Async Workflows",
-      "status": "running",
-      "attempts": 1,
-      "lastError": "Synthesis report file missing on resume",
-      "lastAttemptAt": "2026-05-20T07:30:55.317Z",
+      "status": "pending",
+      "attempts": 0,
+      "lastError": "Dependent analysis files missing on resume",
+      "lastAttemptAt": null,
       "nextRetryAt": null,
       "completedAt": null
     }
