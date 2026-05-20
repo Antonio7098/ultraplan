@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T11:12:37.759Z",
+  "updatedAt": "2026-05-20T11:14:01.757Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -465,10 +465,10 @@
       "dimensionName": "background-jobs-async-workflows",
       "dimensionTitle": "Dimension: Background Jobs & Async Workflows",
       "sourceName": "kubernetes",
-      "status": "pending",
-      "attempts": 0,
+      "status": "running",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T11:14:01.757Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -597,10 +597,10 @@
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "nats-server",
-      "status": "pending",
-      "attempts": 0,
+      "status": "running",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T11:14:01.757Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1976,12 +1976,12 @@
       "dimensionNumber": "03",
       "dimensionName": "configuration-environment-management",
       "dimensionTitle": "Dimension: Configuration & Environment Management",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
-      "lastError": "Dependent analysis files missing on resume",
+      "lastError": null,
       "lastAttemptAt": "2026-05-20T11:09:46.209Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T11:13:59.041Z"
     },
     {
       "dimensionNumber": "04",
@@ -2009,10 +2009,10 @@
       "dimensionNumber": "08",
       "dimensionName": "state-management-persistence",
       "dimensionTitle": "Dimension: State Management & Persistence",
-      "status": "pending",
-      "attempts": 0,
+      "status": "running",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T11:14:01.757Z",
       "nextRetryAt": null,
       "completedAt": null
     }
