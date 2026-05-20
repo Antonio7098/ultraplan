@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T20:44:01.366Z",
+  "updatedAt": "2026-05-20T20:55:17.318Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -465,12 +465,12 @@
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "nats-server",
-      "status": "failed",
-      "attempts": 3,
+      "status": "completed",
+      "attempts": 4,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T19:19:56.478Z",
+      "lastAttemptAt": "2026-05-20T20:52:24.485Z",
       "nextRetryAt": "2026-05-20T20:52:24.468Z",
-      "completedAt": null
+      "completedAt": "2026-05-20T20:55:17.316Z"
     },
     {
       "dimensionNumber": "06",
@@ -1987,10 +1987,21 @@
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "lastError": null,
       "lastAttemptAt": "2026-05-20T20:44:01.366Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-20T20:47:59.233Z"
+    },
+    {
+      "dimensionNumber": "06",
+      "dimensionName": "concurrency-model",
+      "dimensionTitle": "Dimension: Concurrency Model",
+      "status": "running",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-20T20:55:17.318Z",
       "nextRetryAt": null,
       "completedAt": null
     }
