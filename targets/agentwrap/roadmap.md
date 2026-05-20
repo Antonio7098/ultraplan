@@ -25,6 +25,7 @@ Compression layer:
 - `targets/agentwrap/reports/evidence/validation-repair.md`
 - `targets/agentwrap/reports/evidence/observability-metadata.md`
 - `targets/agentwrap/reports/evidence/testing-strategy.md`
+- `targets/agentwrap/reports/permission-based-agent-wrapping.md`
 
 Primary study dimensions:
 
@@ -323,7 +324,7 @@ Add composable resilience policies without hard-coding one retry/fallback flow i
 - Allow policies to inspect error, attempt, runtime, provider, model, validation result, and rate-limit metadata.
 - Preserve attempt relationships.
 - Allow policy decisions about retained session reuse versus fresh session.
-- Keep validation/repair minimal until Sprint 7.
+- Keep validation/repair minimal until Sprint 8.
 
 ### Evidence Inputs
 
@@ -348,7 +349,76 @@ Add composable resilience policies without hard-coding one retry/fallback flow i
 - Every attempt is traceable to the original run.
 - Policy behavior is testable with fake runtimes.
 
-## Sprint 7: Output Validation and Repair
+## Sprint 7: Initialization-Time Permission Policy
+
+### Goal
+
+Let SDK callers decide the agent permission posture at initialization time, while the runtime adapter translates that policy into OpenCode configuration and manages OpenCode approval events internally.
+
+### Scope
+
+- Define runtime-neutral permission policy primitives for SDK initialization.
+- Support tool-level modes such as allow, deny, and ask/manual.
+- Support workspace and external-directory policy where the runtime can enforce it directly.
+- Classify policy features as native, SDK-managed, unsupported, or best-effort before the run starts.
+- Generate or inject OpenCode permission configuration through supported config mechanisms.
+- Handle OpenCode runtime approval requests inside the adapter according to the initialized SDK policy.
+- Allow optional manual approval handling for `ask` decisions without making live approval mandatory for all callers.
+- Emit canonical permission decision and audit events through the existing event stream.
+- Keep Codex and Claude Code permission mechanics as design pressure only; do not implement their adapters in this sprint.
+- Do not introduce a broad public `ToolApprovalService` until real SDK callers need live approval orchestration.
+
+### Evidence Inputs
+
+- `reports/permission-based-agent-wrapping.md`
+- `evidence/runtime-contract.md`
+- `evidence/session-lifecycle.md`
+- `evidence/resilience-policies.md`
+- `evidence/observability-metadata.md`
+- `studies/opencode-wrap-study/reports/final/01-runtime-contract-and-api-shape.md`
+- `studies/opencode-wrap-study/reports/final/02-process-session-lifecycle.md`
+- `studies/go-cli-study/reports/final/04-configuration-management.md`
+- `studies/go-cli-study/reports/final/05-error-handling.md`
+- `studies/go-cli-study/reports/final/10-logging-observability.md`
+- `studies/go-cli-study/reports/final/13-security.md`
+
+### Permission Report Evidence
+
+The permission architecture report establishes that OpenCode supports static permission configuration through config/env injection and runtime permission decisions through an event stream plus approval API. For the current SDK goal, agentwrap should expose initialization-time policy and keep OpenCode-specific approval mechanics inside the adapter.
+
+Use the report now for:
+
+- OpenCode permission config shape and environment injection.
+- OpenCode permission event and approval API mechanics.
+- The distinction between native static policy and runtime-managed decisions.
+- Auditability requirements for every permission decision.
+
+Defer from the report:
+
+- A full cross-agent approval abstraction.
+- Codex `ApprovedExecpolicyAmendment` implementation.
+- Claude Code callback implementation.
+- Mandatory live approval orchestration for every caller.
+
+### Output
+
+- Public SDK permission policy model.
+- OpenCode policy translation layer.
+- OpenCode approval-event handling driven by initialized policy.
+- Permission decision/audit canonical events.
+- Preflight errors for unsupported or contradictory policy.
+- Tests for allow, deny, ask/manual, unsupported policy, config generation, approval handling, and audit event emission.
+
+### Quality Gate
+
+- A caller can initialize a run with a permission policy and never interact with OpenCode approval APIs directly.
+- OpenCode approvals are resolved consistently from SDK policy.
+- Unsupported policy features fail clearly before run start unless explicitly configured as best-effort.
+- Manual approval requests are possible for `ask`, but optional.
+- Permission decisions are visible in canonical events and metadata.
+- OpenCode permission details do not leak into the common caller path.
+
+## Sprint 8: Output Validation and Repair
 
 ### Goal
 
@@ -362,11 +432,14 @@ Make successful runtime execution subordinate to caller-defined product success 
 - Add repair attempt flow after validation failure.
 - Support same-session repair where available.
 - Encourage artifact-first large output flows.
+- Respect initialized permission policy during repair attempts.
+- Ensure permission denials during repair are reported distinctly from validation failures.
 
 ### Evidence Inputs
 
 - `evidence/validation-repair.md`
 - `evidence/session-lifecycle.md`
+- `reports/permission-based-agent-wrapping.md`
 - `studies/opencode-wrap-study/reports/final/03-resilience-fallback-and-validation.md`
 - `studies/go-cli-study/reports/final/06-io-abstraction.md`
 - `studies/go-cli-study/reports/final/05-error-handling.md`
@@ -392,9 +465,10 @@ Session continuation and `parentID` tracking (`session/session.ts`) enable repai
 - Runtime exit success alone cannot mark a run successful when validators are configured.
 - Validation failures include actionable repair context.
 - Repair attempts are bounded and visible.
+- Repair attempts cannot silently bypass the initialized permission policy.
 - Large output expectations can be redirected to artifacts rather than process output.
 
-## Sprint 8: Observability, Metadata, and Persistence Hooks
+## Sprint 9: Observability, Metadata, and Persistence Hooks
 
 ### Goal
 
@@ -405,7 +479,8 @@ Expose enough structured state for dashboards, historical inspection, synthesis,
 - Define run record metadata.
 - Define event sink hooks.
 - Define optional persistence interface.
-- Capture runtime, provider, model, attempts, timing, status, warnings, errors, artifacts, usage, estimated cost, and session retention metadata.
+- Capture runtime, provider, model, attempts, timing, status, warnings, errors, artifacts, usage, estimated cost, session retention metadata, and permission policy summary.
+- Include permission decision and denial audit records in the canonical event history.
 - Add active-run and completed-run inspection.
 - Add executable status/inspect commands.
 
@@ -413,6 +488,7 @@ Expose enough structured state for dashboards, historical inspection, synthesis,
 
 - `evidence/observability-metadata.md`
 - `evidence/cli-design.md`
+- `reports/permission-based-agent-wrapping.md`
 - `studies/opencode-wrap-study/reports/final/04-workflow-composition-and-observability.md`
 - `studies/go-cli-study/reports/final/10-logging-observability.md`
 - `studies/go-cli-study/reports/final/14-performance.md`
@@ -444,16 +520,17 @@ The full **session event catalog** (`packages/core/src/session-event.ts:402`) de
 - Event sink interface.
 - Optional persistence hook.
 - executable status/inspect commands.
-- Tests for metadata completeness and event ordering.
+- Tests for metadata completeness, permission audit completeness, and event ordering.
 
 ### Quality Gate
 
 - A product can build a progress dashboard from canonical events.
 - A product can identify which provider/model produced an artifact.
+- A product can explain why a tool action was allowed, denied, or sent for manual approval.
 - Estimates are clearly marked as estimates.
 - Persistence is optional and not entangled with runtime adapters.
 
-## Sprint 9: Future Interface Review
+## Sprint 10: Future Interface Review
 
 ### Goal
 
@@ -464,11 +541,13 @@ Reassess whether any user-facing convenience surface is warranted after the SDK 
 - Reassess whether a command surface, API surface, or no additional surface is warranted.
 - If a surface is justified, keep it thin and testable.
 - Make configuration behavior visible only if a surface exists.
+- Reassess whether manual permission approval needs a richer public API or UI surface.
 - Separate stdout user output from diagnostics only if a surface exists.
 
 ### Evidence Inputs
 
 - `evidence/testing-strategy.md`
+- `reports/permission-based-agent-wrapping.md`
 - `studies/go-cli-study/reports/final/01-project-structure.md`
 - `studies/go-cli-study/reports/final/02-command-architecture.md`
 - `studies/go-cli-study/reports/final/04-configuration-management.md`
@@ -489,6 +568,7 @@ The **CLI command architecture** (`cli/cmd/*`) uses `effectCmd({ command, descri
 ### Output
 
 - Determination on whether any additional surface is needed.
+- Determination on whether manual approval remains callback-only, becomes a first-class API, or is deferred.
 - If a surface exists, tests with fake runtime.
 - If a surface exists, golden output fixtures for help/status/error output where useful.
 
@@ -497,9 +577,10 @@ The **CLI command architecture** (`cli/cmd/*`) uses `effectCmd({ command, descri
 - Any additional surface does not contain runtime business logic.
 - If a surface exists, output is scriptable and diagnostics are separable.
 - Effective configuration and error states are explainable if a surface exists.
+- Permission policy and manual approval behavior are explainable without exposing OpenCode internals.
 - The SDK can be exercised without requiring OpenCode in unit tests.
 
-## Sprint 10: Second Runtime Spike
+## Sprint 11: Second Runtime Spike
 
 ### Goal
 
@@ -509,7 +590,8 @@ Prove the abstraction is real by adding a minimal second runtime or runtime simu
 
 - Implement only enough to test contract pressure.
 - Identify where the SDK overfit to OpenCode.
-- Exercise canonical event mapping, lifecycle, health, and error behavior.
+- Exercise canonical event mapping, lifecycle, health, permission policy, and error behavior.
+- Use Codex or Claude Code permission semantics as explicit pressure against the Sprint 7 permission model if choosing a real second runtime.
 - Do not broaden product scope.
 
 ### Evidence Inputs
@@ -517,6 +599,7 @@ Prove the abstraction is real by adding a minimal second runtime or runtime simu
 - `evidence/runtime-contract.md`
 - `evidence/session-lifecycle.md`
 - `evidence/resilience-policies.md`
+- `reports/permission-based-agent-wrapping.md`
 - `studies/opencode-wrap-study/reports/final/01-runtime-contract-and-api-shape.md`
 - `studies/opencode-wrap-study/reports/final/02-process-session-lifecycle.md`
 - `studies/opencode-wrap-study/reports/final/03-resilience-fallback-and-validation.md`
@@ -541,10 +624,11 @@ The **`--format json` event output** (`cli/cmd/run.ts`) with per-line `{ type, t
 ### Quality Gate
 
 - The second runtime works without product-level orchestration changes.
+- Permission policy semantics survive a non-OpenCode runtime without rewriting product code.
 - Any OpenCode-specific assumptions are documented or removed.
 - Public API changes are justified in `DECISIONS.md`.
 
-## Sprint 11: UltraPlan Integration Spike
+## Sprint 12: UltraPlan Integration Spike
 
 ### Goal
 
@@ -553,6 +637,7 @@ Validate that the SDK primitive supports UltraPlan-style workflows without absor
 ### Scope
 
 - Run one narrow UltraPlan-like operation through the SDK.
+- Configure permissions through the SDK at run initialization.
 - Use runtime events for progress.
 - Use validators for expected outputs.
 - Preserve metadata for later synthesis.
@@ -563,6 +648,7 @@ Validate that the SDK primitive supports UltraPlan-style workflows without absor
 - PRD/TRD
 - `evidence/observability-metadata.md`
 - `evidence/validation-repair.md`
+- `reports/permission-based-agent-wrapping.md`
 - `studies/opencode-wrap-study/reports/final/04-workflow-composition-and-observability.md`
 
 ### OpenCode Internals Evidence
@@ -586,6 +672,7 @@ The **SyncEvent projection** (`sync/index.ts:167-183`) with immediate transactio
 ### Quality Gate
 
 - UltraPlan can use the SDK without parsing runtime-native output.
+- UltraPlan can select a permission policy without implementing OpenCode approval logic.
 - Product-specific concepts remain outside the SDK.
 - Missing SDK primitives are identified as requirements, not patched around in product code.
 
@@ -619,10 +706,11 @@ The roadmap intentionally moves from stable primitives to product integration:
 5. Lifecycle and retained sessions.
 6. Health/config readiness.
 7. Resilience policies.
-8. Validation and repair.
-9. Observability and metadata.
-10. Future interface review.
-11. Second runtime pressure test.
-12. UltraPlan integration pressure test.
+8. Initialization-time permission policy.
+9. Validation and repair.
+10. Observability and metadata.
+11. Future interface review.
+12. Second runtime pressure test.
+13. UltraPlan integration pressure test.
 
 This ordering keeps the project from jumping straight to workflows before the runtime primitive is solid.
