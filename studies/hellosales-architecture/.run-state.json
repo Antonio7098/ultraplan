@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T18:58:04.475Z",
+  "updatedAt": "2026-05-20T19:07:30.244Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -1101,12 +1101,12 @@
       "dimensionName": "workflow-agent-orchestration",
       "dimensionTitle": "Dimension: Workflow / Agent Orchestration",
       "sourceName": "milvus",
-      "status": "failed",
-      "attempts": 1,
+      "status": "completed",
+      "attempts": 2,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T18:28:06.311Z",
+      "lastAttemptAt": "2026-05-20T19:02:21.482Z",
       "nextRetryAt": "2026-05-20T19:01:31.230Z",
-      "completedAt": null
+      "completedAt": "2026-05-20T19:06:40.286Z"
     },
     {
       "dimensionNumber": "12",
@@ -1389,58 +1389,58 @@
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "cli",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "lastError": null,
       "lastAttemptAt": "2026-05-20T18:58:04.475Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T19:00:18.456Z"
     },
     {
       "dimensionNumber": "15",
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "grafana",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "lastError": null,
       "lastAttemptAt": "2026-05-20T18:58:04.475Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T19:02:21.479Z"
     },
     {
       "dimensionNumber": "15",
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "kubernetes",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T19:02:21.482Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T19:07:30.241Z"
     },
     {
       "dimensionNumber": "15",
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "milvus",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T19:02:21.482Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T19:05:28.187Z"
     },
     {
       "dimensionNumber": "15",
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "nats-server",
-      "status": "pending",
-      "attempts": 0,
+      "status": "running",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T19:07:30.244Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1449,10 +1449,10 @@
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "openfga",
-      "status": "pending",
-      "attempts": 0,
+      "status": "running",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T19:07:30.244Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1910,11 +1910,22 @@
       "dimensionNumber": "11",
       "dimensionName": "ai-runtime-model-abstraction",
       "dimensionTitle": "Dimension: AI Runtime & Model Abstraction",
-      "status": "running",
+      "status": "completed",
       "attempts": 2,
-      "lastError": "Synthesis completed (exit 0) but report file was not generated",
+      "lastError": null,
       "lastAttemptAt": "2026-05-20T18:58:04.475Z",
       "nextRetryAt": "2026-05-20T18:56:17.385Z",
+      "completedAt": "2026-05-20T18:59:12.025Z"
+    },
+    {
+      "dimensionNumber": "12",
+      "dimensionName": "workflow-agent-orchestration",
+      "dimensionTitle": "Dimension: Workflow / Agent Orchestration",
+      "status": "running",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-20T19:07:30.244Z",
+      "nextRetryAt": null,
       "completedAt": null
     }
   ],
