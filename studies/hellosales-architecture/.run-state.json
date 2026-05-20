@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T18:11:49.449Z",
+  "updatedAt": "2026-05-20T18:24:06.132Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -297,11 +297,11 @@
       "dimensionName": "configuration-environment-management",
       "dimensionTitle": "Dimension: Configuration & Environment Management",
       "sourceName": "pocketbase",
-      "status": "running",
+      "status": "failed",
       "attempts": 2,
       "lastError": "Exit code 0 but analysis file was not generated",
       "lastAttemptAt": "2026-05-20T18:10:37.967Z",
-      "nextRetryAt": "2026-05-20T12:17:01.625Z",
+      "nextRetryAt": "2026-05-20T19:14:05.276Z",
       "completedAt": null
     },
     {
@@ -465,11 +465,11 @@
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "nats-server",
-      "status": "pending",
-      "attempts": 1,
+      "status": "failed",
+      "attempts": 2,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T11:42:26.293Z",
-      "nextRetryAt": "2026-05-20T12:17:03.859Z",
+      "lastAttemptAt": "2026-05-20T18:14:05.286Z",
+      "nextRetryAt": "2026-05-20T19:16:43.755Z",
       "completedAt": null
     },
     {
@@ -753,12 +753,12 @@
       "dimensionName": "observability-operational-visibility",
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "grafana",
-      "status": "pending",
-      "attempts": 2,
+      "status": "completed",
+      "attempts": 3,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:47:03.874Z",
+      "lastAttemptAt": "2026-05-20T18:14:05.286Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T18:17:01.524Z"
     },
     {
       "dimensionNumber": "09",
@@ -789,11 +789,11 @@
       "dimensionName": "observability-operational-visibility",
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "nats-server",
-      "status": "pending",
-      "attempts": 2,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:47:03.874Z",
-      "nextRetryAt": null,
+      "status": "failed",
+      "attempts": 3,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T18:14:05.286Z",
+      "nextRetryAt": "2026-05-20T19:47:05.446Z",
       "completedAt": null
     },
     {
@@ -933,12 +933,12 @@
       "dimensionName": "error-taxonomy-failure-handling",
       "dimensionTitle": "Dimension: Error Taxonomy & Failure Handling",
       "sourceName": "temporal",
-      "status": "pending",
-      "attempts": 1,
+      "status": "completed",
+      "attempts": 2,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:47:03.874Z",
+      "lastAttemptAt": "2026-05-20T18:17:05.448Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T18:19:28.058Z"
     },
     {
       "dimensionNumber": "10",
@@ -993,12 +993,12 @@
       "dimensionName": "ai-runtime-model-abstraction",
       "dimensionTitle": "Dimension: AI Runtime & Model Abstraction",
       "sourceName": "milvus",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T18:17:05.448Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T18:21:57.343Z"
     },
     {
       "dimensionNumber": "11",
@@ -1041,34 +1041,34 @@
       "dimensionName": "ai-runtime-model-abstraction",
       "dimensionTitle": "Dimension: AI Runtime & Model Abstraction",
       "sourceName": "temporal",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T18:17:05.448Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T18:19:41.466Z"
     },
     {
       "dimensionNumber": "11",
       "dimensionName": "ai-runtime-model-abstraction",
       "dimensionTitle": "Dimension: AI Runtime & Model Abstraction",
       "sourceName": "victoriametrics",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T18:21:57.348Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T18:24:06.131Z"
     },
     {
       "dimensionNumber": "12",
       "dimensionName": "workflow-agent-orchestration",
       "dimensionTitle": "Dimension: Workflow / Agent Orchestration",
       "sourceName": "cli",
-      "status": "pending",
-      "attempts": 0,
+      "status": "running",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T18:21:57.348Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1888,11 +1888,22 @@
       "dimensionNumber": "07",
       "dimensionName": "data-ingestion-processing-pipelines",
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
-      "status": "running",
+      "status": "completed",
       "attempts": 2,
-      "lastError": "Synthesis completed (exit 0) but report file was not generated",
+      "lastError": null,
       "lastAttemptAt": "2026-05-20T18:10:37.967Z",
       "nextRetryAt": "2026-05-20T12:11:20.326Z",
+      "completedAt": "2026-05-20T18:13:47.138Z"
+    },
+    {
+      "dimensionNumber": "10",
+      "dimensionName": "error-taxonomy-failure-handling",
+      "dimensionTitle": "Dimension: Error Taxonomy & Failure Handling",
+      "status": "running",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-20T18:21:57.348Z",
+      "nextRetryAt": null,
       "completedAt": null
     }
   ],
