@@ -51,7 +51,7 @@
 - `agentwrap/policy.go:20` - `PolicyContext` already reserves `Validation *ValidationResult`, but the placeholder must become real.
 - `agentwrap/metadata.go:17` - `RunMetadata` is the right place to add validation and repair summaries.
 - `agentwrap/metadata.go:118` - existing `SessionAction` values can express same-session, fresh, fork, replace, release repair requests.
-- `agentwrap/events.go:24` - `EventValidation` exists; repair should be visible through events or metadata without expanding core run status.
+- `agentwrap/events.go:24` - `EventValidation` exists and should complement first-class validation/repair run states with detailed phase evidence.
 - `agentwrap/errors.go:12` - `ErrorValidation` and `ErrorRepairExhausted` already exist, and `ErrorPermission` is available for permission-denied repair attempts.
 - `agentwrap/permissions.go:71` - `PermissionPolicy` is already run-scoped caller intent and must be copied into repair requests.
 - `agentwrap/opencode/runtime.go:20` - OpenCode adapter startup owns permission translation and session args; validation/repair should wrap the runtime instead of embedding product validation in the adapter.
@@ -75,7 +75,7 @@
 | Repair and reprompt | TRD Repair and Reprompt | Technical contract | Applicable | Requires bounded repair attempts and explicit retained-session behavior. |
 | Permissions and interaction | TRD Permissions and Interaction | Security | Applicable | Permission denials during repair must remain distinct from validation failures. |
 | Output truncation and large output safety | TRD Output Truncation and Large Output Safety | Artifacts | Applicable | Validation should encourage durable artifact references over terminal/process output. |
-| Explicit lifecycle states | TRD Run and Session Lifecycle | Lifecycle | Applicable with DEC-021 constraint | Repair/validation phases should be event and metadata facts, not new core run statuses. |
+| Explicit lifecycle states | TRD Run and Session Lifecycle | Lifecycle | Applicable | Validation and repair are important enough to model as first-class run states rather than secondary annotations. |
 | Persistence requirements | TRD Persistence Requirements | Durability | Non-Applicable | Sprint 9 owns persistence hooks; Sprint 8 only prepares metadata and event facts. |
 | Cost and time estimation | PRD/TRD Cost and Time Estimation | Observability | Non-Applicable | Validation may preserve metadata but does not alter cost estimation. |
 
@@ -99,7 +99,7 @@
 
 - **Markdown template validation shape:** The TRD requires output validation but does not prescribe how Markdown template compliance should be represented. The sprint should support validating a generated Markdown artifact against a template file, including expected headings, section order, required table shells, and required template slots resolved, without baking UltraPlan report semantics into the SDK.
 - **JSON validation mechanism:** The TRD requires JSON validation but does not prescribe JSON Schema, Go struct decoding, or custom callbacks. The sprint should provide a minimal runtime-neutral validator interface and built-in JSON well-formed/required-field helpers only if they fit existing code style.
-- **Same-session repair default:** Evidence says retained sessions are useful for repair, while DEC-020 rejects silently forcing same-session behavior. The sprint should make repair session action explicit and default conservatively to the caller's existing session request.
+- **Same-session repair default:** Evidence says retained sessions are useful for repair. The sprint should make repair session action explicit and default repair policy to same-session continuation, with unsupported runtimes surfacing that explicitly rather than silently downgrading to fresh-session behavior.
 - **Validation inside policy runner vs separate wrapper:** Sprint 6 policy context reserved validation, but DEC-016 keeps resilience policy as attempt orchestration. Sprint 8 should integrate validation with policy context without turning `PolicyRunner` into a broad workflow engine.
 
 ### Open Questions
@@ -162,7 +162,7 @@
 **Requirements Applied**
 - TRD error model requires `validation` and `repair_exhausted` categories.
 - TRD metadata requirements require validation results and output artifacts in run records.
-- DEC-021 requires recovery phases to be represented as events/metadata, not as expanded core statuses.
+- TRD explicit lifecycle requirements support surfacing important phases directly in run state.
 
 **Evidence Applied**
 - `go-cli-study/reports/final/05-error-handling.md` supports structured errors and programmatic classification.
@@ -173,19 +173,21 @@
 **Options Considered**
 - **Option A:** Add `StatusValidating` and `StatusRepairing` run states.
 - **Option B:** Keep core statuses unchanged and represent validation/repair as events, metadata, and classified errors.
-- **Option C:** Return validation failures only as warnings while leaving status completed.
+- **Option C:** Add `StatusValidating` only, but leave repair as metadata/events.
 
 **Chosen Approach**
-- Keep `RunStatus` unchanged. When validators fail and no repair succeeds, the logical final result is `StatusFailed` with `ErrorValidation` or `ErrorRepairExhausted`, while validation and repair phase details live in metadata and events.
+- Add `StatusValidating` and `StatusRepairing` as first-class run states. A run transitions through runtime execution, validation, and optional repair explicitly. Terminal failure still uses `ErrorValidation`, `ErrorRepairExhausted`, or `ErrorPermission` as appropriate, with events and metadata preserving detailed phase evidence.
 
 **Decision Justification**
-- This honors DEC-021 and keeps the public run status model small.
-- Treating validation failures as warnings would violate the core sprint goal that product success criteria govern final success.
-- Adding core validation/repair statuses would reintroduce the status expansion that DEC-021 explicitly removed.
+- Validation determines whether runtime output actually satisfies caller success criteria, so hiding it behind metadata makes the lifecycle harder to reason about.
+- Repair is not an incidental policy footnote in this SDK; it is a core recovery phase that products will want to observe directly.
+- Treating validation or repair as warnings or secondary annotations would weaken orchestration clarity for dashboards and higher-level automation.
+- The tradeoff is a broader lifecycle model, but in this case the extra states are earned because they correspond to semantically distinct phases of work rather than internal adapter details.
 
 **Execution Notes**
 - Add `ValidationMetadata` and `RepairMetadata` or equivalent fields to `RunMetadata`, including expectation type so Markdown-template and JSON failures are easy to inspect later.
 - Promote the placeholder `ValidationResult` in `policy.go` into a durable result model with expectation IDs, passed/failed/skipped counts, safe failure context, and native metadata where needed.
+- Add `StatusValidating` and `StatusRepairing` to the public lifecycle and emit matching lifecycle transitions/events.
 - A validation failure before repair should use `ErrorValidation`; exhausted repair should use `ErrorRepairExhausted` with validation failures preserved.
 - A permission denial during repair should surface as `ErrorPermission` with repair phase metadata, not as a validation error.
 - Markdown and JSON validation failures should preserve machine-readable expectation IDs plus human-readable repair hints so caller UIs and repair prompt builders can both use them. Markdown failures should identify whether the mismatch was heading, section order, missing required block, or unresolved template slot.
@@ -193,7 +195,7 @@
 **Expected Evidence**
 - **Tests:** Final result status/error tests for Markdown template failure, JSON validation failure, validation pass, repair success, repair exhaustion, and repair permission denial.
 - **Runtime Evidence:** Final metadata includes all validation results and repair attempt summaries even when a later repair succeeds.
-- **Review Checks:** No new core `RunStatus` values for validating or repairing.
+- **Review Checks:** `validating` and `repairing` are public lifecycle states with consistent transitions and terminal outcomes.
 
 ---
 
@@ -216,24 +218,24 @@
 **Options Considered**
 - **Option A:** Always repair in the same retained session.
 - **Option B:** Always start a fresh session with summarized context.
-- **Option C:** Let repair policy/request choose session action, defaulting conservatively and recording resolved relationship.
+- **Option C:** Let repair policy/request choose session action, defaulting to same-session continuation and recording the resolved relationship.
 
 **Chosen Approach**
-- Implement bounded repair attempts as a runtime-neutral repair flow that derives a repair `RunRequest`, carries a parent/original run relationship, and uses explicit repair session action. Same-session repair is available when requested and supported; unsupported same-session repair is reported explicitly or falls back only when caller policy permits.
+- Implement bounded repair attempts as a runtime-neutral repair flow that derives a repair `RunRequest`, carries a parent/original run relationship, and defaults repair policy to `SessionActionContinue`. Unsupported same-session repair is reported explicitly and only falls back to fresh-session behavior when the caller or policy allows it.
 
 **Decision Justification**
-- Same-session repair is useful for context continuity, but silently forcing it could preserve poisoned context after malformed output or unsupported runtime behavior.
-- Fresh sessions are safer in some failure modes but can lose useful context.
-- Explicit caller/policy choice matches prior session policy decisions and leaves future persistence clear.
+- Repair usually exists because the previous run produced almost-correct output, so same-session continuation is the highest-value default for preserving context and avoiding redundant re-grounding.
+- Fresh sessions are safer in some failure modes, but they should be an explicit override or fallback path rather than the default repair posture.
+- Unsupported runtimes or clearly unsafe repair conditions still need explicit surfacing so the default does not overclaim continuity.
 
 **Execution Notes**
-- Add repair config with max attempts, optional prompt builder, session action, and optional policy hook for whether a validation failure is repairable.
+- Add repair config with max attempts, optional prompt builder, default session action of `SessionActionContinue`, and optional policy hook for whether a validation failure is repairable.
 - The default repair prompt should summarize failed expectations, observed state, artifact references, and safe repair hints; it must not embed large artifact content by default.
 - Each repair attempt must emit repair start/end events or event payloads and must append metadata with attempt number, parent run ID, request safe fields, session relationship, validation result, and terminal error if any.
 - Repair attempts should inherit provider/model/workdir/permission policy unless explicitly overridden.
 
 **Expected Evidence**
-- **Tests:** Repair success after one failed validation, repair exhaustion, unsupported same-session repair, fresh-session repair, cancellation during repair, and no unbounded loop.
+- **Tests:** Repair success after one failed validation with same-session as the default, repair exhaustion, unsupported same-session repair, explicit fresh-session override, cancellation during repair, and no unbounded loop.
 - **Runtime Evidence:** Attempt metadata clearly links original run, repair run, and final validation.
 - **Review Checks:** Repair flow does not become a generic DAG/workflow engine.
 
@@ -282,7 +284,7 @@
 | Requirement | Deviation | Reason | Risk | Disposition | Follow-up |
 | --- | --- | --- | --- | --- | --- |
 | Structured data validation | Do not select a full schema library in Sprint 8 | No requirement or evidence chooses JSON Schema or another schema engine | Callers may need richer schemas later | Temporary | Reopen when a real caller needs schema compatibility |
-| Same-session repair | Default does not silently force same-session repair | DEC-020 requires explicit session continuity decisions | Callers may need to configure same-session repair | Permanent unless superseded | Document defaults and add tests |
+| Same-session repair | Default repair policy prefers same-session continuation | Retained context is the primary value of repair in this SDK | Unsupported runtimes or poisoned context can make the default unsafe in some cases | Permanent unless superseded | Surface unsupported and override paths explicitly and add tests |
 | Persistence of validation history | Metadata/events only, no durable backend | Sprint 9 owns persistence hooks | Validation evidence is process-local until persistence exists | Temporary | Sprint 9 stores validation/repair records |
 
 ## Cross-Cutting Reasoning
@@ -290,8 +292,8 @@
 ### Major Decision Summary
 
 - **Validation is a runtime-neutral wrapper layer:** Required by PRD/TRD output validation and supported by validation-repair plus IO abstraction evidence.
-- **Validation and repair are events/metadata, not core statuses:** Required by DEC-021 and supported by existing event/error shapes.
-- **Repair is bounded and session-explicit:** Required by TRD repair/session requirements and supported by session lifecycle evidence.
+- **Validation and repair are first-class lifecycle states:** Required by the user-facing importance of product success checks and supported by TRD lifecycle requirements.
+- **Repair is bounded and defaults to same session:** Required by TRD repair/session requirements and supported by session lifecycle evidence.
 - **Repair inherits permission policy:** Required by Sprint 8 roadmap and Sprint 7 permission decisions.
 
 ### Tradeoffs
@@ -299,7 +301,8 @@
 - A validation wrapper adds an orchestration layer, but avoids adapter duplication and keeps validation product-agnostic.
 - First-class Markdown template and JSON validators increase SDK scope, but they cover the main product success checks you actually need and reduce caller rework.
 - Minimal JSON validation avoids premature schema-library commitment, but may require caller-defined validators for richer schemas.
-- Same-session repair is not forced by default, preserving safety at the cost of explicit caller configuration for context-sensitive repair.
+- First-class `validating` and `repairing` states broaden the lifecycle model, but they make the real execution phases explicit instead of forcing callers to reconstruct them from metadata.
+- Default same-session repair improves context retention, but requires explicit unsupported-state handling and clear override paths for callers that prefer fresh-session repair.
 - Metadata grows before persistence exists, but Sprint 9 will need these facts.
 
 ### Assumptions

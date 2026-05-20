@@ -1,102 +1,160 @@
-# Repo Analysis: age
+# Source Analysis: age
 
 ## Project Structure & Boundaries
 
-### Repo Info
+### Source Info
 
 | Field | Value |
 |-------|-------|
 | Name | age |
-| Path | `/home/antonioborgerees/coding/go-cli-study/repos/age` |
-| Group | `go-cli-study` |
+| Path | `/home/antonioborgerees/coding/ultraplan/studies/go-cli-study/sources/age` |
 | Language / Stack | Go |
-| Analyzed | 2026-05-15 |
+| Analyzed | 2026-05-20 |
 
 ## Summary
 
-Age is an encryption tool that separates concerns cleanly: the core cryptographic logic lives in the root package (`age.go`, `x25519.go`, `scrypt.go`, etc.), while CLI entry points are organized under `cmd/` and internal format/streaming utilities reside in `internal/`. The `pkg/` directory is not used. The CLI layer is intentionally thin, delegating all business logic to the root package.
+age uses an unconventional but effective structure where the core library IS the root module (`filippo.io/age`), CLI binaries are in `cmd/`, and private implementation details are in `internal/`. There is no `pkg/` directory — the public API surface is the root package plus well-defined sub-packages (`agessh/`, `armor/`, `plugin/`). The CLI layer is moderately thin: `cmd/age/age.go` handles flag parsing and I/O orchestration, then delegates to `age.Encrypt()` or `age.Decrypt()` for actual crypto. The `internal/` packages enforce Go's compiler-level import protection for wire format, stream cipher, terminal I/O, and bech32 encoding, preventing external consumers from depending on unstable internals.
 
 ## Rating
 
-**7/10** — Clear stream-oriented pipeline model with bounded loops and structured failure handling, but no pause/resume, compaction, or recovery mechanisms.
-
-**Execution Model**: Step-based, stream-oriented pipeline. Encryption proceeds in three phases: (1) key wrapping via `encryptHdr()` (`age.go:118`) iterates over recipients (bounded by input count) and produces an age header, (2) header and random nonce are written to the output, (3) plaintext is chunked and encrypted through `stream.NewEncryptWriter()` (`stream/stream.go:187`), which processes 64 KB chunks in a `for len(p) > 0` loop (`stream.go:204`). Decryption mirrors this: `format.Parse()` (`internal/format/format.go:250`) reads the header through a bounded `for { break }` loop keyed on the `---` footer prefix, then `decryptHdr()` (`age.go:320`) iterates over identities (bounded, with native-first sorting at `age.go:324`), and finally chunked decryption via `stream.DecryptReader.Read()` (`stream.go:71`). All loops are bounded by input size, file structure, or argument count. Failure is structured via sentinel errors (`ErrIncorrectIdentity` at `age.go:77`), aggregated error types (`NoIdentityMatchError` at `age.go:222`), and consistent `fmt.Errorf("...: %w")` wrapping. The plugin protocol (`plugin/plugin.go:183`) uses explicit state-machine loops with a `broken` flag (`plugin.go:44`) for crash-out on protocol violation. No pause/resume or execution compaction exists. The streaming chunk counter uses an 88-bit nonce whose wrap-around would panic (`stream.go:162`), but this is unreachable in practice.
+**7/10** — Clean layering with strong boundary enforcement via `internal/`. The root-as-library pattern is elegant for a crypto library. Minor deduction because the CLI `cmd/age/` package contains substantive parsing logic (recipient/identity file parsing, key type dispatch) that couples it to the library's type hierarchy, and the `EncryptedIdentity` type in `cmd/age/` blurs the line between CLI and business logic.
 
 ## Evidence Collected
 
+Every entry MUST include a file path with line numbers. Format: `path/to/file.ts:NN`.
+
 | Area | Evidence | File:Line |
 |------|----------|-----------|
-| Main entry point | `main()` in `cmd/age/age.go:105` | `cmd/age/age.go:105` |
-| Keygen entry point | `main()` in `cmd/age-keygen/keygen.go:63` | `cmd/age-keygen/keygen.go:63` |
-| Inspect entry point | `main()` in `cmd/age-inspect/inspect.go:31` | `cmd/age-inspect/inspect.go:31` |
-| Core API (Encrypt/Decrypt) | `Encrypt()`, `Decrypt()` in root `age.go` | `age.go:154,249` |
-| Internal format parsing | `format.Parse()` in `internal/format/format.go` | `internal/format/format.go:250` |
-| Internal stream encryption | `stream.NewEncryptWriter()` in `internal/stream/stream.go` | `internal/stream/stream.go:118` |
-| Plugin interface | `plugin.Plugin` and `plugin.Client` in `plugin/plugin.go` | `plugin/plugin.go:44,89` |
-| No `pkg/` directory | Confirmed absent | - |
-| `internal/` packages | `bech32`, `format`, `inspect`, `stream`, `term` | `internal/*/` |
-| `cmd/` subdirectories | `age`, `age-keygen`, `age-inspect`, `age-plugin-batchpass` | `cmd/*/` |
+| Entry point (age encrypt/decrypt) | `cmd/age/age.go` package main with `flag`-based CLI | `cmd/age/age.go:5` |
+| Entry point (keygen) | `cmd/age-keygen/keygen.go` package main | `cmd/age-keygen/keygen.go:5` |
+| Entry point (inspect) | `cmd/age-inspect/inspect.go` package main | `cmd/age-inspect/inspect.go:5` |
+| Core library | Root package `age` defining `Encrypt()`, `Decrypt()`, `Recipient`, `Identity` interfaces | `age.go:46` |
+| CLI → library bridge | `cmd/age/age.go:421` calls `age.Encrypt(out, recipients...)` | `cmd/age/age.go:421` |
+| CLI → library bridge | `cmd/age/age.go:503` calls `age.Decrypt(in, identities...)` | `cmd/age/age.go:503` |
+| internal/format | Wire format parsing under `internal/` compiler barrier | `internal/format/format.go:5` |
+| internal/stream | STREAM chunked encryption under `internal/` compiler barrier | `internal/stream/stream.go:5` |
+| internal/bech32 | Bech32 encoding (key serialization) under `internal/` barrier | `internal/bech32/bech32.go` |
+| internal/term | Terminal I/O (password prompts) under `internal/` barrier | `internal/term/term.go:1` |
+| internal/inspect | File inspection logic used by `age-inspect` CLI | `internal/inspect/inspect.go:1` |
+| agessh public package | SSH key support as public sub-package | `agessh/agessh.go:1` |
+| armor public package | PEM-like ASCII armor encoding | `armor/armor.go:1` |
+| plugin public package | Plugin protocol client + framework | `plugin/plugin.go:1` |
+| Root-level library files | `x25519.go`, `pq.go`, `scrypt.go`, `parse.go` all in package `age` | `x25519.go:5` |
+| Dependency: root → internal | `age.go:59` imports `internal/format` and `internal/stream` | `age.go:58-59` |
+| Dependency: plugin → internal | `plugin/plugin.go:21` imports `internal/format` | `plugin/plugin.go:21` |
+| Dependency: inspect → internal | `internal/inspect/inspect.go:11-12` imports `internal/format` and `internal/stream` | `internal/inspect/inspect.go:11-12` |
+| Dependency: cmd/age → core | `cmd/age/age.go:23-27` imports `age`, `agessh`, `armor`, `internal/term`, `plugin` | `cmd/age/age.go:23-27` |
 
-## Answers to Protocol Questions
+## Answers to Dimension Questions
 
-**1. Why are folders organized this way?**
+### 1. Why are folders organized this way?
 
-The root-level Go files (`age.go`, `x25519.go`, `scrypt.go`, `pq.go`, `armor/`) form the public library API. The `cmd/` directory contains separate binaries (`age`, `age-keygen`, `age-inspect`, `age-plugin-batchpass`) that import and use the root package. The `internal/` directory holds implementation details that the public API depends on but are not intended for external use.
+The root of the module IS the library API (`package age`). This allows `go get filippo.io/age` to give you the crypto library directly. CLI tools are in `cmd/` subdirectories (each a `package main`). Internal implementation details (wire format, stream cipher, bech32 encoding, terminal I/O, file inspection) are in `internal/` to prevent external import. Public sub-packages (`agessh/`, `armor/`, `plugin/`) extend the library for specific use cases. This structure communicates: "the value of this module is the library; the CLIs are just consumers."
 
-**2. What belongs in `cmd/` vs `internal/` vs `pkg/`?**
+Evidence: The module path is `filippo.io/age` and the root package is `package age` (`age.go:46`). All four CLI binaries live under `cmd/` as `package main` (`cmd/age/age.go:5`, `cmd/age-keygen/keygen.go:5`, etc.).
 
-- `cmd/`: Executable entry points only. Each subdirectory is its own `main` package.
-- `internal/`: Private implementation details shared by the root package (format parsing, streaming, terminal UI, bech32 encoding). Go's `internal` path restriction prevents external imports.
-- `pkg/`: Not used — all public library code lives at the root.
-- Root-level Go files: The public library API (`age.go:154` for `Encrypt`, `age.go:249` for `Decrypt`).
+### 2. What belongs in `cmd/` vs `internal/` vs `pkg/`?
 
-**3. Is the CLI layer thin?**
+- **`cmd/`**: Binary entry points only. Each subdirectory is a standalone `package main` with its own `main()` function. These parse flags, set up I/O, and call into the library.
+- **`internal/`**: Private implementation details that external consumers must not depend on. Go's `internal/` package mechanism enforces this at compile time. Contains `format/` (wire format), `stream/` (STREAM encryption), `bech32/` (key encoding), `term/` (terminal interaction), `inspect/` (file metadata parsing).
+- **No `pkg/` directory**: age uses the root package as its public SDK surface instead of a `pkg/` directory. Public sub-packages (`agessh/`, `armor/`, `plugin/`, `tag/`) live at the top level as peers of the root package.
 
-Yes. `cmd/age/age.go:105` shows the CLI is a thin wrapper around `filippo.io/age` (`age.go:154,249`). It handles flag parsing and file I/O but delegates all cryptographic operations to the library.
+Evidence: `internal/format/format.go:5-6`: "Package format implements the age file format." `internal/stream/stream.go:5-6`: "Package stream implements a variant of the STREAM chunked encryption scheme."
 
-**4. Where does business logic actually live?**
+### 3. Is the CLI layer thin?
 
-In the root package files: `age.go` (core Encrypt/Decrypt), `x25519.go` (X25519 key operations), `scrypt.go` (passphrase-based encryption), `pq.go` (post-quantum hybrid keys), and `armor/` (PEM armor encoding).
+**Moderately thin.** The `cmd/age/age.go` file is ~600 lines, but most of that is flag parsing, validation, I/O setup, error formatting, and the `tui.go` helper file handles output formatting. The actual crypto operations are single-line calls: `age.Encrypt(out, recipients...)` (`cmd/age/age.go:421`) and `age.Decrypt(in, identities...)` (`cmd/age/age.go:503`). However, `cmd/age/` also contains significant parsing logic: `parse.go` (~310 lines) handles recipient and identity file parsing with SSH key support, type-switching over identity types (`*age.X25519Identity`, `*age.HybridIdentity`, `*agessh.RSAIdentity`, etc. at `cmd/age/age.go:531-557`), and encrypted identity handling (`encrypted_keys.go`). The `cmd/age-keygen/keygen.go` is thinner at ~185 lines.
 
-**5. How do they prevent package coupling?**
+Evidence: `cmd/age/age.go:411-435` shows `encrypt()` function — ~24 lines that just wrap output in armor if needed, call `age.Encrypt()`, and copy data. `cmd/age/age.go:486-519` shows `decrypt()` — ~33 lines handling armor detection and calling `age.Decrypt()`.
 
-- Go's `internal/` path restriction prevents external packages from importing `internal/*` (`internal/format/format.go:6`, `internal/stream/stream.go`).
-- The `cmd/` binaries only import the root `filippo.io/age` package, not `internal/` directly.
-- Dependency direction is strictly inward: `cmd/` → root `age` package → `internal/` packages.
+### 4. Where does business logic actually live?
+
+Business logic lives in the root `age` package and its public sub-packages:
+
+- **Root `age` package**: Core encryption/decryption (`age.go:154-173`, `age.go:249-266`), X25519 key exchange (`x25519.go`), hybrid ML-KEM+X25519 (`pq.go`), scrypt passphrase (`scrypt.go`), identity parsing (`parse.go`).
+- **`agessh/` package**: SSH key support wrapping `golang.org/x/crypto/ssh` (`agessh/agessh.go`).
+- **`armor/` package**: ASCII armor encoding/decoding (`armor/armor.go`).
+- **`plugin/` package**: Plugin protocol implementation — both client (running external plugin binaries) and framework (exposing Go implementations as plugins) (`plugin/plugin.go`).
+- **`internal/` packages**: Low-level crypto primitives — wire format serialization (`internal/format/format.go`), STREAM cipher (`internal/stream/stream.go`), bech32 encoding (`internal/bech32/bech32.go`).
+
+Evidence: `age.go:154-173` defines `Encrypt()`, `age.go:249-266` defines `Decrypt()`. `x25519.go:24-26` defines `X25519Recipient` — "The standard age pre-quantum public key."
+
+### 5. How do they prevent package coupling?
+
+1. **`internal/` compiler barrier**: Go's `internal/` package mechanism prevents external modules from importing `internal/format`, `internal/stream`, `internal/bech32`, `internal/term`. This is the primary coupling prevention mechanism. Evidence: `internal/format/format.go:5`, `internal/stream/stream.go:5`.
+2. **Unidirectional dependency flow**: CLI (`cmd/age/`) imports `age`, `agessh`, `armor`, `internal/term`, `plugin`. The library packages (`age`, `agessh`, `plugin`) never import CLI packages. Imports flow one way: CLI → library → internal.
+3. **Interface-based APIs**: `age.Recipient` and `age.Identity` are interfaces (`age.go:65-86`), allowing plugins and custom implementations without coupling to concrete types.
+4. **No global state in library**: The `age` package has no global configuration or state — all state is passed through function parameters (`Encrypt(dst, recipients...)`, `Decrypt(src, identities...)`).
+5. **Public sub-packages as peers**: `agessh/`, `armor/`, `plugin/` are top-level sub-packages that import the root `age` package but have no dependencies on each other, preventing cross-coupling.
+
+Evidence: `age.go:65-73` defines `Identity` interface, `age.go:82-86` defines `Recipient` interface. `cmd/age/age.go:23-27` shows CLI imports; `age.go:58-59` shows library imports only `internal/format` and `internal/stream`.
 
 ## Architectural Decisions
 
-1. **No `pkg/`** — All public API lives at module root, following Go's recommended practice for libraries.
-2. **`internal/` for implementation details** — Format encoding, stream encryption, and terminal UI are in `internal/` to enforce non-export via Go's import rules.
-3. **Separate binaries per concern** — `age` (encryption), `age-keygen` (key generation), `age-inspect` (file inspection) are separate `cmd/` entries, allowing independent distribution.
-4. **Plugin architecture** — `plugin/plugin.go` defines a `Plugin` interface and `Client` that external plugin processes implement, keeping the plugin protocol out of the main binary.
+| Decision | Rationale |
+|----------|-----------|
+| Root package as library | `go get filippo.io/age` gives the library directly; the module identity IS the library identity |
+| No `pkg/` directory | The root package IS the public API surface; public sub-packages are peers at top level |
+| `internal/` for format/stream/bech32 | Wire format, stream cipher, and key encoding are implementation details that should never become public API commitments |
+| `internal/term` for terminal I/O | Terminal interaction is a CLI concern; marking it `internal/` prevents library consumers from accidentally depending on it |
+| `plugin/` as public package | Plugin protocol (both client and framework) is a stable public API that external plugin authors need to depend on |
+| `agessh/` as public sub-package | SSH key compatibility is an optional feature; keeping it separate avoids pulling in SSH crypto dependencies for users who only need native keys |
+| `armor/` as public sub-package | ASCII armor encoding is useful independently (e.g., for users who want PEM-like output separate from encryption) |
+| `cmd/` per binary | Each CLI tool (`age`, `age-keygen`, `age-inspect`, `age-plugin-batchpass`) is independently buildable with its own `package main` |
+| `age.Stanza` ↔ `format.Stanza` assignability | Defined in comment at `internal/format/format.go:23-24`: "Stanza is assignable to age.Stanza, and if this package is made public, age.Stanza can be made a type alias of this type." This is a deliberate escape hatch for future API expansion. |
+| No framework CLI library | Uses standard library `flag` instead of cobra/urfave/cli; age's CLI surface is small enough that flag suffices |
 
 ## Notable Patterns
 
-- **`main()` packages in `cmd/` are thin** — They import `filippo.io/age` and call high-level APIs like `age.Encrypt()` and `age.Decrypt()`.
-- **Version injection via linker flags** — `cmd/age/age.go:102` defines `Version` string set at link time, avoiding a runtime import.
-- **Identity/Recipient interface segregation** — `age.go:65` defines `Identity` and `age.go:82` defines `Recipient` as separate interfaces, following the principle of least authority.
+- **Library-first module design**: The Go module IS the library. This is the opposite of many Go CLI projects where `cmd/` contains a thin wrapper around `pkg/`. age's root is the library, and CLIs are consumers.
+- **`internal/` as API firewall**: Five distinct internal packages protect five distinct concerns (format, stream, bech32, term, inspect), each isolated from external consumption.
+- **Interface-based plugin system**: `plugin.Plugin` (`plugin/plugin.go:29`) implements both `age.Recipient` and `age.Identity` interfaces, enabling external binaries to participate in the encryption/decryption workflow without the library knowing about them.
+- **CLI error formatting in separate file**: `cmd/age/tui.go` isolates all terminal output formatting (`printf`, `errorf`, `warningf`, `errorWithHint`) from flag parsing and orchestration logic.
+- **Test-only hooks**: `cmd/age/age.go:409` uses a function variable `testOnlyConfigureScryptIdentity` that tests can override, enabling test-specific configuration without exposing test APIs.
+- **Lazy I/O initialization**: `cmd/age/age.go:560-585` implements a `lazyOpener` that defers file creation until the first `Write()` call, meaning empty output doesn't create files.
+- **Version injection**: Both `cmd/age/age.go:103` and `cmd/age-keygen/keygen.go:61` use a `var Version string` that can be set at link time, with a fallback to `debug.ReadBuildInfo()`.
 
 ## Tradeoffs
 
-1. **Root-level files could be split further** — `pq.go`, `primitives.go`, and `parse.go` at root contain related logic. Moving them to `internal/` would reduce root surface area but increase import depth.
-2. **`internal/` is flat, not nested** — All internal packages are at `internal/*` rather than `internal/age/*`, which works for a small number of packages but may not scale.
+| Tradeoff | Description |
+|----------|-------------|
+| Root package as library means `go install filippo.io/age/cmd/age@latest` | Users must specify the full import path to install CLI tools, not just the module path |
+| No `pkg/` directory means no clear SDK boundary | Unlike projects with `pkg/` + `internal/`, age has no explicit "public SDK" directory — the API surface is implicit (root + select sub-packages) |
+| CLI contains non-trivial parsing logic | `cmd/age/parse.go` (~310 lines) handles recipient parsing, SSH key parsing, and plugin identity initialization — this logic lives in the CLI layer rather than the library |
+| Type switch in CLI couples to library types | `cmd/age/age.go:531-557` switches over concrete identity types (`*age.X25519Identity`, `*agessh.RSAIdentity`, etc.) — adding a new key type requires updating both the library AND the CLI |
+| `cmd/age/encrypted_keys.go` in CLI | Encrypted identity file handling lives in the CLI layer rather than the library, limiting programmatic reuse |
+| Inspect logic in `internal/` | `internal/inspect/` is under the compiler barrier, so external tools can't programmatically inspect age files without reimplementing the logic |
+| Standard `flag` vs. comprehensive CLI framework | Works fine for age's small command surface but lacks subcommands, autocomplete, and help formatting |
+| `term` package wraps `golang.org/x/term` | `internal/term/term.go` re-exports terminal functionality with age-specific behaviors (ephemeral prompts, Windows CONIN$/CONOUT$ handling), adding an abstraction layer over the upstream library |
 
 ## Failure Modes / Edge Cases
 
-- **Plugin protocol breakage** — If `plugin/plugin.go:44` changes the `Plugin` interface, plugins compiled against older versions will break silently at runtime.
-- **No `internal/` access from `cmd/` is enforced by Go** — External packages cannot import `internal/`, so the boundary is compiler-enforced.
+| Mode | Evidence |
+|------|----------|
+| PowerShell line-ending corruption | `cmd/age/age.go:440-441` detects CRLF-mangled and UTF-16-mangled header intros with specific error hints |
+| Binary output to terminal | `cmd/age/age.go:289-294` refuses to output binary to terminal when decrypting; `cmd/age/age.go:297-302` refuses for non-armored encryption output |
+| TTY input buffering | `cmd/age/age.go:253-262` buffers terminal input on decrypt to avoid password prompts interfering with typed input |
+| Input/output file conflict | `cmd/age/age.go:265-269` detects when input and output paths resolve to the same file |
+| Plugin not found | `cmd/age/age.go:422-428` handles `plugin.NotFoundError` with a hint to install the missing plugin |
+| Scrypt identity with passphrase file | `cmd/age/age.go:445-452` provides a clear error when identities are specified for a passphrase-encrypted file |
+| Non-printable decrypted output | `cmd/age/age.go:289-294` checks for control characters and refuses to print binary to terminal |
+| File permission warning | `cmd/age-keygen/keygen.go:122-124` warns when writing secret key to a world-readable file |
 
 ## Future Considerations
 
-- Consider moving format-specific parsing (`parse.go`) into `internal/format/` if the public API stabilizes.
-- The plugin architecture (`plugin/plugin.go`) could benefit from version negotiation to support graceful upgrades.
+- **Stanze type unification**: The comment at `internal/format/format.go:23-24` explicitly notes that `age.Stanza` and `format.Stanza` could be unified as type aliases if `internal/format` were ever made public.
+- **Plugin test framework**: `plugin/plugin.go:24` has a TODO: "add plugin test framework."
+- **Encrypted identity promotion**: `cmd/age/encrypted_keys.go` contains encrypted identity logic that arguably belongs in the library itself for programmatic reuse.
+- **`internal/inspect` promotion**: The file inspection API could be promoted to a public package if external tooling needs arise.
+- **Post-quantum key types**: As PQ becomes default (as hinted at in `cmd/age-keygen/keygen.go:26`), the type switch pattern in `cmd/age/age.go:531-557` will need extension.
 
 ## Questions / Gaps
 
-- **Why no `pkg/`?** The project appears to follow a "library at root" pattern but doesn't document this decision. No evidence found explaining the choice.
-- **`armor/` at root vs `internal/armor/`?** The `armor/` package is at root (`armor`) rather than `internal/armor`, indicating it is considered part of the public API. This is intentional per `age.go:14`.
+- No evidence of explicit linter or CI gates preventing reverse imports (e.g., `agessh/` importing `cmd/age/`), though the architecture makes such imports unlikely.
+- The `tag/` top-level package purpose is unclear from the explored files — seems involved in git tag signing/verification but its relationship to the core encryption flow is unexplored.
+- `extra/` directory contents were not explored — may contain migration tools or supplementary scripts.
+- No `AGENTS.md` or `CONTRIBUTING.md` describing the architectural conventions formally.
 
 ---
 
-Generated by `study-areas/01-project-structure.md` against `age`.
+Generated by `01-project-structure.md` against `age`.

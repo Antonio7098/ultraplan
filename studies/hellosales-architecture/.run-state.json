@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T11:42:26.293Z",
+  "updatedAt": "2026-05-20T18:10:37.967Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -298,10 +298,10 @@
       "dimensionTitle": "Dimension: Configuration & Environment Management",
       "sourceName": "pocketbase",
       "status": "running",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:42:26.293Z",
-      "nextRetryAt": null,
+      "attempts": 2,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T18:10:37.967Z",
+      "nextRetryAt": "2026-05-20T12:17:01.625Z",
       "completedAt": null
     },
     {
@@ -465,11 +465,11 @@
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "nats-server",
-      "status": "running",
+      "status": "pending",
       "attempts": 1,
-      "lastError": null,
+      "lastError": "Exit code 0 but analysis file was not generated",
       "lastAttemptAt": "2026-05-20T11:42:26.293Z",
-      "nextRetryAt": null,
+      "nextRetryAt": "2026-05-20T12:17:03.859Z",
       "completedAt": null
     },
     {
@@ -754,9 +754,9 @@
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "grafana",
       "status": "pending",
-      "attempts": 1,
+      "attempts": 2,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:38:40.660Z",
+      "lastAttemptAt": "2026-05-20T11:47:03.874Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -790,9 +790,9 @@
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "nats-server",
       "status": "pending",
-      "attempts": 1,
+      "attempts": 2,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:38:40.660Z",
+      "lastAttemptAt": "2026-05-20T11:47:03.874Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -934,9 +934,9 @@
       "dimensionTitle": "Dimension: Error Taxonomy & Failure Handling",
       "sourceName": "temporal",
       "status": "pending",
-      "attempts": 0,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T11:47:03.874Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1847,7 +1847,7 @@
       "status": "running",
       "attempts": 1,
       "lastError": "Dependent analysis files missing on resume",
-      "lastAttemptAt": "2026-05-20T11:42:26.293Z",
+      "lastAttemptAt": "2026-05-20T18:10:37.967Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1888,10 +1888,10 @@
       "dimensionNumber": "07",
       "dimensionName": "data-ingestion-processing-pipelines",
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
-      "status": "failed",
-      "attempts": 1,
+      "status": "running",
+      "attempts": 2,
       "lastError": "Synthesis completed (exit 0) but report file was not generated",
-      "lastAttemptAt": "2026-05-20T11:38:40.660Z",
+      "lastAttemptAt": "2026-05-20T18:10:37.967Z",
       "nextRetryAt": "2026-05-20T12:11:20.326Z",
       "completedAt": null
     }
