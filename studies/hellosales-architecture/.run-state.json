@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T19:07:30.244Z",
+  "updatedAt": "2026-05-20T20:08:48.173Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -297,12 +297,12 @@
       "dimensionName": "configuration-environment-management",
       "dimensionTitle": "Dimension: Configuration & Environment Management",
       "sourceName": "pocketbase",
-      "status": "failed",
-      "attempts": 2,
+      "status": "completed",
+      "attempts": 3,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T18:10:37.967Z",
+      "lastAttemptAt": "2026-05-20T19:16:15.832Z",
       "nextRetryAt": "2026-05-20T19:14:05.276Z",
-      "completedAt": null
+      "completedAt": "2026-05-20T19:18:43.012Z"
     },
     {
       "dimensionNumber": "05",
@@ -466,10 +466,10 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "nats-server",
       "status": "failed",
-      "attempts": 2,
+      "attempts": 3,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T18:14:05.286Z",
-      "nextRetryAt": "2026-05-20T19:16:43.755Z",
+      "lastAttemptAt": "2026-05-20T19:19:56.478Z",
+      "nextRetryAt": "2026-05-20T20:52:24.468Z",
       "completedAt": null
     },
     {
@@ -789,12 +789,12 @@
       "dimensionName": "observability-operational-visibility",
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "nats-server",
-      "status": "failed",
-      "attempts": 3,
+      "status": "completed",
+      "attempts": 5,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T18:14:05.286Z",
+      "lastAttemptAt": "2026-05-20T20:05:40.951Z",
       "nextRetryAt": "2026-05-20T19:47:05.446Z",
-      "completedAt": null
+      "completedAt": "2026-05-20T20:08:40.400Z"
     },
     {
       "dimensionNumber": "09",
@@ -1186,10 +1186,10 @@
       "dimensionTitle": "Dimension: Extensibility & Plugin Architecture",
       "sourceName": "grafana",
       "status": "failed",
-      "attempts": 1,
+      "attempts": 2,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T18:35:47.439Z",
-      "nextRetryAt": "2026-05-20T19:09:17.443Z",
+      "lastAttemptAt": "2026-05-20T19:11:26.607Z",
+      "nextRetryAt": "2026-05-20T20:15:28.530Z",
       "completedAt": null
     },
     {
@@ -1305,12 +1305,12 @@
       "dimensionName": "testing-strategy-reliability",
       "dimensionTitle": "Dimension: Testing Strategy & Reliability Engineering",
       "sourceName": "kubernetes",
-      "status": "failed",
-      "attempts": 1,
+      "status": "completed",
+      "attempts": 3,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T18:48:14.419Z",
+      "lastAttemptAt": "2026-05-20T20:05:40.951Z",
       "nextRetryAt": "2026-05-20T19:21:15.309Z",
-      "completedAt": null
+      "completedAt": "2026-05-20T20:08:48.160Z"
     },
     {
       "dimensionNumber": "14",
@@ -1329,12 +1329,12 @@
       "dimensionName": "testing-strategy-reliability",
       "dimensionTitle": "Dimension: Testing Strategy & Reliability Engineering",
       "sourceName": "nats-server",
-      "status": "failed",
-      "attempts": 1,
+      "status": "completed",
+      "attempts": 3,
       "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T18:52:22.980Z",
+      "lastAttemptAt": "2026-05-20T20:05:40.951Z",
       "nextRetryAt": "2026-05-20T19:25:25.269Z",
-      "completedAt": null
+      "completedAt": "2026-05-20T20:08:35.554Z"
     },
     {
       "dimensionNumber": "14",
@@ -1438,10 +1438,10 @@
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "nats-server",
       "status": "running",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T19:07:30.244Z",
-      "nextRetryAt": null,
+      "attempts": 2,
+      "lastError": "Exit code 0 but analysis file was not generated",
+      "lastAttemptAt": "2026-05-20T20:08:48.173Z",
+      "nextRetryAt": "2026-05-20T19:41:26.598Z",
       "completedAt": null
     },
     {
@@ -1449,71 +1449,71 @@
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "openfga",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "lastError": null,
       "lastAttemptAt": "2026-05-20T19:07:30.244Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T19:09:50.920Z"
     },
     {
       "dimensionNumber": "15",
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "pocketbase",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T19:11:26.607Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T19:14:05.812Z"
     },
     {
       "dimensionNumber": "15",
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "temporal",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T19:11:26.607Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T19:16:15.823Z"
     },
     {
       "dimensionNumber": "15",
       "dimensionName": "performance-resource-discipline",
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "victoriametrics",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T19:16:15.832Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T19:18:02.620Z"
     },
     {
       "dimensionNumber": "16",
       "dimensionName": "security-multi-tenant-isolation",
       "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
       "sourceName": "cli",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T19:16:15.832Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T19:19:56.475Z"
     },
     {
       "dimensionNumber": "16",
       "dimensionName": "security-multi-tenant-isolation",
       "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
       "sourceName": "grafana",
-      "status": "pending",
-      "attempts": 0,
-      "lastError": null,
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "status": "failed",
+      "attempts": 1,
+      "lastError": "Exit code 1",
+      "lastAttemptAt": "2026-05-20T19:19:56.478Z",
+      "nextRetryAt": "2026-05-20T20:19:56.623Z",
       "completedAt": null
     },
     {
@@ -1521,11 +1521,11 @@
       "dimensionName": "security-multi-tenant-isolation",
       "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
       "sourceName": "kubernetes",
-      "status": "pending",
-      "attempts": 0,
-      "lastError": null,
-      "lastAttemptAt": null,
-      "nextRetryAt": null,
+      "status": "failed",
+      "attempts": 1,
+      "lastError": "Exit code 1",
+      "lastAttemptAt": "2026-05-20T19:19:56.478Z",
+      "nextRetryAt": "2026-05-20T20:19:56.619Z",
       "completedAt": null
     },
     {
@@ -1921,10 +1921,32 @@
       "dimensionNumber": "12",
       "dimensionName": "workflow-agent-orchestration",
       "dimensionTitle": "Dimension: Workflow / Agent Orchestration",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "lastError": null,
       "lastAttemptAt": "2026-05-20T19:07:30.244Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-20T19:09:30.841Z"
+    },
+    {
+      "dimensionNumber": "09",
+      "dimensionName": "observability-operational-visibility",
+      "dimensionTitle": "Dimension: Observability & Operational Visibility",
+      "status": "running",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-20T20:08:48.173Z",
+      "nextRetryAt": null,
+      "completedAt": null
+    },
+    {
+      "dimensionNumber": "14",
+      "dimensionName": "testing-strategy-reliability",
+      "dimensionTitle": "Dimension: Testing Strategy & Reliability Engineering",
+      "status": "running",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-20T20:08:48.173Z",
       "nextRetryAt": null,
       "completedAt": null
     }
