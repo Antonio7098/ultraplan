@@ -290,6 +290,30 @@ Do not convert study recommendations into accepted architecture decisions until 
 - **Rejected Alternatives:** Mirroring OpenCode's exact 4 internal runner states was rejected because `agentwrap` needs caller-facing terminal statuses. Keeping the previous 14-state lifecycle was rejected because it mixed execution status with policy phases. Keeping event category and correlation fields in the canonical envelope was rejected because they were SDK projections rather than native event facts. Keeping `Retryable`/`Fallbackable`/`UserActionable`/`Unrecoverable` on `SDKError` was rejected because agentwrap-level retryability can differ from OpenCode-level retryability and must be strategy-owned.
 - **Risk / Follow-up:** DEC-005, DEC-006, DEC-013, and DEC-017 are superseded where they describe the older envelope, error booleans, lifecycle vocabulary, or built-in retry classification. Sprint 7 validation/repair must build on fact-based errors and policy hooks rather than reintroducing lifecycle states for repair phases. Sprint 8 persistence should store event payload kind and policy metadata explicitly because those fields are no longer top-level event envelope fields.
 
+### DEC-022: Permission Policy Is Initialized Through RunRequest And Translated By Adapters
+
+- **Status:** Accepted
+- **Date:** 2026-05-20
+- **Sprint:** `targets/agentwrap/sprints/07-permission-policy/plan.md`
+- **Requirement Source:** `targets/agentwrap/sources/PRD.md` permissions and blocking states; `targets/agentwrap/sources/TRD.md` permission/sandbox configuration and canonical permission events.
+- **Evidence Source:** `targets/agentwrap/reports/permission-based-agent-wrapping.md`; Sprint 7 implementation in `/home/antonioborgerees/coding/agentwrap`; `GOCACHE=/tmp/agentwrap-go-build go test ./...`.
+- **Decision:** Add structured `PermissionPolicy` to `RunRequest` while preserving legacy `PermissionMode` for compatibility and config summaries. Callers express SDK-level tool classes and actions at run initialization. Runtime adapters translate supported fields into native configuration and record support/audit metadata with a stable permission policy ID.
+- **Tradeoff:** The public SDK gains a structured permission surface before a second runtime adapter exists.
+- **Rejected Alternatives:** Adapter options were rejected because permission posture is caller intent for a specific run, not global runtime construction state. Mutating user OpenCode config files was rejected in favor of per-process `OPENCODE_CONFIG_CONTENT`.
+- **Risk / Follow-up:** Sprint 11 should pressure-test the SDK tool vocabulary against Codex or Claude Code permission semantics.
+
+### DEC-023: Live OpenCode Approval Posting Is Deferred Until Server-Mode Transport Exists
+
+- **Status:** Accepted
+- **Date:** 2026-05-20
+- **Sprint:** `targets/agentwrap/sprints/07-permission-policy/plan.md`
+- **Requirement Source:** `targets/agentwrap/roadmap.md` Sprint 7 scope; `targets/agentwrap/reports/permission-based-agent-wrapping.md` OpenCode event/approval API evidence.
+- **Evidence Source:** Current OpenCode adapter in `/home/antonioborgerees/coding/agentwrap/opencode` uses `opencode run --format json` subprocess output, not `opencode serve` SSE/REST transport; `GOCACHE=/tmp/agentwrap-go-build go test ./...`; `GOCACHE=/tmp/agentwrap-go-build AGENTWRAP_OPENCODE_PERMISSION_SMOKE=1 go test ./opencode -run TestRealOpenCodePermissionSmoke -count=1 -timeout 10m`.
+- **Decision:** Sprint 7 implements initialization-time policy translation and audit visibility for the current subprocess adapter. It does not claim live REST/SSE approval posting. Unsupported live approval behavior is documented as a deferral rather than faked.
+- **Tradeoff:** Manual approval is represented through `ask` policy and native OpenCode behavior, but the SDK cannot yet programmatically answer approval requests over REST/SSE in subprocess mode.
+- **Rejected Alternatives:** Implementing a broad public `ToolApprovalService` now was rejected because the adapter lacks the required transport and the roadmap explicitly defers that abstraction. Pretending JSON permission events can be answered without an approval API was rejected as unsafe.
+- **Risk / Follow-up:** Add an OpenCode server-mode adapter or approval transport before promising SDK-managed live approval decisions.
+
 ## Superseded Decisions
 
 - DEC-005 is superseded where it requires sequence, correlation, cause, context, or category fields in the canonical event envelope.
