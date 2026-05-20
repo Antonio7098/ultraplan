@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T20:55:17.318Z",
+  "updatedAt": "2026-05-20T21:06:02.243Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -1976,10 +1976,10 @@
       "dimensionNumber": "17",
       "dimensionName": "developer-experience-operational-ergonomics",
       "dimensionTitle": "Dimension: Developer Experience & Operational Ergonomics",
-      "status": "failed",
-      "attempts": 1,
+      "status": "running",
+      "attempts": 2,
       "lastError": "Synthesis completed (exit 0) but report file was not generated",
-      "lastAttemptAt": "2026-05-20T20:34:30.694Z",
+      "lastAttemptAt": "2026-05-20T21:06:02.243Z",
       "nextRetryAt": "2026-05-20T21:06:02.236Z",
       "completedAt": null
     },
@@ -1998,12 +1998,12 @@
       "dimensionNumber": "06",
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "lastError": null,
       "lastAttemptAt": "2026-05-20T20:55:17.318Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:56:13.219Z"
     }
   ],
   "isComplete": false
