@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T20:29:17.731Z",
+  "updatedAt": "2026-05-20T20:44:01.366Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -1653,168 +1653,168 @@
       "dimensionName": "developer-experience-operational-ergonomics",
       "dimensionTitle": "Dimension: Developer Experience & Operational Ergonomics",
       "sourceName": "nats-server",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:29:29.899Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:32:00.481Z"
     },
     {
       "dimensionNumber": "17",
       "dimensionName": "developer-experience-operational-ergonomics",
       "dimensionTitle": "Dimension: Developer Experience & Operational Ergonomics",
       "sourceName": "openfga",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:29:29.899Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:32:02.639Z"
     },
     {
       "dimensionNumber": "17",
       "dimensionName": "developer-experience-operational-ergonomics",
       "dimensionTitle": "Dimension: Developer Experience & Operational Ergonomics",
       "sourceName": "pocketbase",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:29:29.899Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:31:53.119Z"
     },
     {
       "dimensionNumber": "17",
       "dimensionName": "developer-experience-operational-ergonomics",
       "dimensionTitle": "Dimension: Developer Experience & Operational Ergonomics",
       "sourceName": "temporal",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:32:02.641Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:34:17.078Z"
     },
     {
       "dimensionNumber": "17",
       "dimensionName": "developer-experience-operational-ergonomics",
       "dimensionTitle": "Dimension: Developer Experience & Operational Ergonomics",
       "sourceName": "victoriametrics",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:32:02.641Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:34:30.692Z"
     },
     {
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
       "sourceName": "cli",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:32:02.641Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:34:07.963Z"
     },
     {
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
       "sourceName": "grafana",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:34:30.694Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:36:07.748Z"
     },
     {
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
       "sourceName": "kubernetes",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:34:30.694Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:38:23.839Z"
     },
     {
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
       "sourceName": "milvus",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:38:23.841Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:41:06.672Z"
     },
     {
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
       "sourceName": "nats-server",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:38:23.841Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:40:11.261Z"
     },
     {
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
       "sourceName": "openfga",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:38:23.841Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:41:04.818Z"
     },
     {
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
       "sourceName": "pocketbase",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:41:06.673Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:43:19.073Z"
     },
     {
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
       "sourceName": "temporal",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:41:06.673Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:42:47.329Z"
     },
     {
       "dimensionNumber": "18",
       "dimensionName": "governance-evolution-strategy",
       "dimensionTitle": "Dimension: Governance & Evolution Strategy",
       "sourceName": "victoriametrics",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T20:41:06.673Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T20:44:01.364Z"
     }
   ],
   "synthesisTasks": [
@@ -1965,10 +1965,32 @@
       "dimensionNumber": "16",
       "dimensionName": "security-multi-tenant-isolation",
       "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
       "lastError": null,
       "lastAttemptAt": "2026-05-20T20:27:06.180Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-20T20:29:27.492Z"
+    },
+    {
+      "dimensionNumber": "17",
+      "dimensionName": "developer-experience-operational-ergonomics",
+      "dimensionTitle": "Dimension: Developer Experience & Operational Ergonomics",
+      "status": "failed",
+      "attempts": 1,
+      "lastError": "Synthesis completed (exit 0) but report file was not generated",
+      "lastAttemptAt": "2026-05-20T20:34:30.694Z",
+      "nextRetryAt": "2026-05-20T21:06:02.236Z",
+      "completedAt": null
+    },
+    {
+      "dimensionNumber": "18",
+      "dimensionName": "governance-evolution-strategy",
+      "dimensionTitle": "Dimension: Governance & Evolution Strategy",
+      "status": "running",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-20T20:44:01.366Z",
       "nextRetryAt": null,
       "completedAt": null
     }
