@@ -21,334 +21,341 @@
 | 7 | temporal | `/home/antonioborgerees/coding/ultraplan/studies/hellosales-architecture/sources/temporal` |
 | 8 | victoriametrics | `/home/antonioborgerees/coding/ultraplan/studies/hellosales-architecture/sources/victoriametrics` |
 
+Note: pocketbase source analysis was not available at `reports/source/03-configuration-environment-management/pocketbase.md`.
+
 ## Executive Summary
 
-Configuration and environment management across the eight studied sources reveals two convergent themes: multi-source composition is universal (file + env + CLI), and secrets isolation via struct tags or dedicated types is the dominant pattern. Significant divergence exists in three areas: hot-reload capability (ranging from none to etcd-watch-based), validation timing (startup-only vs. lazy), and feature flag sophistication (static lists vs. OpenFeature-based remote providers). No source achieves a perfect score; all have observable gaps in secrets encryption-at-rest, remote config stores, or config change auditability.
+All eight studied sources implement configuration systems with layered sourcing, but they diverge sharply on four axes: **hot-reload capability** (full support in k8s/nats/milvus/temporal/victoriametrics; absent in cli/openfga/grafana), **secret isolation mechanism** (keyring, `json:"-"`, bcrypt, masking, Password type), **validation strategy** (strict startup vs lazy/runtime), and **remote config store integration** (only milvus uses etcd; all others are local-file/env-only). No source implements Vault, and no source has a production-ready feature flag system with dynamic evaluation.
 
 ## Core Thesis
 
-The studied sources cluster into two distinct approaches to configuration: **static config with restart** (cli, grafana, openfga) and **reactive config with hot-reload** (kubernetes, milvus, nats-server, temporal, victoriametrics). The first group prioritizes simplicity and fail-fast behavior; the second prioritizes operational continuity. Neither approach is superior — the choice reflects product shape (standalone tool vs. distributed system), deployment model (single-instance vs. orchestrated), and user expectations (devops-friendly vs. app-developer-friendly).
+Configuration management in production Go systems typically follows one of three architectural models: **static-eager** (load once at startup, validate thoroughly, require restart for changes — cli, openfga), **static-with-hot-reload** (load at startup but watch for changes and apply selectively — nats-server, temporal, victoriametrics, kubernetes), or **reactive-event-driven** (multi-source with event dispatch on change — milvus). The choice is driven by the system's operational context: developer tools like CLI prioritize simplicity and cross-platform consistency; infrastructure components like k8s and nats require operational flexibility; AI/data systems like milvus prioritize runtime adaptability. Regardless of model, all systems treat secrets differently from general config, and the gap between "secrets on disk in plaintext" and "secrets from Vault" remains wide across all sources.
 
 ## Rating Summary
 
 | Source | Score | Approach | Main Strength | Main Concern |
 |--------|-------|----------|---------------|--------------|
-| kubernetes | 8/10 | Hot-reload via watches | Multi-stage composition, per-object ConfigMap watches | No env:var struct tag binding |
-| nats-server | 8/10 | Hot-reload via option interface | Comprehensive hot-reload coverage, custom lexer/parser | Secrets plaintext in config files |
-| temporal | 8/10 | Static + dynamic config split | Dynamic config with subscription-based hot-reload | No Vault integration, legacy loader deprecated |
-| grafana | 8/10 | Layered INI overrides | Feature flags with OpenFeature, env expander | No hot-reload for most config |
-| milvus | 7/10 | Priority-based multi-source | Event-driven reactive config via etcd | Secrets in plaintext YAML files |
-| openfga | 7/10 | Viper-based composition | `json:"-"` secret isolation, comprehensive Verify() | No hot-reload, no remote config store |
-| victoriametrics | 7/10 | SIGHUP + periodic reload | Password type with external sources, graceful degradation | Opt-in env var support, no feature flag system |
-| cli | 7/10 | Layered config with keyring | Source tracking, keyring with timeout wrapper | No hot-reload, lazy validation only |
+| cli | 7/10 | Static-eager with keyring | Clean interface/implementation separation, factory pattern | No hot-reload, lazy validation only |
+| grafana | 8/10 | Static-eager with env-override | Layered override system, feature toggle registry | Legacy Cfg global state, no hot-reload |
+| kubernetes | 8/10 | Static-with-hot-reload + event-driven | Per-object watches, drop-in merge, feature gates | No env:var struct binding, no native Vault |
+| milvus | 7/10 | Reactive-event-driven | Event dispatcher, etcd hot-reload, callback pattern | Secrets in plaintext, polling vs watch |
+| nats-server | 8/10 | Static-with-hot-reload | Option interface pattern, reflection-based diff | Custom format, no remote store |
+| openfga | 7/10 | Static-eager with Viper | Hierarchical typed config structs, json:"-" secrets | No hot-reload, silent defaults, static flags |
+| temporal | 8/10 | Static-eager + dynamic-config | Separation of static/dynamic, PasswordCommand, masking | No Vault, static config requires restart |
+| victoriametrics | 7/10 | Static-with-hot-reload | Password type, SIGHUP graceful fallback, opt-in env | No formal feature flags, secret detection by naming |
 
 ## Approach Models
 
-### Static Config with Restart
+### 1. Static-Eager (cli, openfga, grafana)
 
-This model (cli, grafana, openfga) loads configuration at startup and does not support runtime changes. Config is validated at startup with fail-fast behavior. Secrets are injected via environment variables or external stores at startup.
+Configuration is loaded once at startup from file/env sources. Validation occurs at load time or on specific access. Changes require process restart. Secrets are isolated via OS keyring (cli), `json:"-"` struct tags (openfga), or redaction patterns (grafana). This model is simplest to implement and reason about, but forces operators to restart for any config change.
 
-**Archetypal implementations:**
-- **grafana**: INI-based layered loading (`loadConfiguration()` at `pkg/setting/setting.go:1255-1317`) with `GF_` prefix env overrides. Feature flags defined in `standardFeatureFlags` slice (`pkg/services/featuremgmt/registry.go:17-1320`) with `RequiresRestart` semantics.
-- **openfga**: Viper-based multi-source composition with `SetEnvPrefix("OPENFGA")` and `AutomaticEnv()` (`cmd/root.go:23-25`). `Verify()` methods for startup validation (`pkg/server/config/config.go:486-491`). Secrets isolated via `json:"-"` struct tags (`pkg/server/config/config.go:132-137`).
-- **cli**: Factory-based lazy loading (`pkg/cmdutil/factory.go:36`) with `Option[T]` pattern for missing values. Keyring for secrets (`internal/keyring/keyring.go:22-74`).
+### 2. Static-With-Hot-Reload (nats-server, temporal, victoriametrics)
 
-### Reactive Config with Hot-Reload
+Configuration loads at startup, but a reload mechanism watches for file changes or listens for signals (SIGHUP). Not all config keys support hot-reload — only those explicitly designed as hot-swappable. This model balances safety (defaults applied once) with operational flexibility (certain values tunable without restart).
 
-This model (kubernetes, milvus, nats-server, temporal, victoriametrics) supports runtime configuration changes through file watching, signal handling, or periodic polling.
+### 3. Reactive-Event-Driven (milvus)
 
-**Archetypal implementations:**
-- **kubernetes**: fsnotify-based pod manifest watching (`pkg/kubelet/config/file_linux.go:67-99`), per-object ConfigMap/Secret watches via `NewWatchBasedManager()` (`pkg/kubelet/util/manager/watch_based_manager.go:180-210`). Strict startup validation via `ValidateKubeletConfiguration()` (`pkg/kubelet/apis/config/validation/validation.go:46-64`).
-- **milvus**: `config.Manager` with `EventDispatcher` for reactive updates (`pkg/config/event_dispatcher.go:42-58`). etcd source with periodic polling (5s default) at `pkg/config/refresher.go:64-81`. CAS-based cache updates (`pkg/config/manager.go:124-140`).
-- **nats-server**: `option` interface pattern (`server/reload.go:42-74`) for granular hot-swap. `diffOptions()` uses reflection to detect changes (`server/reload.go:1581`). Custom lexer/parser supports `$VAR` env substitution (`conf/parse.go:383-398`).
-- **temporal**: `FileBasedClient` polls dynamic config file at interval (`common/dynamicconfig/file_based_client.go:133-147`). `NotifyingClient` with `Subscribe()` for runtime updates (`common/dynamicconfig/client.go:36-41`). `PasswordCommand` for external secret fetching (`common/config/persistence.go:301-323`).
-- **victoriametrics**: SIGHUP + ticker-based reload (`lib/promscrape/scraper.go:112-206`). Graceful fallback on reload failure. `Password` type with `file://`/`http://` sources (`lib/flagutil/password.go:37-47`).
+Configuration flows through a Manager that accepts multiple Source implementations (Env, File, Etcd) with priority ordering. Changes in etcd trigger events through a Dispatcher, which notifies registered callbacks. This model enables fine-grained reactive behavior where components can subscribe to specific config keys and respond to changes without polling.
+
+### 4. Hybrid-Multi-Stage (kubernetes)
+
+Configuration composed in stages: flag parsing → file loading → drop-in directory merge. Hot-reload works per-object for ConfigMaps/Secrets via watches, but the kubelet config itself requires restart. Feature gates are versioned specs with separate enabled/disabled tracking.
 
 ## Pattern Catalog
 
-### Pattern 1: Multi-Source Priority Ordering
+### Pattern 1: Layered Config Composition with Priority
 
-**Problem**: How to compose configuration from file, environment variables, and CLI flags with predictable precedence.
+**Problem**: How to combine defaults, config files, environment variables, and CLI flags without ambiguity.
 
-**Solution**: Define explicit priority order and merge sequentially. Most sources use CLI > Env > File > Defaults.
+**Solution**: Define a fixed precedence order and apply sources in that sequence. Kubernetes uses 4-stage: defaults → file → drop-ins → flags. Grafana uses defaults.ini → custom.ini → env vars → cmd properties. Temporal uses embedded template → config dir → legacy hierarchy.
 
-**Sources demonstrating**:
-- nats-server: CLI > env vars > config file > defaults (`server/opts.go:5827-5909`)
-- grafana: defaults.ini > custom.ini > cmdline defaults > env vars > CLI properties (`pkg/setting/setting.go:1255-1317`)
-- openfga: CLI flags > env vars > config file > defaults (`cmd/root.go:19-38`)
-- kubernetes: flags > file > drop-ins (`cmd/kubelet/app/server.go:236-243`)
+**Sources**: grafana (`pkg/setting/setting.go:1255-1317`), kubernetes (`cmd/kubelet/app/server.go:148-258`), temporal (`common/config/loader.go:71-117`)
 
-**When to copy**: Any application that supports multiple config sources.
+**When to copy**: Any system with multiple config sources needs explicit precedence to prevent operator confusion.
 
-**When overkill**: Single-source applications with no env/CLI override needs.
+**When overkill**: Single-source systems (file-only or env-only) don't need layered composition.
 
-### Pattern 2: Secrets Isolation via Struct Tags
+### Pattern 2: Secret Isolation via Output Masking
 
-**Problem**: Preventing accidental secret leakage in logs, error messages, or serialized output.
+**Problem**: Config structs may contain sensitive values that could leak into logs if serialized accidentally.
 
-**Solution**: Use `json:"-"` struct tag on sensitive fields to exclude from JSON/YAML serialization.
+**Solution**: Replace sensitive field values with `******` before returning string representations. Temporal's `MaskYaml()` in `common/masker/masker.go:9-14` masks `password` and `keyData` fields. VictoriaMetrics' `Password.String()` returns `"secret"` (`lib/flagutil/password.go:88-90`). OpenFGA uses `json:"-"` struct tags (`pkg/server/config/config.go:132-137`).
 
-**Sources demonstrating**:
-- openfga: `DatastoreConfig` URI/Password marked `json:"-"` (`pkg/server/config/config.go:132-137`)
-- temporal: `MaskYaml()` replaces `password`/`keyData` fields with `******` (`common/masker/masker.go:9-14`)
+**Sources**: temporal, victoriametrics, openfga
 
-**When to copy**: Any service handling credentials, API keys, or tokens.
+**When to copy**: Any system where config structs are logged or serialized — which is most production systems.
 
-**When overkill**: Services without sensitive configuration values.
+**When overkill**: Systems where config never appears in logs or where secrets are already isolated in external stores.
 
-### Pattern 3: Hot-Reload via Signal or File Watch
+### Pattern 3: Hot-Reload via File Watching or Signal
 
-**Problem**: Allowing configuration changes without process restart.
+**Problem**: Config changes require process restart, disrupting long-running services.
 
-**Solution**: Register signal handler (SIGHUP) or file watcher, reload config on trigger, compare against running config to decide restart behavior.
+**Solution**: Watch config files for changes (SIGHUP, fsnotify, polling) and re-apply selectively. VictoriaMetrics uses SIGHUP + ticker (`lib/promscrape/scraper.go:112-206`). NATS uses `Server.Reload()` + `diffOptions()` (`server/reload.go:1396`). Kubernetes uses fsnotify for pod manifests (`pkg/kubelet/config/file_linux.go:67-99`) and per-object watches for ConfigMaps (`pkg/kubelet/util/manager/watch_based_manager.go:180-210`).
 
-**Sources demonstrating**:
-- victoriametrics: SIGHUP handler + periodic ticker (`lib/promscrape/scraper.go:110-162`)
-- nats-server: `option.Apply()` interface for granular changes (`server/reload.go:42-74`)
-- kubernetes: fsnotify for pod manifests, per-object watches for ConfigMaps (`pkg/kubelet/util/manager/watch_based_manager.go:180-210`)
+**Sources**: kubernetes, nats-server, temporal, victoriametrics
 
-**When to copy**: Long-running services where restart is disruptive.
+**When to copy**: Long-running server processes where operators need to change behavior without full restart.
 
-**When overkill**: Short-lived tools, sidecar processes, or cases where restart is acceptable.
+**When overkill**: Short-lived processes (CLI tools, batch jobs) where restart cost is low.
 
-### Pattern 4: Feature Flag Registry
+### Pattern 4: Event-Driven Reactive Config
 
-**Problem**: Managing gradual rollouts, experimental features, and runtime toggles.
+**Problem**: Multiple components need to react to config changes without polling or restart.
 
-**Solution**: Central registry with typed flags, `IsEnabled()` checks, and per-flag metadata (stable/beta, requires-restart).
+**Solution**: Dispatch events on config change and let subscribers register callbacks. Milvus' `EventDispatcher` supports exact-key and prefix-based registration (`pkg/config/event_dispatcher.go:42-71`). Temporal's `NotifyingClient` with `Subscribe()` allows runtime updates to propagate (`common/dynamicconfig/client.go:36-41`).
 
-**Sources demonstrating**:
-- grafana: `FeatureManager` with `standardFeatureFlags` slice (`pkg/services/featuremgmt/registry.go:17-1320`), OpenFeature integration (`pkg/services/featuremgmt/openfeature.go:14-39`)
-- kubernetes: `FeatureGate` interface with versioned specs (`pkg/features/kube_features.go:41-1179`)
+**Sources**: milvus, temporal
 
-**When to copy**: Services needing progressive delivery, A/B testing, or kill-switch capability.
+**When to copy**: Complex systems with many components that need to adapt to config changes — especially AI/ML pipelines where data processing parameters affect multiple stages.
 
-**When overkill**: Simple single-tenant services with infrequent configuration changes.
+**When overkill**: Simple services where config is read once at startup and rarely changes.
 
-### Pattern 5: Event-Driven Reactive Config
+### Pattern 5: Feature Flag Registry with Type-Safe Access
 
-**Problem**: Propagating configuration changes to multiple subscribers without polling.
+**Problem**: Feature toggles need to be controlled at runtime without recompilation.
 
-**Solution**: Central dispatcher with prefix-based registration, callbacks fired on config change events.
+**Solution**: Define flags in a registry with typed accessors. Grafana's `standardFeatureFlags` slice in `pkg/services/featuremgmt/registry.go:17-1320` enumerates all flags with metadata. Kubernetes uses `FeatureGate` interface with versioned specs (`pkg/features/kube_features.go:41-1179`).
 
-**Sources demonstrating**:
-- milvus: `EventDispatcher.Register` with key prefix support (`pkg/config/event_dispatcher.go:42-71`), `ParamItem.RegisterCallback` (`pkg/util/paramtable/param_item.go:81-83`)
+**Sources**: grafana, kubernetes, openfga (static list in `pkg/server/config/config.go:107-121`)
 
-**When to copy**: Distributed systems with multiple components needing config awareness.
+**When to copy**: Systems that need to progressively enable features, A/B test, or gate experimental functionality.
 
-**When overkill**: Monolithic single-process applications.
+**When overkill**: Single-tenant or simple systems where all features are always enabled or compile-time toggles suffice.
 
-### Pattern 6: Env Var Template Substitution
+### Pattern 6: Remote Config Store Integration
 
-**Problem**: Embedding environment variable values anywhere in configuration files.
+**Problem**: Centralized config management across multiple deployment instances.
 
-**Solution**: Parse config file as template, expand `$(VAR)` or `%{VAR}` placeholders before YAML/JSON parsing.
+**Solution**: Store config in etcd (milvus) with periodic polling and event-based updates. All other sources are local-file/env-only.
 
-**Sources demonstrating**:
-- grafana: `$(ENV_VAR)` and `$(file:/path)` syntax via expander system (`pkg/setting/expanders.go:52-79`)
-- nats-server: `$VAR` syntax in config values (`conf/parse.go:383-398`)
-- victoriametrics: `%{ENV_VAR}` placeholders in config files (`lib/envtemplate/envtemplate.go:12-16`)
-- temporal: `{{ env "VAR_NAME" }}` in embedded template (`common/config/config_template_embedded.yaml:4`)
+**Sources**: milvus (`pkg/config/etcd_source.go:106`)
 
-**When to copy**: Containerized deployments where config is generated from environment.
+**When to copy**: Distributed systems requiring consistent config across nodes — especially multi-tenant AI systems.
 
-**When overkill**: Development environments where direct file editing is preferred.
+**When overkill**: Single-instance deployments or systems where config changes are infrequent.
+
+### Pattern 7: Secret Injection via External Command
+
+**Problem**: Secrets should not be stored in config files but fetched dynamically at startup.
+
+**Solution**: Execute an external command and capture its stdout as the secret value. Temporal's `PasswordCommand` in `common/config/persistence.go:301-323` runs a command with 30-second timeout. VictoriaMetrics' `Password` type supports `file://`, `http://`, `https://` sources with periodic re-reading (`lib/flagutil/password.go:37-47`).
+
+**Sources**: temporal, victoriametrics
+
+**When to copy**: Systems integrating with secret stores that don't support direct SDK integration (Vault, AWS Secrets Manager via shell wrapper).
+
+**When overkill**: Systems with native Vault/KMS integration or where secrets are provided via environment variables already.
 
 ## Key Differences
 
-### Secrets Management Approaches
+### Hot-Reload Capability
 
-**Keyring-based (cli)**: Authentication tokens stored in OS-native keychain via `zalando/go-keyring` with 3-second timeout wrapper (`internal/keyring/keyring.go:22-74`). Fallback to plaintext `hosts.yml` if keyring unavailable.
+**Full hot-reload**: kubernetes (ConfigMap/Secret watches, pod manifest fsnotify), nats-server (option interface with diff detection), temporal (dynamic config file polling with subscriptions), victoriametrics (SIGHUP + ticker), milvus (etcd event-driven)
 
-**Struct tag-based (openfga, temporal)**: Sensitive fields marked with `json:"-"` to exclude from serialization. Temporal additionally calls `MaskYaml()` on config output (`common/config/config.go:696-703`).
+**Partial hot-reload**: grafana (DynamicSection reads env vars at access time, but no file watching; TLS cert hot-reload in openfga)
 
-**Dedicated Password type (victoriametrics)**: `Password` struct accepts `file://`, `http://`, `https://` sources with periodic re-reading. `String()` returns `"secret"` to prevent log exposure (`lib/flagutil/password.go:88-90`).
+**No hot-reload**: cli (config loaded once via factory), openfga (TLS certs only)
 
-**Plaintext with file permissions (nats-server, milvus)**: Secrets stored as bcrypt-hashed strings in config files. No envelope encryption or secret store integration.
+The divide correlates with operational context: infrastructure components (k8s, nats, VM) prioritize operational flexibility; application layers (cli, openfga) prioritize simplicity and predictability.
 
-### Hot-Reload Scope
+### Secrets Management Strategy
 
-**Full hot-reload (nats-server, victoriametrics)**: Many options support runtime changes via signal or periodic checking. nats-server uses `option` interface pattern; victoriametrics uses SIGHUP + ticker.
+| Source | Mechanism | Encryption at Rest |
+|--------|-----------|-------------------|
+| cli | OS keyring (zalando/go-keyring) | Yes (via keychain) |
+| grafana | Envelope encryption with KMS providers | Yes (enterprise) |
+| kubernetes | Secret objects in etcd, per-pod projection | Yes (etcd encryption) |
+| milvus | Plaintext in YAML/env | No |
+| nats-server | Bcrypt-hashed in config file | No |
+| openfga | json:"-" tags, env var injection | No |
+| temporal | PasswordCommand, MaskYaml | No |
+| victoriametrics | Password type, file/http sources | No |
 
-**Partial hot-reload (kubernetes, milvus, temporal)**: Only specific config areas reload. Kubernetes: pod manifests + ConfigMaps/Secrets via watches. Milvus: etcd-sourced config via polling. Temporal: dynamic config file via polling.
+Only kubernetes and grafana (enterprise) implement encryption at rest for secrets. All others rely on OS file permissions. This is a significant gap for multi-tenant deployments.
 
-**No hot-reload (cli, grafana, openfga)**: All config changes require process restart. This is a deliberate simplification.
+### Config Format Choices
+
+- **INI** (grafana): Familiar in ops community, but no schema validation
+- **YAML** (milvus, temporal, openfga, victoriametrics): Structured, supports complex types
+- **Custom .conf** (nats-server): Human-friendly with comments, but custom parser
+- **Struct tags + flags** (kubernetes): Type-safe but no native env:var binding
+- **Viper** (openfga): Mature library, but opaque behavior
 
 ### Validation Strategy
 
-**Startup-only with fail-fast (openfga, grafana)**: `Verify()` methods called before server start; invalid config causes panic. openfga splits validation into `VerifyServerSettings()` and `VerifyBinarySettings()` (`pkg/server/config/config.go:486-639`).
+**Startup-only strict**: kubernetes (ValidateKubeletConfiguration at `pkg/kubelet/apis/config/validation/validation.go:46-64`), openfga (Verify() at `pkg/server/config/config.go:486-491`), temporal (Validate() at `common/config/loader.go:213-214`)
 
-**Startup + lazy (kubernetes, temporal)**: Strict validation at startup; deferred validation at admission/runtime for some fields.
+**Startup + lazy**: grafana (MustBool/MustString provide defaults but no schema), cli (ValidateKey/ValidateValue only on `gh config set`)
 
-**Lazy-only (cli)**: No schema validation at `NewConfig()` time. Validation only occurs when values are set via `gh config set` command (`pkg/cmd/config/set/set.go:90-129`). Accessors like `AccessibleColors()` call `.Unwrap()` which panics on missing value (`internal/config/config.go:119-121`).
+**Event-driven validation**: milvus (PanicIfEmpty at access time, CAS caching)
 
 ## Tradeoffs
 
-| Decision | Benefit | Cost | Best-fit Context | Failure Mode | Alternative |
-|----------|---------|------|------------------|--------------|-------------|
-| No hot-reload | Simpler implementation, fail-fast behavior | Requires restart for all changes | CLI tools, single-tenant services | Disrupts long-running sessions | Hot-reload via signal/watches |
-| Hot-reload via polling | Portability across environments | Config propagation delay (5s-60s typical) | Distributed systems, orchestration | Stale config window after changes | Native watches where supported |
-| Plaintext secrets in config | No external dependency | Exposed if file permissions broken | Single-node deployments, dev | Credentials in version control risk | Keyring, Vault, KMS |
-| Lazy validation only | Fast startup | Invalid config detected late | Development tooling | Runtime panics on missing required values | Strict startup validation |
-| Viper dependency (openfga) | Battle-tested, multi-source support | Opaque behavior, non-standard errors | Rapid development | Vendor lock-in to Viper patterns | Custom parser (nats-server) |
+| Decision | Benefit | Cost | Best Fit | Failure Mode | Alternative |
+|-----------|---------|------|----------|--------------|-------------|
+| No hot-reload | Simpler implementation, predictable behavior | Requires restart for any change | CLI tools, batch systems | Downtime for config changes | SIGHUP-based reload |
+| Env var opt-in (VictoriaMetrics) | Prevents accidental exposure | Requires explicit enablement | Security-sensitive deployments | Some users don't discover it | Always-on env binding |
+| Keyring for secrets (cli) | OS-native security | Keychain availability varies | Desktop CLI tools | Fallback to plaintext if keyring fails | Vault integration |
+| Polling vs etcd watches (milvus) | Works without watch API support | 5s latency on config propagation | Embedded deployments | Config drift between nodes | Native etcd watches |
+| Lazy validation (cli, grafana) | Fast startup | Errors surface late | Development tools | Runtime panics on missing config | Strict startup validation |
+| Custom config format (nats-server) | Human-friendly, comments supported | Custom parser maintenance | Messaging infrastructure | Not interchangeable with standard formats | YAML/JSON |
 
 ## Decision Guide
 
-**Choose no hot-reload when**:
-- Application restarts are cheap (CLI tools, short-lived processes)
-- Configuration changes are infrequent
-- Fail-fast on misconfiguration is acceptable
+**Q: Should I implement hot-reload?**
+- Yes, if your process runs longer than typical deployment frequency (> hours) and config changes happen in production
+- No, if your process is short-lived (CLI, batch jobs) or config never changes after startup
 
-**Choose hot-reload via signal when**:
-- Process restart is disruptive (long-running servers, distributed systems)
-- Configuration changes happen via file system (Kubernetes ConfigMaps, config files edited in-place)
-- Portability across environments is important
+**Q: How should I handle secrets?**
+- Environment variables for simple cases (inject at runtime, not stored on disk)
+- OS keyring for desktop tools (cli uses this pattern)
+- `json:"-"` or output masking for any config that might be logged
+- Vault/KMS integration for production multi-tenant deployments (none of the sources did this natively)
 
-**Choose hot-reload via etcd/watch when**:
-- Centralized configuration management is needed
-- Multi-node consistency is required
-- Config propagation latency under 10s is acceptable
+**Q: Should I use Viper?**
+- Viper provides multi-source composition out of the box (openfga uses it)
+- The tradeoff is opacity — error handling is non-standard and debugging config issues can be hard
+- For simple cases, standard `encoding/json` or `gopkg.in/yaml.v3` with manual env var binding is more transparent
 
-**Choose keyring for secrets when**:
-- OS-native credential store is available (desktop apps, CLI tools)
-- Secrets are per-user rather than per-deployment
-- Timeout handling is needed for unavailable keychain
+**Q: Feature flags — static list or dynamic evaluation?**
+- Static list (grafana registry, openfga experimental) is simpler and sufficient for OSS projects
+- Dynamic evaluation with remote providers (Grafana's OpenFeature integration) enables percentage rollouts and A/B testing
+- If you need per-tenant targeting or gradual rollouts, consider a dedicated flag system
 
-**Choose struct tag isolation when**:
-- Application is Go-based with JSON/YAML config serialization
-- Secrets appear in structured config structs
-- Accidental logging of config is a risk
+**Q: Validation — strict startup or lazy?**
+- Strict startup validation (kubernetes, openfga, temporal) catches errors before the system starts — better for production
+- Lazy validation (cli, grafana) allows faster startup but risks runtime failures
+- The best approach: validate at startup for required fields, lazily for optional overrides
 
 ## Practical Tips
 
-1. **Implement source tracking** — Know whether a config value came from env var, config file, or default. cli does this via `ConfigEntry` struct (`internal/gh/gh.go:24-27`).
+1. **Always track config source provenance**: cli tracks `ConfigEntry.Source` ("default" vs "user"), allowing UI to indicate where values came from
 
-2. **Use explicit priority ordering** — Document and enforce config source precedence. grafana's layered approach (`pkg/setting/setting.go:1255-1317`) makes precedence explicit.
+2. **Use structured config types over flat maps**: openfga's `Config` struct with typed sub-structs (`DatastoreConfig`, `GRPCConfig`, etc.) provides self-documenting structure and type safety
 
-3. **Fail fast on critical config** — Require essential config at startup via `PanicIfEmpty` (milvus) or `validate:"nonzero"` tags (temporal).
+3. **Hot-reload partial, not all**: nats-server's `option` interface pattern allows granular control over which changes are hot-swappable and which require restart
 
-4. **Support graceful degradation on reload failure** — victoriametrics continues with previous config if reload fails (`lib/promscrape/scraper.go:164-169`); this prevents momentary unavailability.
+4. **Graceful degradation on reload failure**: VictoriaMetrics continues with previous config if SIGHUP reload fails — critical for availability-sensitive services
 
-5. **Use CAS for concurrent config access** — milvus uses `sync/atomic.Value.Swap()` to atomically replace config (`manager.go:195`).
+5. **Secret detection by naming is fragile**: VictoriaMetrics uses string matching (pass, key, secret, token) which can miss custom-named secrets; explicit registration is more reliable
 
-6. **Tag sensitive fields explicitly** — Don't rely on naming conventions alone. openfga uses `json:"-"` (`pkg/server/config/config.go:132`); victoriametrics uses `RegisterSecretFlag()` (`lib/flagutil/secret.go:13-16`).
+6. **Event callbacks for reactive behavior**: milvus' `EventDispatcher` with prefix-based registration enables components to subscribe to specific config areas without polling
 
-7. **Implement config change callbacks** — milvus's `EventDispatcher` allows components to react to config changes without polling (`pkg/config/event_dispatcher.go:42-58`).
+7. **Config migration via versioned transforms**: cli uses `Migration` interface with `PreVersion()`/`PostVersion()`/`Do()` for schema evolution
+
+8. **PasswordCommand pattern for external secrets**: temporal's external command execution allows integration with secret stores without native SDK support
 
 ## Anti-Patterns / Caution Signs
 
-**Caution: Panic on missing config at access time** — cli accessor methods like `AccessibleColors()` call `.Unwrap()` which panics if no value exists (`internal/config/config.go:119-121`). Prefer returning errors or defaults.
-
-**Caution: Silent defaults for missing required config** — openfga's `DefaultConfig()` returns fully populated struct; if `datastore.uri` is not set, empty string is used and runtime fails later. No pre-flight validation for valid connection strings.
-
-**Caution: Env var override without indication** — cli's `ActiveToken()` checks `GH_TOKEN` env var first but users may not realize config is being bypassed (`internal/config/config.go:317-318`).
-
-**Caution: Hot-reload with polling fallback** — kubernetes fsnotify can lose events; fallback polling handles edge cases but adds overhead. Config propagation may lag up to resync interval.
-
-**Caution: No config rollback mechanism** — Most sources (nats-server, openfga, victoriametrics) have no version history for config changes. Bad config reload loses previous working state.
-
-**Caution: Validation only on known keys** — nats-server's `diffOptions()` uses reflection; if a new field is added to `Options` struct without implementing hot-reload, the default case returns error rather than succeeding silently.
-
-**Caution: Memory growth from event handlers** — milvus's `EventDispatcher` accumulates handlers via `Register` without visible cleanup mechanism. Long-running processes may leak memory.
+- **Panic on missing required config** (milvus' `PanicIfEmpty`): Hard failure at startup can prevent containerized deployments from starting with incomplete config — prefer graceful error returns
+- **Silent defaults for missing config** (openfga): When `datastore.uri` is not set, empty string is used and runtime fails later — explicit required field enforcement is better
+- **Global Cfg struct** (grafana's legacy `Cfg`): Creates coupling and hard-to-test dependencies — prefer dependency injection
+- **No config change audit trail** (all sources): None of the studied systems log who changed what config and when — compliance gap for regulated environments
+- **Feature flag typos silently ignored** (openfga): `ExperimentalListObjectsOptimizations` vs `experimental_list_objects_optimizations` — validate flag names at startup
+- **Memory growth from event handlers** (milvus): `EventDispatcher` accumulates handlers via `Register` without cleanup — need deregistration mechanism
+- **Strict parse disabled by default** (victoriametrics): Unknown YAML fields silently ignored unless `-promscrape.config.strictParse` is set — typos go unnoticed
 
 ## Notable Absences
 
-1. **Vault or external secrets store integration** — No source integrates with HashiCorp Vault, AWS Secrets Manager, or GCP Secret Manager. All secrets management is local (keyring, plaintext files, or env vars).
-
-2. **Config encryption at rest** — Only grafana (Enterprise) has envelope encryption for secrets. All OSS projects store config plaintext on disk.
-
-3. **Feature flag targeting rules** — Only grafana supports remote feature flag providers via OpenFeature. Others use static lists or simple maps.
-
-4. **Config change audit trail** — No source logs who changed what config and when. This is a compliance gap for regulated environments.
-
-5. **Per-tenant configuration isolation** — Most sources manage global config. Multi-tenant deployments lack namespace isolation for tenant-specific settings.
-
-6. **Configuration rollback** — No source preserves previous config state for rollback after bad reload.
-
-7. **Structured schema validation** — Most sources validate individual values but lack JSON Schema or CUE validation for config structure.
+1. **No source implements Vault integration natively** — all secrets are either plaintext on disk, OS keyring, or env-injected
+2. **No source has production-ready dynamic feature flag system** with targeting rules, percentage rollouts, and per-tenant configuration
+3. **No source has config version history or rollback** — changes are not preserved or recoverable
+4. **No source has config change audit logging** — who changed what and when is not tracked
+5. **No source has per-tenant runtime configuration overrides** — all config applies uniformly across tenants/users
 
 ## Per-Source Notes
 
 ### cli (7/10)
-Well-architected interface/implementation separation (`internal/gh/gh.go:32` / `internal/config/config.go:40`). Factory pattern for lazy loading enables `gh version` without config. Keyring with timeout wrapper is robust. Main gaps: no hot-reload, lazy-only validation that can panic.
+Interface/implementation separation via `gh.Config` in `internal/gh/gh.go:32`. Keyring with timeout wrapper. Factory pattern for lazy loading. No hot-reload — config loaded once via `sync.Once`. Option type pattern for graceful fallback on missing values. Source tracking enables provenance UI.
 
 ### grafana (8/10)
-INI format is familiar to ops community. `GF_` prefix avoids collisions. Layered override system is explicit. Feature flags with OpenFeature integration is sophisticated. Main gaps: no hot-reload for most config, global `Cfg` struct being deprecated.
+INI-based layered config with `GF_` env prefix. `applyEnvVariableOverrides()` at `pkg/setting/setting.go:913-997` enables runtime env overrides via `DynamicSection`. Feature toggle registry with code generation (`make gen-feature-toggles`). OpenFeature integration for remote flags. Legacy `Cfg` global being deprecated in favor of `ConfigProvider` interface.
 
 ### kubernetes (8/10)
-Three-stage composition (flag → file → drop-in) is thorough. Per-object watches for ConfigMaps scale well. `datapolicy` struct tags for log redaction. Strict startup validation with aggregated errors. Main gap: no env:var struct tag binding, relies on flag parsing only.
+Three-stage composition: flag → file → drop-in merge via JSON patch. fsnotify for pod manifest hot-reload. Per-object watch for ConfigMaps/Secrets with field selectors. Feature gates as versioned specs. Strict startup validation with aggregated errors. `datapolicy` struct tag for sensitive data redaction.
 
 ### milvus (7/10)
-Event-driven reactive config via etcd is well-architected. `EventDispatcher` with prefix support enables fine-grained watchers. CAS caching for thread safety. Main gaps: secrets in plaintext YAML, cipher plugin unused.
+Reactive event-driven model with `EventDispatcher`. Priority-based multi-source: Env(50) > Etcd(10) > File(100). Event-driven hot-reload via etcd polling. `ParamItem` with callback registration. CAS cached values for concurrent access. Secrets in plaintext YAML/env — no encryption at rest.
 
 ### nats-server (8/10)
-Custom lexer/parser is powerful (comments, `$VAR`, include directives). `option` interface for granular hot-reload is clean. Bcrypt prefix special-casing protects passwords. Main gap: secrets plaintext in config files, no external secret store.
+Custom lexer/parser for `.conf` format with `$VAR` env substitution. `option` interface pattern for granular hot-reload control. `diffOptions()` via reflection identifies unsupported changes. Bcrypt prefix special-cased in variable lookup to prevent expansion. `NoErrOnUnknownFields(true)` for forward compatibility.
 
 ### openfga (7/10)
-Viper is battle-tested. `json:"-"` for secret isolation is explicit. `Verify()` methods are comprehensive. JSON Schema as documentation. Main gaps: no hot-reload, no remote config store, silent defaults for missing required config.
+Viper-based multi-source config with `SetEnvPrefix("OPENFGA")` and `AutomaticEnv()`. Hierarchical typed config structs. `json:"-"` tags for secret isolation. Two-phase verification: `VerifyServerSettings()` then `VerifyBinarySettings()`. TLS cert hot-reload via certwatcher. Static experimental feature flags.
 
 ### temporal (8/10)
-Static/dynamic config split is principled. `NotifyingClient` with subscriptions enables reactive updates. `PasswordCommand` for external secrets. `MaskYaml()` prevents log leakage. Main gaps: no Vault integration, legacy loader deprecated, polling delay.
+Separation of static config (loaded once, validated at startup) and dynamic config (polled from file, supports subscriptions). `PasswordCommand` for external secret fetching. `MaskYaml()` prevents password leakage in logs. `FileBasedClient` with `Update()` atomically swaps config via `sync/atomic.Value.Swap()`. Embedded template with Go template + sprig functions for container deployments.
 
 ### victoriametrics (7/10)
-`Password` type with external sources is innovative. SIGHUP + graceful degradation is robust. `checkOverflow()` for unknown field detection. Main gaps: opt-in env var support (users may miss), no feature flag system, strict parse disabled by default.
+Opt-in env var support via `-envflag.enable`. `%{ENV_VAR}` template substitution before YAML parsing. `Password` type with `file://`/`http://` sources and periodic re-reading. `RegisterSecretFlag()` + auto-detection by naming. SIGHUP + ticker hot-reload with graceful fallback. `yaml.UnmarshalStrict()` for unknown field detection.
 
 ## Open Questions
 
-1. **Why do most sources lack Vault integration?** — All eight sources rely on env vars, plaintext files, or OS keyrings for secrets. None integrate with centralized secret stores. Is this a complexity concern, a "not invented here" attitude, or delegation to orchestration layer?
+1. **Why no Vault integration across any source?** The operational complexity of Vault may outweigh benefits for many teams. Is there a gap in the ecosystem for simpler secret injection patterns?
 
-2. **How should config schema evolution be handled?** — No source has a documented mechanism for schema versioning or migration between major versions. cli has `Migration` interface but only for config-to-config migrations, not schema changes.
+2. **Why no production feature flag system in any source?** Open-source projects may not need dynamic evaluation, but multi-tenant SaaS products would benefit. Is this an artifact of the studied sources or a real gap in the Go ecosystem?
 
-3. **What is the right granularity for hot-reload?** — Some options require restart (store_dir in nats-server), others don't. How should this boundary be decided? Is there a principle or just historical accident?
+3. **Config format proliferation**: Eight sources use five different config formats (INI, YAML, custom .conf, struct tags+flags, Viper). Is there a need for a standard Go config format with built-in validation, hot-reload, and secret management?
 
-4. **How should per-tenant config isolation work in multi-tenant systems?** — None of the studied sources implement tenant-specific config overrides beyond the multi-account support in nats-server. What patterns exist for this?
-
-5. **When does config validation belong at startup vs. at runtime?** — kubernetes validates everything at startup (fail-fast). temporal validates static config at startup but dynamic config lazily. What's the principled boundary?
+4. **The hot-reload boundary**: Most systems have some config that requires restart. What's the right mental model for which config should be hot-reloadable vs static?
 
 ## Evidence Index
 
-| Source | Evidence | File:Line |
-|--------|----------|-----------|
-| cli | Config interface | `internal/gh/gh.go:32-80` |
-| cli | Config implementation | `internal/config/config.go:40-46` |
-| cli | Keyring wrapper | `internal/keyring/keyring.go:22-74` |
-| cli | Config validation on set | `pkg/cmd/config/set/set.go:90-129` |
-| cli | ActiveToken priority | `internal/config/config.go:237-260` |
-| grafana | Config loading sequence | `pkg/setting/setting.go:1255-1317` |
-| grafana | Env var overrides | `pkg/setting/setting.go:913-997` |
-| grafana | Feature flag registry | `pkg/services/featuremgmt/registry.go:17-1320` |
-| grafana | OpenFeature integration | `pkg/services/featuremgmt/openfeature.go:14-39` |
-| grafana | Secrets redaction | `pkg/setting/setting.go:828-878` |
-| kubernetes | Kubelet config loading | `cmd/kubelet/app/server.go:148-258` |
-| kubernetes | Drop-in merge | `cmd/kubelet/app/server.go:331-400` |
-| kubernetes | File watch | `pkg/kubelet/config/file_linux.go:67-99` |
-| kubernetes | ConfigMap manager | `pkg/kubelet/util/manager/watch_based_manager.go:222-257` |
-| kubernetes | Startup validation | `cmd/kubelet/app/server.go:254-258` |
-| kubernetes | Datapolicy tags | `staging/src/k8s.io/component-base/logs/datapol/datapol.go:88-91` |
-| milvus | Config Manager | `pkg/config/manager.go:86-97` |
-| milvus | Event dispatcher | `pkg/config/event_dispatcher.go:42-58` |
-| milvus | Hot-reload refresher | `pkg/config/refresher.go:64-81` |
-| milvus | Etcd source | `pkg/config/etcd_source.go:168-184` |
-| milvus | CAS cache | `pkg/config/manager.go:124-140` |
-| nats-server | Config parsing | `conf/parse.go:383-398` |
-| nats-server | Hot-reload | `server/reload.go:1396-1485` |
-| nats-server | Option interface | `server/reload.go:42-74` |
-| nats-server | Validation | `server/server.go:1137-1183` |
-| nats-server | Feature flags | `server/feature_flags.go:27-77` |
-| openfga | Viper init | `cmd/root.go:23-25` |
-| openfga | Config Verify | `pkg/server/config/config.go:486-491` |
-| openfga | Secret isolation | `pkg/server/config/config.go:132-137` |
-| openfga | TLS hot-reload | `cmd/run/run.go:1239-1241` |
-| temporal | Config template | `common/config/config_template_embedded.yaml:4` |
-| temporal | MaskYaml | `common/masker/masker.go:9-14` |
-| temporal | Dynamic config client | `common/dynamicconfig/client.go:12-41` |
-| temporal | FileBasedClient | `common/dynamicconfig/file_based_client.go:133-147` |
-| temporal | PasswordCommand | `common/config/persistence.go:301-323` |
-| victoriametrics | Env flag binding | `lib/envflag/envflag.go:24-27` |
-| victoriametrics | Password type | `lib/flagutil/password.go:37-47` |
-| victoriametrics | Secret detection | `lib/flagutil/secret.go:28-33` |
-| victoriametrics | Hot reload | `lib/promscrape/scraper.go:112-206` |
-| victoriametrics | Strict YAML parsing | `lib/promscrape/config.go:129` |
+Every evidence reference in this report follows the `path/to/file.go:NN` or similar format from per-source reports.
+
+### cli
+- `internal/gh/gh.go:32` — Config interface definition
+- `internal/config/config.go:40-46` — Config implementation
+- `internal/config/config.go:554-585` — Default config values
+- `internal/keyring/keyring.go:22-74` — Keyring wrapper with timeout
+- `pkg/cmdutil/factory.go:36` — Factory pattern
+
+### grafana
+- `pkg/setting/setting.go:1255-1317` — Config loading sequence
+- `pkg/setting/setting.go:913-997` — Env var overrides
+- `pkg/setting/setting.go:828-878` — RedactedValue for secrets
+- `pkg/services/featuremgmt/manager.go:15-103` — FeatureManager
+- `pkg/services/featuremgmt/registry.go:17-1320` — Feature flag registry
+
+### kubernetes
+- `cmd/kubelet/app/server.go:148-258` — Kubelet config loading
+- `cmd/kubelet/app/server.go:331-400` — Drop-in merge
+- `pkg/kubelet/config/file_linux.go:67-99` — File watch (inotify)
+- `pkg/kubelet/util/manager/watch_based_manager.go:180-210` — ConfigMap watch
+- `pkg/features/kube_features.go:41-1179` — Feature gate definitions
+
+### milvus
+- `pkg/config/manager.go:86-97` — Config Manager struct
+- `pkg/config/event_dispatcher.go:42-71` — Event dispatcher
+- `pkg/util/paramtable/base_table.go:138-166` — BaseTable init
+- `pkg/util/paramtable/param_item.go:37-57` — ParamItem struct
+
+### nats-server
+- `conf/parse.go:383-398` — Env var support (`$VAR` syntax)
+- `server/reload.go:42-74` — Option interface
+- `server/reload.go:1396-1485` — Server.Reload()
+- `server/opts.go:5827-5909` — MergeOptions for CLI override
+
+### openfga
+- `cmd/root.go:23-25` — Viper init with env prefix
+- `pkg/server/config/config.go:132-137` — DatastoreConfig with json:"-"
+- `pkg/server/config/config.go:486-491` — Config.Verify()
+- `pkg/featureflags/client.go:3-5` — Feature flag client interface
+
+### temporal
+- `common/config/config.go:30-56` — Config struct
+- `common/config/loader.go:71-117` — Loading options
+- `common/masker/masker.go:9-14` — MaskYaml function
+- `common/dynamicconfig/client.go:36-41` — NotifyingClient interface
+- `common/dynamicconfig/file_based_client.go:133-147` — FileBasedClient polling
+
+### victoriametrics
+- `lib/envflag/envflag.go:24-27` — Env var flag binding
+- `lib/flagutil/password.go:37-47` — Password type
+- `lib/flagutil/secret.go:13-16` — RegisterSecretFlag
+- `lib/promscrape/scraper.go:112-206` — Hot reload with SIGHUP
 
 ---
 

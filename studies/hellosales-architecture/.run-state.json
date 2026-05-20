@@ -1,7 +1,7 @@
 {
   "version": 1,
   "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T11:27:04.096Z",
+  "updatedAt": "2026-05-20T11:42:26.293Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -300,7 +300,7 @@
       "status": "running",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:26:30.868Z",
+      "lastAttemptAt": "2026-05-20T11:42:26.293Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -333,12 +333,12 @@
       "dimensionName": "background-jobs-async-workflows",
       "dimensionTitle": "Dimension: Background Jobs & Async Workflows",
       "sourceName": "kubernetes",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T11:29:27.493Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T11:35:49.514Z"
     },
     {
       "dimensionNumber": "05",
@@ -465,10 +465,10 @@
       "dimensionName": "concurrency-model",
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "nats-server",
-      "status": "pending",
-      "attempts": 0,
+      "status": "running",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T11:42:26.293Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -621,12 +621,12 @@
       "dimensionName": "data-ingestion-processing-pipelines",
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "victoriametrics",
-      "status": "pending",
-      "attempts": 0,
+      "status": "completed",
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T11:29:27.493Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T11:38:40.627Z"
     },
     {
       "dimensionNumber": "08",
@@ -754,9 +754,9 @@
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "grafana",
       "status": "pending",
-      "attempts": 0,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T11:38:40.660Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -790,9 +790,9 @@
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "nats-server",
       "status": "pending",
-      "attempts": 0,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": null,
+      "lastAttemptAt": "2026-05-20T11:38:40.660Z",
       "nextRetryAt": null,
       "completedAt": null
     },
@@ -1844,12 +1844,12 @@
       "dimensionNumber": "03",
       "dimensionName": "configuration-environment-management",
       "dimensionTitle": "Dimension: Configuration & Environment Management",
-      "status": "completed",
+      "status": "running",
       "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:26:30.868Z",
+      "lastError": "Dependent analysis files missing on resume",
+      "lastAttemptAt": "2026-05-20T11:42:26.293Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T11:27:01.508Z"
+      "completedAt": null
     },
     {
       "dimensionNumber": "04",
@@ -1866,12 +1866,12 @@
       "dimensionNumber": "05",
       "dimensionName": "background-jobs-async-workflows",
       "dimensionTitle": "Dimension: Background Jobs & Async Workflows",
-      "status": "running",
+      "status": "completed",
       "attempts": 1,
-      "lastError": "Dependent analysis files missing on resume",
+      "lastError": null,
       "lastAttemptAt": "2026-05-20T11:26:30.868Z",
       "nextRetryAt": null,
-      "completedAt": null
+      "completedAt": "2026-05-20T11:28:08.123Z"
     },
     {
       "dimensionNumber": "08",
@@ -1883,6 +1883,17 @@
       "lastAttemptAt": "2026-05-20T11:14:01.757Z",
       "nextRetryAt": null,
       "completedAt": "2026-05-20T11:16:27.009Z"
+    },
+    {
+      "dimensionNumber": "07",
+      "dimensionName": "data-ingestion-processing-pipelines",
+      "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
+      "status": "failed",
+      "attempts": 1,
+      "lastError": "Synthesis completed (exit 0) but report file was not generated",
+      "lastAttemptAt": "2026-05-20T11:38:40.660Z",
+      "nextRetryAt": "2026-05-20T12:11:20.326Z",
+      "completedAt": null
     }
   ],
   "isComplete": false
