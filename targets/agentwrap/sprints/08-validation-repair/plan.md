@@ -9,7 +9,7 @@
 ## Sprint Overview
 
 - **Sprint Name:** Output Validation and Repair
-- **Sprint Focus:** Add runtime-neutral output expectations, validators, validation events/metadata, and bounded repair attempts that preserve session and permission facts.
+- **Sprint Focus:** Add runtime-neutral output expectations, especially template-file-to-Markdown-artifact validation and JSON validation, plus bounded repair attempts that preserve session and permission facts.
 - **Depends On:** Sprints 0-7 runtime contract, OpenCode adapter, lifecycle/session handling, health/config, resilience policy metadata, and initialization-time permission policy.
 - **Status:** Not Started
 
@@ -27,7 +27,7 @@
 - `targets/agentwrap/reports/evidence/session-lifecycle.md` - repair session continuity and explicit session relationship metadata.
 - `targets/agentwrap/reports/evidence/testing-strategy.md` - fake-first tests, fixtures, edge cases, integration gates.
 - `targets/agentwrap/reports/permission-based-agent-wrapping.md` - permission policy and audit constraints during repair.
-- `studies/opencode-wrap-study/reports/final/03-resilience-fallback-and-validation.md` - structured output validation, bounded attempts, typed failures.
+- `studies/opencode-wrap-study/reports/final/03-resilience-fallback-and-validation.md` - output validation, bounded attempts, typed failures.
 - `studies/go-cli-study/reports/final/05-error-handling.md` - classified, structured errors.
 - `studies/go-cli-study/reports/final/06-io-abstraction.md` - testable filesystem/IO boundaries.
 - `studies/go-cli-study/reports/final/11-testing-strategy.md` - table-driven tests, fakes, fixtures, golden expectations.
@@ -50,7 +50,7 @@
 
 - Define runtime-neutral validation expectation, validation result, validation failure, repair context, and repair metadata types.
 - Add a validation configuration surface for SDK callers without adding UltraPlan-specific report semantics.
-- Implement built-in validators for file presence, directory presence, artifact reference/presence, minimal structured data checks, metadata fields, and caller-defined checks.
+- Implement built-in validators for file presence, directory presence, artifact reference/presence, Markdown template-file compliance, JSON output validation, metadata fields, and caller-defined checks.
 - Implement a `Runtime`-compatible validation/repair wrapper that runs validators after successful attempts and can launch bounded repair attempts.
 - Promote `PolicyContext.Validation` from placeholder into a real policy-visible validation result.
 - Emit validation and repair events with safe expected/observed detail, attempt numbers, session relationship, and repair outcome.
@@ -72,7 +72,7 @@
 ## Proposed Implementation Shape
 
 - **Package / Module Boundaries:** Keep public validation types in the root `agentwrap` package. Put deterministic validation logic in small root-package helpers or an internal helper if it has no public surface. Keep OpenCode adapter unchanged except where tests prove adapter artifact/session facts need exposure.
-- **Public Surface:** Add validation expectation/spec types and a `Runtime` wrapper such as `ValidationRunner` or `ValidatingRuntime`. Include caller-defined validator interface/function support and repair config with max attempts, prompt builder, session action, and request override hook.
+- **Public Surface:** Add validation expectation/spec types and a `Runtime` wrapper such as `ValidationRunner` or `ValidatingRuntime`. Include first-class template-file-to-Markdown-artifact and JSON validators, caller-defined validator interface/function support, and repair config with max attempts, prompt builder, session action, and request override hook.
 - **State And Lifecycle:** Keep core `RunStatus` values unchanged. Validation and repair phases are event and metadata facts. Repair attempts have parent/original run linkage, explicit session action, and resolved session relationship.
 - **Error And Failure Behavior:** Validation failure without successful repair returns `ErrorValidation`. Exhausted repair returns `ErrorRepairExhausted` with validation details preserved. Permission denial during repair returns `ErrorPermission` with repair phase metadata, not `ErrorValidation`.
 - **Observability:** Emit `EventValidation` for validation start/result and add a repair event kind or repair payload convention for repair start/result/exhaustion. Final metadata includes validation results, repair attempt summaries, inherited permission policy ID, and session relationship.
@@ -85,7 +85,7 @@
   > **Evidence:** `validation-repair.md`, `go-cli-study/reports/final/06-io-abstraction.md`, `agentwrap/opencode/runtime.go`.
   > **Tradeoff:** Adds an orchestration wrapper, but avoids adapter duplication and product-specific validation in OpenCode.
   > **Rejected Alternative:** Adapter-local validation, because it would leak validation behavior into runtime-specific code.
-  > **Risk / Follow-up:** Keep built-ins generic; add product-specific validators only in caller code.
+  > **Risk / Follow-up:** Keep built-ins generic even while making template-file Markdown and JSON validation first-class; add product-specific validators only in caller code.
 
 - [ ] **Decision 2: Validation And Repair Are Events/Metadata, Not Core Statuses**
   > **Requirement:** TRD lifecycle and error model, constrained by DEC-021 minimal status model.
@@ -112,7 +112,7 @@
 
 - [ ] **Task 1: Define Validation Model**
   > *Description: Add the public types that describe expectations, validator context, validation results, validation failures, and repair context.*
-  - [ ] **Sub-task 1.1:** Define expectation IDs, expectation kinds, path/artifact/metadata/structured fields, severity, and safe repair hints.
+  - [ ] **Sub-task 1.1:** Define expectation IDs, expectation kinds, including template-file Markdown and JSON expectation types, plus template path, artifact path, and metadata fields, severity, and safe repair hints.
   - [ ] **Sub-task 1.2:** Replace the minimal `ValidationResult` placeholder with a durable result model that records pass/fail/skipped counts and failure details.
   - [ ] **Sub-task 1.3:** Add validation and repair fields to `RunMetadata` while keeping existing metadata backward-compatible.
 
@@ -120,8 +120,9 @@
   > *Description: Provide generic validators that meet Sprint 8 scope without product-specific report semantics.*
   - [ ] **Sub-task 2.1:** Implement file presence and directory presence validation relative to workdir or artifact roots.
   - [ ] **Sub-task 2.2:** Implement artifact presence/reference validation against `RunResult.Artifacts` and `RunMetadata.Artifacts`.
-  - [ ] **Sub-task 2.3:** Implement minimal structured data/metadata checks and caller-defined validator invocation.
-  - [ ] **Sub-task 2.4:** Ensure validators return safe expected/observed facts and avoid embedding large content by default.
+  - [ ] **Sub-task 2.3:** Implement Markdown template-file validation for required headings, sections, ordering, and unresolved placeholder or required-block checks in a runtime-neutral template model.
+  - [ ] **Sub-task 2.4:** Implement JSON validation for well-formed output plus minimal required-field or shape checks, and support caller-defined validators.
+  - [ ] **Sub-task 2.5:** Ensure validators return safe expected/observed facts and avoid embedding large content by default.
 
 - [ ] **Task 3: Add Validation Wrapper Runtime**
   > *Description: Run validators after successful runtime completion and convert failed validation into explicit logical failure.*
@@ -145,15 +146,15 @@
 
 - [ ] **Task 6: Tests, Docs, And Decisions**
   > *Description: Add focused evidence that the sprint behavior works and document limitations.*
-  - [ ] **Sub-task 6.1:** Add unit/table tests for built-in validators and caller-defined validators.
-  - [ ] **Sub-task 6.2:** Add fake-runtime tests for missing output, malformed output, empty output, repair success, repair exhaustion, unsupported same-session repair, cancellation, and permission denial.
-  - [ ] **Sub-task 6.3:** Update README/package docs with validation/repair usage and artifact-first guidance.
+  - [ ] **Sub-task 6.1:** Add unit/table tests for template-file Markdown validators, JSON validators, and caller-defined validators.
+  - [ ] **Sub-task 6.2:** Add fake-runtime tests for missing output, template mismatch against `ultraplan/templates/repo-analysis.md`, invalid JSON, JSON shape mismatch, repair success, repair exhaustion, unsupported same-session repair, cancellation, and permission denial.
+  - [ ] **Sub-task 6.3:** Update README/package docs with template-file Markdown validation, JSON validation, repair usage, and artifact-first guidance.
   - [ ] **Sub-task 6.4:** Add accepted decisions to `DECISIONS.md` after implementation evidence exists.
 
 ## Testing And Documentation Checklist
 
-- [ ] **Unit Tests:** validators, result aggregation, error categories, prompt builder, permission inheritance, session-action derivation.
-- [ ] **Fixture Tests:** fake run artifacts, missing files, malformed structured output, empty output, repair prompts, repair attempt event sequences.
+- [ ] **Unit Tests:** template-file Markdown validators, JSON validators, result aggregation, error categories, prompt builder, permission inheritance, session-action derivation.
+- [ ] **Fixture Tests:** fake run artifacts, missing files, Markdown section mismatches against a real template file, invalid JSON, JSON shape mismatches, repair prompts, repair attempt event sequences.
 - [ ] **Integration Tests:** wrapper with OpenCode adapter only if implementation touches adapter request/session behavior; otherwise record explicit deferral.
 - [ ] **Real Runtime Smoke:** gated and optional for this sprint unless OpenCode repair/session behavior changes; record command and result if run.
 - [ ] **Documentation Updates:** README, package docs, and decision log after implementation.
@@ -171,13 +172,16 @@
 ## Open Questions
 
 - Should validation config live directly on `RunRequest`, only on a wrapper, or both with one canonical normalization path? The reasoning recommends wrapper orchestration plus small request-level spec.
-- Should built-in structured validation stay minimal or add a schema library later? Defer until caller evidence chooses a schema approach.
+- Should Markdown template validation support only required sections and ordering in Sprint 8, or also exact placeholder/text matching and required table shells? Start with sections/order plus unresolved-slot detection, then add stricter matching only if required.
+- Should built-in JSON validation stay minimal or add a schema library later? Defer until caller evidence chooses a schema approach.
 - Should repair use a default prompt builder or require caller-provided prompts? Implement a small safe default with caller override.
 - Should `EventRepair` be added as a new event kind or should repair use `EventValidation` payload subtypes? Choose the smallest shape that remains clear in tests.
 
 ## Success Criteria
 
 - [ ] **Configured validation controls success:** A runtime result with successful process exit fails logically when required validators fail.
+- [ ] **Markdown templates are enforceable:** A caller can validate an artifact such as `go-cli-study/reports/repo/01-project-structure/yq.md` against a template such as `ultraplan/templates/repo-analysis.md` and receive explicit mismatch failures when headings, ordering, required blocks, or placeholder resolution are wrong.
+- [ ] **JSON outputs are enforceable:** A caller can require valid JSON and minimal shape or required-field compliance and receive explicit mismatch failures.
 - [ ] **Validation details are actionable:** Failures include expectation, observed state, safe detail, and repair context.
 - [ ] **Repair is bounded and visible:** Repair attempts emit events, update metadata, stop at max attempts, and return `ErrorRepairExhausted` when appropriate.
 - [ ] **Session continuity is explicit:** Repair metadata shows same, fresh, forked, unsupported, or best-effort session relationship.
@@ -186,7 +190,7 @@
 
 ## Study Evaluation
 
-- [ ] **Patterns Followed:** typed/classified errors, explicit events/metadata, fake-first tests, injected/testable IO boundary, bounded attempts, artifact-first validation.
+- [ ] **Patterns Followed:** typed/classified errors, explicit events/metadata, fake-first tests, injected/testable IO boundary, bounded attempts, artifact-first validation, first-class template-file Markdown and JSON validation.
 - [ ] **Anti-Patterns Avoided:** process-exit-as-success, adapter-local product validation, unbounded repair, permission broadening, raw large content in events/prompts, new core validation/repair statuses.
 - [ ] **Comparison Needed:** Compare completed implementation against validation-repair, session-lifecycle, error-handling, IO-abstraction, and testing-strategy evidence.
 - [ ] **Proceed / Iterate:** Proceed to Sprint 9 only when validation failure, repair success, repair exhaustion, permission denial, and unsupported same-session repair have deterministic tests.
@@ -199,3 +203,5 @@
 ## Execution Evidence
 
 - 2026-05-20: Sprint 8 reasoning and tracker created from roadmap, PRD/TRD, feature architecture protocol, study index, validation/session/testing/permission evidence, final reports, Sprint 7 artifacts, decision log, and current agentwrap code references.
+- 2026-05-20: Scope updated to make Markdown template validation and JSON validation explicit first-class built-ins rather than leaving them implied under generic structured-data validation.
+- 2026-05-20: Markdown validation scope clarified with the concrete template/artifact case: validate `go-cli-study/reports/repo/01-project-structure/yq.md` against `ultraplan/templates/repo-analysis.md`.

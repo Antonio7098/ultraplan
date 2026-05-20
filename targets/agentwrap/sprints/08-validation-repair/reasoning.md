@@ -61,7 +61,7 @@
 - **OpenCode live approval API details:** Relevant to future server-mode approval transport, but Sprint 8 must respect the initialized permission policy through existing `RunRequest.PermissionPolicy` and must not implement live approval posting.
 - **CLI design evidence:** Sprint 8 does not add an executable/user-facing command surface.
 - **Persistence backend evidence:** Sprint 9 owns durable event sink and persistence hooks. Sprint 8 should create metadata that persistence can later store, not choose a storage backend.
-- **Full JSON schema technology choice:** Requirements ask for structured data validation, but no target requirement selects a schema library. Sprint 8 should expose caller-defined structured validators and minimal built-in checks without committing to a schema engine.
+- **Full JSON schema technology choice:** Requirements ask for JSON validation, but no target requirement selects a schema library. Sprint 8 should expose caller-defined JSON validators and minimal built-in checks without committing to a schema engine.
 
 ## Requirement Map
 
@@ -71,7 +71,7 @@
 | --- | --- | --- | --- | --- |
 | Validate required outputs | PRD Primary Use Cases / Output Validation | Product success | Applicable | A run cannot be marked complete only because the runtime exited successfully. |
 | Output validation MVP | PRD MVP Scope | Product success | Applicable | Sprint 8 is the MVP layer for validation and repair. |
-| Output/artifact validation | TRD Output and Artifact Validation | Technical contract | Applicable | Defines expected files, directories, structured data, metadata fields, caller validators, and repair context. |
+| Output/artifact validation | TRD Output and Artifact Validation | Technical contract | Applicable | Defines expected files, directories, Markdown/report structure, JSON output, metadata fields, caller validators, and repair context. |
 | Repair and reprompt | TRD Repair and Reprompt | Technical contract | Applicable | Requires bounded repair attempts and explicit retained-session behavior. |
 | Permissions and interaction | TRD Permissions and Interaction | Security | Applicable | Permission denials during repair must remain distinct from validation failures. |
 | Output truncation and large output safety | TRD Output Truncation and Large Output Safety | Artifacts | Applicable | Validation should encourage durable artifact references over terminal/process output. |
@@ -82,7 +82,7 @@
 ### Applicable Requirements
 
 - **Runtime exit success is insufficient:** Validation must run after a successful runtime result when configured and must be able to convert the logical result to failed validation.
-- **Expected outputs must be caller-defined:** The SDK must support file presence, directory presence, structured data, metadata field, artifact reference, and caller-defined validation checks without UltraPlan-specific report semantics.
+- **Expected outputs must be caller-defined:** The SDK must support file presence, directory presence, Markdown template structure, JSON output, metadata field, artifact reference, and caller-defined validation checks without UltraPlan-specific report semantics.
 - **Validation failures need repair context:** Each failure needs expected value, observed value, safe detail, and optional repair hint so a repair prompt can be generated without dumping large or sensitive output.
 - **Repair attempts are bounded and visible:** Repair must have explicit max attempts, attempt metadata, events, and terminal exhaustion behavior.
 - **Session continuity must be explicit:** Repair should be able to request same-session continuation when useful, but must record same, fresh, forked, unsupported, or best-effort outcomes.
@@ -97,14 +97,16 @@
 
 ### Ambiguous Or Conflicting Requirements
 
-- **Structured data validation mechanism:** The TRD requires structured data validation but does not prescribe JSON Schema, Go struct decoding, or custom callbacks. The sprint should provide a minimal runtime-neutral validator interface and built-in JSON well-formed/required-field helpers only if they fit existing code style.
+- **Markdown template validation shape:** The TRD requires output validation but does not prescribe how Markdown template compliance should be represented. The sprint should support validating a generated Markdown artifact against a template file, including expected headings, section order, required table shells, and required template slots resolved, without baking UltraPlan report semantics into the SDK.
+- **JSON validation mechanism:** The TRD requires JSON validation but does not prescribe JSON Schema, Go struct decoding, or custom callbacks. The sprint should provide a minimal runtime-neutral validator interface and built-in JSON well-formed/required-field helpers only if they fit existing code style.
 - **Same-session repair default:** Evidence says retained sessions are useful for repair, while DEC-020 rejects silently forcing same-session behavior. The sprint should make repair session action explicit and default conservatively to the caller's existing session request.
 - **Validation inside policy runner vs separate wrapper:** Sprint 6 policy context reserved validation, but DEC-016 keeps resilience policy as attempt orchestration. Sprint 8 should integrate validation with policy context without turning `PolicyRunner` into a broad workflow engine.
 
 ### Open Questions
 
 - Should the public request shape be `RunRequest.Validation *ValidationSpec` or should validation be provided only by a wrapping `ValidationRunner`? The plan recommends a wrapper plus a small request spec to keep the base runtime contract readable.
-- Should structured validators include a built-in JSON schema engine later? Defer until caller evidence proves schema compatibility needs.
+- Should Markdown template validation be section-based, ordered-slot based, or both? The plan should prefer a small generic template-file model that can express required headings, required sections in order, and required placeholder resolution.
+- Should JSON validators include a built-in schema engine later? Defer until caller evidence proves schema compatibility needs.
 - Should repair prompts be generated by a default template or entirely caller-provided? The plan recommends a small default prompt builder with caller override, because repair context has a common shape.
 
 ## Sprint Decision Analysis
@@ -115,7 +117,7 @@
 
 **Requirements Applied**
 - PRD output validation requires callers to define success criteria beyond runtime exit status.
-- TRD output/artifact validation requires files, directories, structured data, metadata fields, and caller-defined validators.
+- TRD output/artifact validation requires files, directories, Markdown/report structure, JSON output, metadata fields, and caller-defined validators.
 - Feature architecture protocol requires runtime orchestration to own sequencing and logic modules to stay stateless.
 
 **Evidence Applied**
@@ -130,7 +132,7 @@
 - **Option C:** Leave validation entirely to callers outside the SDK.
 
 **Chosen Approach**
-- Implement validation as a runtime-neutral wrapper/orchestrator around a `Runtime`, with public validation spec/types attached to `RunRequest` or wrapper config. Built-in validators should cover file presence, directory presence, artifact presence/reference, structured JSON/data checks where minimal, metadata fields, and caller-defined checks.
+- Implement validation as a runtime-neutral wrapper/orchestrator around a `Runtime`, with public validation spec/types attached to `RunRequest` or wrapper config. Built-in validators should cover file presence, directory presence, artifact presence/reference, Markdown template-file compliance, JSON validity/shape checks where minimal, metadata fields, and caller-defined checks.
 
 **Decision Justification**
 - A wrapper keeps OpenCode details out of common validation logic and preserves product-agnostic SDK boundaries.
@@ -141,10 +143,13 @@
 **Execution Notes**
 - Validation logic should be stateless and deterministic: given `RunResult`, artifacts, metadata, and a read-only artifact/filesystem view, it returns `ValidationResult`.
 - File/directory validators should resolve paths relative to the run workdir or explicit artifact references and should avoid reading large content by default.
+- Markdown template validators should work from a template file plus a durable artifact file or explicit text output and should report missing, extra, unresolved, or out-of-order sections in a repair-friendly shape.
+- A representative target case is validating a report like `go-cli-study/reports/repo/01-project-structure/yq.md` against a template such as `ultraplan/templates/repo-analysis.md`.
+- JSON validators should distinguish invalid JSON from valid-but-nonconforming JSON so repair prompts can tell the model what broke.
 - Caller validators receive a safe context, not raw native payloads by default.
 
 **Expected Evidence**
-- **Tests:** Unit tests for each built-in validator, caller-defined validator invocation, expected vs observed failure details, and empty/missing/malformed cases.
+- **Tests:** Unit tests for each built-in validator, especially template-file-to-artifact Markdown validation and JSON validators, plus caller-defined validator invocation, expected vs observed failure details, and empty/missing/malformed cases.
 - **Runtime Evidence:** `EventValidation` events with stable result IDs, pass/fail status, expectation IDs, safe details, and repair hints.
 - **Review Checks:** OpenCode adapter remains free of product validation logic except for emitting native artifacts it already owns.
 
@@ -179,13 +184,14 @@
 - Adding core validation/repair statuses would reintroduce the status expansion that DEC-021 explicitly removed.
 
 **Execution Notes**
-- Add `ValidationMetadata` and `RepairMetadata` or equivalent fields to `RunMetadata`.
+- Add `ValidationMetadata` and `RepairMetadata` or equivalent fields to `RunMetadata`, including expectation type so Markdown-template and JSON failures are easy to inspect later.
 - Promote the placeholder `ValidationResult` in `policy.go` into a durable result model with expectation IDs, passed/failed/skipped counts, safe failure context, and native metadata where needed.
 - A validation failure before repair should use `ErrorValidation`; exhausted repair should use `ErrorRepairExhausted` with validation failures preserved.
 - A permission denial during repair should surface as `ErrorPermission` with repair phase metadata, not as a validation error.
+- Markdown and JSON validation failures should preserve machine-readable expectation IDs plus human-readable repair hints so caller UIs and repair prompt builders can both use them. Markdown failures should identify whether the mismatch was heading, section order, missing required block, or unresolved template slot.
 
 **Expected Evidence**
-- **Tests:** Final result status/error tests for validation pass, validation fail without repair, repair success, repair exhaustion, and repair permission denial.
+- **Tests:** Final result status/error tests for Markdown template failure, JSON validation failure, validation pass, repair success, repair exhaustion, and repair permission denial.
 - **Runtime Evidence:** Final metadata includes all validation results and repair attempt summaries even when a later repair succeeds.
 - **Review Checks:** No new core `RunStatus` values for validating or repairing.
 
@@ -291,7 +297,8 @@
 ### Tradeoffs
 
 - A validation wrapper adds an orchestration layer, but avoids adapter duplication and keeps validation product-agnostic.
-- Minimal structured validation avoids premature schema-library commitment, but may require caller-defined validators for rich report validation.
+- First-class Markdown template and JSON validators increase SDK scope, but they cover the main product success checks you actually need and reduce caller rework.
+- Minimal JSON validation avoids premature schema-library commitment, but may require caller-defined validators for richer schemas.
 - Same-session repair is not forced by default, preserving safety at the cost of explicit caller configuration for context-sensitive repair.
 - Metadata grows before persistence exists, but Sprint 9 will need these facts.
 
@@ -353,6 +360,6 @@ The tracker must include:
 
 ## Documentation Updates
 
-- `agentwrap/README.md` - document validation expectations, repair attempts, permission inheritance, and limitations.
+- `agentwrap/README.md` - document Markdown template validation, JSON validation, repair attempts, permission inheritance, and limitations.
 - `agentwrap/doc.go` - summarize validation/repair public API once implemented.
 - `targets/agentwrap/DECISIONS.md` - implementation should record durable decisions for validation wrapper boundary, repair/session behavior, and permission inheritance after code lands.
