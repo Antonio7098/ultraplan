@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "createdAt": "2026-05-19T12:04:40.454Z",
-  "updatedAt": "2026-05-20T21:06:02.243Z",
+  "createdAt": "2026-05-21T11:08:44.223Z",
+  "updatedAt": "2026-05-21T11:08:44.228Z",
   "batchSize": 3,
   "tasks": [
     {
@@ -12,9 +12,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:04:40.456Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.219Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:09:26.669Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "01",
@@ -24,9 +24,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:04:40.456Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:08:55.639Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "01",
@@ -36,9 +36,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:04:40.456Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:09:57.117Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "01",
@@ -48,9 +48,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:09:57.122Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:13:55.257Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "01",
@@ -60,9 +60,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:09:57.122Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:13:22.936Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "01",
@@ -72,9 +72,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:09:57.122Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:15:13.176Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "01",
@@ -84,9 +84,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:15:13.186Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:19:12.141Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "01",
@@ -96,9 +96,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:15:13.186Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:17:54.066Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "01",
@@ -108,9 +108,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:15:13.186Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:19:25.051Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "02",
@@ -120,9 +120,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:19:25.069Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:24:38.165Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "02",
@@ -132,9 +132,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:19:25.069Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:22:08.200Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "02",
@@ -144,9 +144,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:24:38.178Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:28:46.408Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "02",
@@ -156,9 +156,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:24:38.178Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:29:36.748Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "02",
@@ -167,10 +167,10 @@
       "sourceName": "nats-server",
       "status": "completed",
       "attempts": 1,
-      "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": "2026-05-20T07:24:20.315Z",
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T07:30:55.308Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "02",
@@ -180,9 +180,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:31:37.804Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:36:59.140Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "02",
@@ -190,11 +190,11 @@
       "dimensionTitle": "Dimension: Dependency Injection & Composition",
       "sourceName": "pocketbase",
       "status": "completed",
-      "attempts": 2,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:54:38.050Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:59:15.716Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "02",
@@ -202,11 +202,11 @@
       "dimensionTitle": "Dimension: Dependency Injection & Composition",
       "sourceName": "temporal",
       "status": "completed",
-      "attempts": 2,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:54:38.050Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:58:42.248Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "02",
@@ -215,10 +215,10 @@
       "sourceName": "victoriametrics",
       "status": "completed",
       "attempts": 1,
-      "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": "2026-05-19T19:11:04.288Z",
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T19:13:41.790Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "03",
@@ -228,9 +228,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:59:15.721Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T13:04:34.301Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "03",
@@ -239,10 +239,10 @@
       "sourceName": "grafana",
       "status": "completed",
       "attempts": 1,
-      "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": "2026-05-19T19:11:04.288Z",
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T19:13:49.520Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "03",
@@ -252,9 +252,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T13:04:34.305Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T13:12:09.164Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "03",
@@ -264,9 +264,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T13:04:34.305Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T13:08:10.199Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "03",
@@ -275,10 +275,10 @@
       "sourceName": "nats-server",
       "status": "completed",
       "attempts": 1,
-      "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": "2026-05-19T19:11:04.288Z",
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T19:14:15.567Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "03",
@@ -288,9 +288,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T13:12:09.166Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T13:17:29.052Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "03",
@@ -298,11 +298,143 @@
       "dimensionTitle": "Dimension: Configuration & Environment Management",
       "sourceName": "pocketbase",
       "status": "completed",
-      "attempts": 3,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T19:16:15.832Z",
-      "nextRetryAt": "2026-05-20T19:14:05.276Z",
-      "completedAt": "2026-05-20T19:18:43.012Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "03",
+      "dimensionName": "configuration-environment-management",
+      "dimensionTitle": "Dimension: Configuration & Environment Management",
+      "sourceName": "temporal",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "03",
+      "dimensionName": "configuration-environment-management",
+      "dimensionTitle": "Dimension: Configuration & Environment Management",
+      "sourceName": "victoriametrics",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "04",
+      "dimensionName": "http-api-surface",
+      "dimensionTitle": "Dimension: HTTP/API Surface Design",
+      "sourceName": "cli",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "04",
+      "dimensionName": "http-api-surface",
+      "dimensionTitle": "Dimension: HTTP/API Surface Design",
+      "sourceName": "grafana",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "04",
+      "dimensionName": "http-api-surface",
+      "dimensionTitle": "Dimension: HTTP/API Surface Design",
+      "sourceName": "kubernetes",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "04",
+      "dimensionName": "http-api-surface",
+      "dimensionTitle": "Dimension: HTTP/API Surface Design",
+      "sourceName": "milvus",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "04",
+      "dimensionName": "http-api-surface",
+      "dimensionTitle": "Dimension: HTTP/API Surface Design",
+      "sourceName": "nats-server",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "04",
+      "dimensionName": "http-api-surface",
+      "dimensionTitle": "Dimension: HTTP/API Surface Design",
+      "sourceName": "openfga",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "04",
+      "dimensionName": "http-api-surface",
+      "dimensionTitle": "Dimension: HTTP/API Surface Design",
+      "sourceName": "pocketbase",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "04",
+      "dimensionName": "http-api-surface",
+      "dimensionTitle": "Dimension: HTTP/API Surface Design",
+      "sourceName": "temporal",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
+    },
+    {
+      "dimensionNumber": "04",
+      "dimensionName": "http-api-surface",
+      "dimensionTitle": "Dimension: HTTP/API Surface Design",
+      "sourceName": "victoriametrics",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "05",
@@ -312,9 +444,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T13:43:12.245Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T13:48:36.438Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "05",
@@ -324,9 +456,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T13:43:12.245Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T13:48:29.044Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "05",
@@ -336,9 +468,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:29:27.493Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T11:35:49.514Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "05",
@@ -348,9 +480,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T13:48:36.444Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T13:56:15.383Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "05",
@@ -360,9 +492,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T13:56:15.395Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T14:02:29.821Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "05",
@@ -372,9 +504,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T13:56:15.395Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T14:04:10.316Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "05",
@@ -383,10 +515,10 @@
       "sourceName": "pocketbase",
       "status": "completed",
       "attempts": 1,
-      "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": "2026-05-19T19:22:22.257Z",
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T19:25:49.660Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "05",
@@ -396,9 +528,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T14:04:10.319Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T14:07:50.274Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "05",
@@ -406,11 +538,11 @@
       "dimensionTitle": "Dimension: Background Jobs & Async Workflows",
       "sourceName": "victoriametrics",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": "2026-05-20T07:36:21.301Z",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T07:41:41.843Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "06",
@@ -419,10 +551,10 @@
       "sourceName": "cli",
       "status": "completed",
       "attempts": 1,
-      "lastError": "Per-source analysis file missing on resume",
-      "lastAttemptAt": "2026-05-20T07:36:21.301Z",
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T07:41:01.138Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "06",
@@ -430,11 +562,11 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "grafana",
       "status": "completed",
-      "attempts": 2,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T07:42:51.921Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T07:49:10.837Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "06",
@@ -442,11 +574,11 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "kubernetes",
       "status": "completed",
-      "attempts": 2,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T07:42:51.921Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T07:47:51.451Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "06",
@@ -456,9 +588,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T07:42:51.921Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T07:50:53.666Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "06",
@@ -466,11 +598,11 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "nats-server",
       "status": "completed",
-      "attempts": 4,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T20:52:24.485Z",
-      "nextRetryAt": "2026-05-20T20:52:24.468Z",
-      "completedAt": "2026-05-20T20:55:17.316Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "06",
@@ -480,9 +612,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T07:50:53.676Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T07:54:48.396Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "06",
@@ -490,11 +622,11 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "pocketbase",
       "status": "completed",
-      "attempts": 3,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T09:20:42.664Z",
-      "nextRetryAt": "2026-05-20T08:24:30.403Z",
-      "completedAt": "2026-05-20T09:25:31.439Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "06",
@@ -502,11 +634,11 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "temporal",
       "status": "completed",
-      "attempts": 3,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T10:30:16.397Z",
-      "nextRetryAt": "2026-05-20T10:29:30.762Z",
-      "completedAt": "2026-05-20T10:36:54.437Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "06",
@@ -514,11 +646,11 @@
       "dimensionTitle": "Dimension: Concurrency Model",
       "sourceName": "victoriametrics",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T09:25:31.440Z",
-      "nextRetryAt": "2026-05-20T08:30:06.503Z",
-      "completedAt": "2026-05-20T09:31:30.955Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "07",
@@ -528,9 +660,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T07:54:58.467Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T08:01:01.664Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "07",
@@ -538,11 +670,11 @@
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "grafana",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T09:31:30.957Z",
-      "nextRetryAt": "2026-05-20T08:35:33.357Z",
-      "completedAt": "2026-05-20T09:38:10.896Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "07",
@@ -552,9 +684,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T08:02:30.988Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T08:11:44.948Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "07",
@@ -564,9 +696,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T08:02:30.988Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T08:12:04.851Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "07",
@@ -576,9 +708,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T08:12:04.854Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T08:16:32.156Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "07",
@@ -588,9 +720,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T08:12:04.854Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T08:17:07.798Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "07",
@@ -598,11 +730,11 @@
       "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
       "sourceName": "pocketbase",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T09:31:30.957Z",
-      "nextRetryAt": "2026-05-20T08:52:20.206Z",
-      "completedAt": "2026-05-20T09:39:24.163Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "07",
@@ -612,9 +744,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T08:17:07.802Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T08:21:56.159Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "07",
@@ -624,9 +756,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:29:27.493Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T11:38:40.627Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "08",
@@ -636,9 +768,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T08:22:20.213Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T08:28:04.055Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "08",
@@ -648,9 +780,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T08:22:20.213Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T08:27:32.347Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "08",
@@ -658,11 +790,11 @@
       "dimensionTitle": "Dimension: State Management & Persistence",
       "sourceName": "kubernetes",
       "status": "completed",
-      "attempts": 3,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T10:47:32.812Z",
-      "nextRetryAt": "2026-05-20T10:45:20.170Z",
-      "completedAt": "2026-05-20T10:51:31.824Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "08",
@@ -672,9 +804,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T09:39:37.834Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T09:44:19.532Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "08",
@@ -684,9 +816,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T09:39:37.834Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T09:44:10.138Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "08",
@@ -696,9 +828,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T09:45:20.171Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T09:50:40.777Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "08",
@@ -708,9 +840,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T09:45:20.171Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T09:50:54.526Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "08",
@@ -720,9 +852,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T09:45:20.171Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T09:49:11.388Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "08",
@@ -730,11 +862,11 @@
       "dimensionTitle": "Dimension: State Management & Persistence",
       "sourceName": "victoriametrics",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T10:30:16.397Z",
-      "nextRetryAt": "2026-05-20T10:28:29.258Z",
-      "completedAt": "2026-05-20T10:34:54.356Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "09",
@@ -744,9 +876,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T09:50:54.527Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T09:54:33.040Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "09",
@@ -754,11 +886,11 @@
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "grafana",
       "status": "completed",
-      "attempts": 3,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:14:05.286Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:17:01.524Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "09",
@@ -768,9 +900,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T09:58:29.260Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:04:28.075Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "09",
@@ -780,9 +912,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T09:58:29.260Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:04:08.122Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "09",
@@ -790,11 +922,11 @@
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "nats-server",
       "status": "completed",
-      "attempts": 5,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T20:05:40.951Z",
-      "nextRetryAt": "2026-05-20T19:47:05.446Z",
-      "completedAt": "2026-05-20T20:08:40.400Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "09",
@@ -804,9 +936,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:04:28.077Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:07:19.511Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "09",
@@ -816,9 +948,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:04:28.077Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:06:16.841Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "09",
@@ -828,9 +960,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:04:28.077Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:09:26.384Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "09",
@@ -838,11 +970,11 @@
       "dimensionTitle": "Dimension: Observability & Operational Visibility",
       "sourceName": "victoriametrics",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T10:47:32.812Z",
-      "nextRetryAt": "2026-05-20T10:42:58.045Z",
-      "completedAt": "2026-05-20T10:49:25.927Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "10",
@@ -852,9 +984,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:09:26.385Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:13:14.176Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "10",
@@ -864,9 +996,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:09:26.385Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:13:27.530Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "10",
@@ -874,11 +1006,11 @@
       "dimensionTitle": "Dimension: Error Taxonomy & Failure Handling",
       "sourceName": "kubernetes",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T10:47:32.812Z",
-      "nextRetryAt": "2026-05-20T10:47:22.183Z",
-      "completedAt": "2026-05-20T10:51:29.697Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "10",
@@ -886,11 +1018,11 @@
       "dimensionTitle": "Dimension: Error Taxonomy & Failure Handling",
       "sourceName": "milvus",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T10:51:31.848Z",
-      "nextRetryAt": "2026-05-20T10:46:07.914Z",
-      "completedAt": "2026-05-20T10:55:55.103Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "10",
@@ -900,9 +1032,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:13:27.532Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:17:37.602Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "10",
@@ -912,9 +1044,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:17:37.604Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:24:20.040Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "10",
@@ -924,9 +1056,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:17:37.604Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:20:54.828Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "10",
@@ -934,11 +1066,11 @@
       "dimensionTitle": "Dimension: Error Taxonomy & Failure Handling",
       "sourceName": "temporal",
       "status": "completed",
-      "attempts": 2,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:17:05.448Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:19:28.058Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "10",
@@ -948,9 +1080,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:24:20.042Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:28:01.258Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "11",
@@ -960,9 +1092,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:24:20.042Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:28:11.060Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "11",
@@ -972,9 +1104,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:24:20.042Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:30:16.395Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "11",
@@ -984,9 +1116,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:36:54.441Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:42:25.014Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "11",
@@ -996,9 +1128,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:17:05.448Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:21:57.343Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "11",
@@ -1008,9 +1140,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:42:25.017Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:45:34.221Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "11",
@@ -1020,9 +1152,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:42:25.017Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:44:40.445Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "11",
@@ -1032,9 +1164,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T10:55:55.105Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T10:57:51.917Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "11",
@@ -1044,9 +1176,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:17:05.448Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:19:41.466Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "11",
@@ -1056,9 +1188,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:21:57.348Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:24:06.131Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "12",
@@ -1068,9 +1200,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:21:57.348Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:24:37.594Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "12",
@@ -1080,9 +1212,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:24:37.599Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:28:06.302Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "12",
@@ -1092,9 +1224,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:24:37.599Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:28:03.057Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "12",
@@ -1102,11 +1234,11 @@
       "dimensionTitle": "Dimension: Workflow / Agent Orchestration",
       "sourceName": "milvus",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T19:02:21.482Z",
-      "nextRetryAt": "2026-05-20T19:01:31.230Z",
-      "completedAt": "2026-05-20T19:06:40.286Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "12",
@@ -1116,9 +1248,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:28:06.311Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:31:43.308Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "12",
@@ -1128,9 +1260,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:28:06.311Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:32:42.441Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "12",
@@ -1140,9 +1272,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:32:42.444Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:35:10.848Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "12",
@@ -1152,9 +1284,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:32:42.444Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:35:47.436Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "12",
@@ -1164,9 +1296,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:32:42.444Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:35:05.933Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "13",
@@ -1176,21 +1308,21 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:35:47.439Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:39:09.549Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "13",
       "dimensionName": "extensibility-plugin-architecture",
       "dimensionTitle": "Dimension: Extensibility & Plugin Architecture",
       "sourceName": "grafana",
-      "status": "failed",
-      "attempts": 3,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T20:16:55.792Z",
-      "nextRetryAt": "2026-05-20T21:51:19.144Z",
-      "completedAt": null
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "13",
@@ -1200,9 +1332,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:35:47.439Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:41:38.348Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "13",
@@ -1212,9 +1344,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:41:38.352Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:44:04.612Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "13",
@@ -1224,9 +1356,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:41:38.352Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:44:21.350Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "13",
@@ -1236,9 +1368,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:41:38.352Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:43:57.222Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "13",
@@ -1248,9 +1380,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:44:21.353Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:48:04.646Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "13",
@@ -1260,9 +1392,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:44:21.353Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:48:14.417Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "13",
@@ -1272,9 +1404,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:44:21.353Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:45:51.547Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "14",
@@ -1284,9 +1416,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:48:14.419Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:50:15.913Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "14",
@@ -1296,9 +1428,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:48:14.419Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:52:22.976Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "14",
@@ -1306,11 +1438,11 @@
       "dimensionTitle": "Dimension: Testing Strategy & Reliability Engineering",
       "sourceName": "kubernetes",
       "status": "completed",
-      "attempts": 3,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T20:05:40.951Z",
-      "nextRetryAt": "2026-05-20T19:21:15.309Z",
-      "completedAt": "2026-05-20T20:08:48.160Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "14",
@@ -1320,9 +1452,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:52:22.980Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:54:10.128Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "14",
@@ -1330,11 +1462,11 @@
       "dimensionTitle": "Dimension: Testing Strategy & Reliability Engineering",
       "sourceName": "nats-server",
       "status": "completed",
-      "attempts": 3,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T20:05:40.951Z",
-      "nextRetryAt": "2026-05-20T19:25:25.269Z",
-      "completedAt": "2026-05-20T20:08:35.554Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "14",
@@ -1344,9 +1476,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:52:22.980Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:55:12.918Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "14",
@@ -1356,9 +1488,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:55:25.272Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:57:57.848Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "14",
@@ -1368,9 +1500,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:55:25.272Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:56:38.495Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "14",
@@ -1380,9 +1512,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:55:25.272Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:58:04.473Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "15",
@@ -1392,9 +1524,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:58:04.475Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:00:18.456Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "15",
@@ -1404,9 +1536,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:58:04.475Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:02:21.479Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "15",
@@ -1416,9 +1548,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T19:02:21.482Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:07:30.241Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "15",
@@ -1428,9 +1560,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T19:02:21.482Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:05:28.187Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "15",
@@ -1438,11 +1570,11 @@
       "dimensionTitle": "Dimension: Performance & Resource Discipline",
       "sourceName": "nats-server",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 0 but analysis file was not generated",
-      "lastAttemptAt": "2026-05-20T20:08:48.173Z",
-      "nextRetryAt": "2026-05-20T19:41:26.598Z",
-      "completedAt": "2026-05-20T20:12:40.693Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "15",
@@ -1452,9 +1584,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T19:07:30.244Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:09:50.920Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "15",
@@ -1464,9 +1596,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T19:11:26.607Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:14:05.812Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "15",
@@ -1476,9 +1608,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T19:11:26.607Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:16:15.823Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "15",
@@ -1488,9 +1620,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T19:16:15.832Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:18:02.620Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "16",
@@ -1500,9 +1632,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T19:16:15.832Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:19:56.475Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "16",
@@ -1510,11 +1642,11 @@
       "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
       "sourceName": "grafana",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 1",
-      "lastAttemptAt": "2026-05-20T20:21:19.151Z",
-      "nextRetryAt": "2026-05-20T20:19:56.623Z",
-      "completedAt": "2026-05-20T20:23:32.713Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "16",
@@ -1522,11 +1654,11 @@
       "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
       "sourceName": "kubernetes",
       "status": "completed",
-      "attempts": 2,
-      "lastError": "Exit code 1",
-      "lastAttemptAt": "2026-05-20T20:21:19.151Z",
-      "nextRetryAt": "2026-05-20T20:19:56.619Z",
-      "completedAt": "2026-05-20T20:22:38.351Z"
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "16",
@@ -1536,9 +1668,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:12:40.700Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:16:55.790Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "16",
@@ -1548,9 +1680,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:12:40.700Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:15:06.692Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "16",
@@ -1560,9 +1692,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:16:55.792Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:19:10.334Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "16",
@@ -1572,9 +1704,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:16:55.792Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:20:02.175Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "16",
@@ -1584,9 +1716,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:21:19.151Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:24:06.461Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "16",
@@ -1596,9 +1728,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:24:06.463Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:27:06.178Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "17",
@@ -1608,9 +1740,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:24:06.463Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:26:12.140Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "17",
@@ -1620,9 +1752,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:24:06.463Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:26:15.804Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "17",
@@ -1632,9 +1764,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:27:06.180Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:29:17.731Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "17",
@@ -1644,9 +1776,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:27:06.180Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:29:15.559Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "17",
@@ -1656,9 +1788,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:29:29.899Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:32:00.481Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "17",
@@ -1668,9 +1800,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:29:29.899Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:32:02.639Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "17",
@@ -1680,9 +1812,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:29:29.899Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:31:53.119Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "17",
@@ -1692,9 +1824,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:32:02.641Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:34:17.078Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "17",
@@ -1704,9 +1836,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:32:02.641Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:34:30.692Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "18",
@@ -1716,9 +1848,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:32:02.641Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:34:07.963Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "18",
@@ -1728,9 +1860,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:34:30.694Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:36:07.748Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "18",
@@ -1740,9 +1872,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:34:30.694Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:38:23.839Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "18",
@@ -1752,9 +1884,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:38:23.841Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:41:06.672Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "18",
@@ -1764,9 +1896,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:38:23.841Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:40:11.261Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "18",
@@ -1776,9 +1908,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:38:23.841Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:41:04.818Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "18",
@@ -1788,9 +1920,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:41:06.673Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:43:19.073Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "18",
@@ -1800,9 +1932,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:41:06.673Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:42:47.329Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     },
     {
       "dimensionNumber": "18",
@@ -1812,9 +1944,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:41:06.673Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.220Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:44:01.364Z"
+      "completedAt": "2026-05-21T11:08:44.220Z"
     }
   ],
   "synthesisTasks": [
@@ -1825,9 +1957,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-19T12:19:25.069Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.221Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-19T12:22:53.943Z"
+      "completedAt": "2026-05-21T11:08:44.221Z"
     },
     {
       "dimensionNumber": "02",
@@ -1836,9 +1968,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T07:24:20.315Z",
-      "nextRetryAt": "2026-05-19T13:36:42.847Z",
-      "completedAt": "2026-05-20T07:27:04.903Z"
+      "lastAttemptAt": "2026-05-21T11:08:44.221Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.221Z"
     },
     {
       "dimensionNumber": "03",
@@ -1847,20 +1979,20 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:10:37.967Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:11:44.529Z"
+      "completedAt": "2026-05-21T11:08:44.222Z"
     },
     {
       "dimensionNumber": "04",
       "dimensionName": "http-api-surface",
       "dimensionTitle": "Dimension: HTTP/API Surface Design",
       "status": "completed",
-      "attempts": 4,
+      "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T09:15:50.665Z",
-      "nextRetryAt": "2026-05-20T09:03:36.589Z",
-      "completedAt": "2026-05-20T09:20:39.907Z"
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.222Z"
     },
     {
       "dimensionNumber": "05",
@@ -1869,130 +2001,9 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:26:30.868Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T11:28:08.123Z"
-    },
-    {
-      "dimensionNumber": "08",
-      "dimensionName": "state-management-persistence",
-      "dimensionTitle": "Dimension: State Management & Persistence",
-      "status": "completed",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T11:14:01.757Z",
-      "nextRetryAt": null,
-      "completedAt": "2026-05-20T11:16:27.009Z"
-    },
-    {
-      "dimensionNumber": "07",
-      "dimensionName": "data-ingestion-processing-pipelines",
-      "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
-      "status": "completed",
-      "attempts": 2,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:10:37.967Z",
-      "nextRetryAt": "2026-05-20T12:11:20.326Z",
-      "completedAt": "2026-05-20T18:13:47.138Z"
-    },
-    {
-      "dimensionNumber": "10",
-      "dimensionName": "error-taxonomy-failure-handling",
-      "dimensionTitle": "Dimension: Error Taxonomy & Failure Handling",
-      "status": "completed",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:21:57.348Z",
-      "nextRetryAt": null,
-      "completedAt": "2026-05-20T18:24:19.639Z"
-    },
-    {
-      "dimensionNumber": "11",
-      "dimensionName": "ai-runtime-model-abstraction",
-      "dimensionTitle": "Dimension: AI Runtime & Model Abstraction",
-      "status": "completed",
-      "attempts": 2,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T18:58:04.475Z",
-      "nextRetryAt": "2026-05-20T18:56:17.385Z",
-      "completedAt": "2026-05-20T18:59:12.025Z"
-    },
-    {
-      "dimensionNumber": "12",
-      "dimensionName": "workflow-agent-orchestration",
-      "dimensionTitle": "Dimension: Workflow / Agent Orchestration",
-      "status": "completed",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T19:07:30.244Z",
-      "nextRetryAt": null,
-      "completedAt": "2026-05-20T19:09:30.841Z"
-    },
-    {
-      "dimensionNumber": "09",
-      "dimensionName": "observability-operational-visibility",
-      "dimensionTitle": "Dimension: Observability & Operational Visibility",
-      "status": "completed",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:08:48.173Z",
-      "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:10:29.184Z"
-    },
-    {
-      "dimensionNumber": "14",
-      "dimensionName": "testing-strategy-reliability",
-      "dimensionTitle": "Dimension: Testing Strategy & Reliability Engineering",
-      "status": "completed",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:08:48.173Z",
-      "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:10:42.571Z"
-    },
-    {
-      "dimensionNumber": "15",
-      "dimensionName": "performance-resource-discipline",
-      "dimensionTitle": "Dimension: Performance & Resource Discipline",
-      "status": "completed",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:12:40.700Z",
-      "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:13:57.480Z"
-    },
-    {
-      "dimensionNumber": "16",
-      "dimensionName": "security-multi-tenant-isolation",
-      "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
-      "status": "completed",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:27:06.180Z",
-      "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:29:27.492Z"
-    },
-    {
-      "dimensionNumber": "17",
-      "dimensionName": "developer-experience-operational-ergonomics",
-      "dimensionTitle": "Dimension: Developer Experience & Operational Ergonomics",
-      "status": "running",
-      "attempts": 2,
-      "lastError": "Synthesis completed (exit 0) but report file was not generated",
-      "lastAttemptAt": "2026-05-20T21:06:02.243Z",
-      "nextRetryAt": "2026-05-20T21:06:02.236Z",
-      "completedAt": null
-    },
-    {
-      "dimensionNumber": "18",
-      "dimensionName": "governance-evolution-strategy",
-      "dimensionTitle": "Dimension: Governance & Evolution Strategy",
-      "status": "completed",
-      "attempts": 1,
-      "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:44:01.366Z",
-      "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:47:59.233Z"
+      "completedAt": "2026-05-21T11:08:44.222Z"
     },
     {
       "dimensionNumber": "06",
@@ -2001,9 +2012,141 @@
       "status": "completed",
       "attempts": 1,
       "lastError": null,
-      "lastAttemptAt": "2026-05-20T20:55:17.318Z",
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
       "nextRetryAt": null,
-      "completedAt": "2026-05-20T20:56:13.219Z"
+      "completedAt": "2026-05-21T11:08:44.222Z"
+    },
+    {
+      "dimensionNumber": "07",
+      "dimensionName": "data-ingestion-processing-pipelines",
+      "dimensionTitle": "Dimension: Data Ingestion & Processing Pipelines",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.222Z"
+    },
+    {
+      "dimensionNumber": "08",
+      "dimensionName": "state-management-persistence",
+      "dimensionTitle": "Dimension: State Management & Persistence",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.222Z"
+    },
+    {
+      "dimensionNumber": "09",
+      "dimensionName": "observability-operational-visibility",
+      "dimensionTitle": "Dimension: Observability & Operational Visibility",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.222Z"
+    },
+    {
+      "dimensionNumber": "10",
+      "dimensionName": "error-taxonomy-failure-handling",
+      "dimensionTitle": "Dimension: Error Taxonomy & Failure Handling",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.222Z"
+    },
+    {
+      "dimensionNumber": "11",
+      "dimensionName": "ai-runtime-model-abstraction",
+      "dimensionTitle": "Dimension: AI Runtime & Model Abstraction",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.222Z"
+    },
+    {
+      "dimensionNumber": "12",
+      "dimensionName": "workflow-agent-orchestration",
+      "dimensionTitle": "Dimension: Workflow / Agent Orchestration",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.222Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.222Z"
+    },
+    {
+      "dimensionNumber": "14",
+      "dimensionName": "testing-strategy-reliability",
+      "dimensionTitle": "Dimension: Testing Strategy & Reliability Engineering",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.223Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.223Z"
+    },
+    {
+      "dimensionNumber": "15",
+      "dimensionName": "performance-resource-discipline",
+      "dimensionTitle": "Dimension: Performance & Resource Discipline",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.223Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.223Z"
+    },
+    {
+      "dimensionNumber": "16",
+      "dimensionName": "security-multi-tenant-isolation",
+      "dimensionTitle": "Dimension: Security & Multi-Tenant Isolation",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.223Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.223Z"
+    },
+    {
+      "dimensionNumber": "17",
+      "dimensionName": "developer-experience-operational-ergonomics",
+      "dimensionTitle": "Dimension: Developer Experience & Operational Ergonomics",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.223Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.223Z"
+    },
+    {
+      "dimensionNumber": "18",
+      "dimensionName": "governance-evolution-strategy",
+      "dimensionTitle": "Dimension: Governance & Evolution Strategy",
+      "status": "completed",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.223Z",
+      "nextRetryAt": null,
+      "completedAt": "2026-05-21T11:08:44.223Z"
+    },
+    {
+      "dimensionNumber": "13",
+      "dimensionName": "extensibility-plugin-architecture",
+      "dimensionTitle": "Dimension: Extensibility & Plugin Architecture",
+      "status": "running",
+      "attempts": 1,
+      "lastError": null,
+      "lastAttemptAt": "2026-05-21T11:08:44.228Z",
+      "nextRetryAt": null,
+      "completedAt": null
     }
   ],
   "isComplete": false

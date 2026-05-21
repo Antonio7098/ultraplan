@@ -443,18 +443,24 @@ function createInitialState(ROOT: string, allSources: Source[], allDimensions: D
       return task && task.status === "completed"
     })
     if (allDone && allSources.length > 0) {
-      synthesisTasks.push({
-        dimensionNumber: d.number,
-        dimensionName: d.name,
-        dimensionTitle: d.title,
-        status: "completed",
-        attempts: 1,
-        lastError: null,
-        lastAttemptAt: new Date().toISOString(),
-        nextRetryAt: null,
-        completedAt: new Date().toISOString(),
-      })
-      console.log(`  Synthesis for ${d.title} already complete — report found`)
+      const reportPath = join(ROOT, "reports/final", `${d.number}-${d.name}.md`)
+      const reportExists = existsSync(reportPath)
+      if (reportExists) {
+        synthesisTasks.push({
+          dimensionNumber: d.number,
+          dimensionName: d.name,
+          dimensionTitle: d.title,
+          status: "completed",
+          attempts: 1,
+          lastError: null,
+          lastAttemptAt: new Date().toISOString(),
+          nextRetryAt: null,
+          completedAt: new Date().toISOString(),
+        })
+        console.log(`  Synthesis for ${d.title} already complete — report found`)
+      } else {
+        console.log(`  Synthesis for ${d.title} pending — report missing`)
+      }
     }
   }
 
